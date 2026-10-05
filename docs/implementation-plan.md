@@ -44,4 +44,4 @@ India, England, and Australia are the launch countries. The featured demo match 
 
 ## Verification
 
-`pnpm ci` runs lint, typecheck, unit tests, and the production build. `pnpm test:e2e` runs Playwright against `pnpm dev`. There is no interactive browser tool in this environment, so end-to-end coverage is Playwright and HTTP checks.
+`pnpm run ci` runs lint, typecheck, unit tests, and the production build. `pnpm test:e2e` runs Playwright against `pnpm dev`. There is no interactive browser tool in this environment, so end-to-end coverage is Playwright and HTTP checks.
