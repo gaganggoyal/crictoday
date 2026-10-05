@@ -34,7 +34,9 @@ test("a visitor can search, filter, and open a ground", async ({ page }) => {
   );
   expect(calendar.status()).toBe(200);
   expect(calendar.headers()["content-type"]).toContain("text/calendar");
-  expect(await calendar.text()).toContain("BEGIN:VCALENDAR");
+  const ics = await calendar.text();
+  expect(ics).toContain("BEGIN:VCALENDAR");
+  expect(ics).toContain("LOCATION:Narendra Modi Stadium\\, Ahmedabad");
 });
 
 test("ticket states and the outbound interstitial stay honest", async ({ page }) => {
@@ -54,9 +56,11 @@ test("ticket states and the outbound interstitial stay honest", async ({ page })
 
   await page.goto("/match/england-vs-new-zealand-lords-2026-10-20");
   await expect(page.getByText("This match is postponed")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Add to calendar" })).toHaveCount(0);
 
   await page.goto("/match/surrey-vs-yorkshire-birmingham-2026-10-22");
   await expect(page.getByText("This match is cancelled")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Add to calendar" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Request ticket alert" })).toHaveCount(0);
 
   await page.goto("/match/india-vs-australia-1st-test-ahmedabad-2026-10-16");

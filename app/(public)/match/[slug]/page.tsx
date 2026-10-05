@@ -148,12 +148,14 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
             >
               Open map
             </a>
-            <a
-              className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-medium"
-              href={`/match/${match.slug}/calendar`}
-            >
-              Add to calendar
-            </a>
+            {state === "CANCELLED" || state === "POSTPONED" ? null : (
+              <a
+                className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-medium"
+                href={`/match/${match.slug}/calendar`}
+              >
+                Add to calendar
+              </a>
+            )}
             <ShareButton title={`${match.homeName} vs ${match.awayName}`} />
           </div>
           <section>
