@@ -1,26 +1,138 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f3f5ef;
+  --foreground: #162018;
+  --surface: #fffefb;
+  --muted: #3e4a42;
+  --line: #d9e0d4;
+  --pitch: #176b43;
+  --pitch-deep: #105535;
+  --ball: #d85f25;
+  --link: #176b43;
+  --danger: #8c2f1b;
+  --warning: #8a5a12;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #101612;
+  --foreground: #f3f5ef;
+  --surface: #1a2420;
+  --muted: #c5d0c6;
+  --line: #2c3b33;
+  --pitch: #176b43;
+  --pitch-deep: #0d3f28;
+  --ball: #f08a52;
+  --link: #8ee0b0;
+  --danger: #ffb4a2;
+  --warning: #f0c27a;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-pitch: var(--pitch);
+  --color-pitch-deep: var(--pitch-deep);
+  --color-ball: var(--ball);
+  --color-link: var(--link);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-satoshi), "Satoshi", "Avenir Next", sans-serif;
+  --font-display: var(--font-cabinet), "Cabinet Grotesk", "Avenir Next", sans-serif;
+  --radius-card: 1.25rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ball);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #176b43;
+  color: #fffefb;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  animation: ticker 48s linear infinite;
+}
+
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+  animation-play-state: paused;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.field {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.65rem 0.8rem;
+}
+
+.field:focus {
+  outline: 2px solid var(--ball);
+  outline-offset: 2px;
 }

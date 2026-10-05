@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# cricketmatch.today
 
-## Getting Started
+Find the match. Feel the ground.
 
-First, run the development server:
+Upcoming cricket by country, ground, and local time, with an official or authorised way in when one has been reviewed. This repository is the Next.js app for that product.
+
+## Run the demo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://127.0.0.1:3000. The demo banner is intentional. Fixtures, prices, and ticket domains in that mode are illustrative. Demo sign-in addresses, local development only:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `admin@cricketmatch.today`
+- `moderator@cricketmatch.today`
+- `organiser@cricketmatch.today`
+- `academy@cricketmatch.today`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The sign-in page shows the magic link when demo roles are allowed. Nothing is emailed unless `RESEND_API_KEY` and `EMAIL_FROM` are set. With Supabase configured, sign-in uses Supabase magic links instead of the demo cookie.
 
-## Learn More
+## Checks
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm ci
+pnpm test:e2e
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`pnpm ci` is lint, typecheck, unit tests, and the production build. Playwright installs a browser on first run and drives `pnpm dev`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Production
 
-## Deploy on Vercel
+Copy `.env.example` to `.env.local` and fill in the values you have. Leave `ALLOW_DEMO_DATA` unset on the public site. Without Supabase, a production process shows an empty catalog rather than the demo seed.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Read [docs/implementation-plan.md](docs/implementation-plan.md), [docs/deployment.md](docs/deployment.md), and [docs/production-checklist.md](docs/production-checklist.md) before deploying. Current gaps are in [docs/progress.md](docs/progress.md).
