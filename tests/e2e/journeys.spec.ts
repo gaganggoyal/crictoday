@@ -154,7 +154,11 @@ test("a fan can request, confirm, and stop a ticket alert", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Alert stopped" })).toBeVisible();
 });
 
-test("an organiser lists a match and a moderator publishes the ticket link", async ({ page }) => {
+test("an organiser lists a match and a moderator publishes the ticket link", async ({
+  page,
+  browser,
+  baseURL,
+}) => {
   const stamp = Date.now();
   const email = `club-${stamp}@example.com`;
   const home = `Harbour ${stamp}`;
@@ -196,22 +200,23 @@ test("an organiser lists a match and a moderator publishes the ticket link", asy
   await page.getByRole("button", { name: "Save decision" }).click();
   await expect(page.getByText("Decision saved.")).toBeVisible();
 
-  // A fan confirms an alert while the ticket link is still pending.
-  await page.context().clearCookies();
-  await page.goto(`/matches?q=${encodeURIComponent(home)}`);
-  await page
+  // A fan confirms an alert in their own browser while the ticket link is still pending.
+  const fanContext = await browser.newContext({ baseURL });
+  const fan = await fanContext.newPage();
+  await fan.goto(`/matches?q=${encodeURIComponent(home)}`);
+  await fan
     .getByRole("link", { name: new RegExp(home) })
     .first()
     .click();
-  await page.getByRole("textbox", { name: "Email", exact: true }).fill(`fan-${stamp}@example.com`);
-  await page.getByLabel("Your country").fill("India");
-  await page.getByRole("checkbox", { name: /Email me about this match only/ }).check();
-  await page.getByRole("button", { name: "Request ticket alert" }).click();
-  await page.getByRole("link", { name: "Demo inbox: open the confirmation link" }).click();
-  await page.getByRole("button", { name: "Confirm alert" }).click();
-  await expect(page.getByRole("heading", { name: "Alert confirmed" })).toBeVisible();
+  await fan.getByRole("textbox", { name: "Email", exact: true }).fill(`fan-${stamp}@example.com`);
+  await fan.getByLabel("Your country").fill("India");
+  await fan.getByRole("checkbox", { name: /Email me about this match only/ }).check();
+  await fan.getByRole("button", { name: "Request ticket alert" }).click();
+  await fan.getByRole("link", { name: "Demo inbox: open the confirmation link" }).click();
+  await fan.getByRole("button", { name: "Confirm alert" }).click();
+  await expect(fan.getByRole("heading", { name: "Alert confirmed" })).toBeVisible();
+  await fanContext.close();
 
-  await signIn(page, "admin@cricketmatch.today");
   await page.goto("/admin/ticket-links");
   const card = page.locator("li").filter({ hasText: home });
   await card.getByRole("button", { name: "Approve link" }).click();
