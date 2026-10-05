@@ -19,8 +19,9 @@ import type {
   Submission,
 } from "@/lib/domain/types";
 import { DEFAULT_ALLOW_DOMAINS, DEFAULT_DENY_DOMAINS, academies, matches } from "@/lib/data/seed";
+import { ticketAlertMessage, type EmailMatch } from "@/lib/email/messages";
 
-export type EmailDraft = { to: string; subject: string; text: string };
+export type EmailDraft = { to: string; subject: string; text: string; html?: string };
 
 export type WorkflowFailure = { ok: false; errors: Record<string, string>; store?: StoreShape };
 export type WorkflowSuccess<T> = {
@@ -681,22 +682,11 @@ export function reviewSubmission(
 
 /** The alert for an approved offer. approve_ticket_offer in the Supabase migration sends the same text. */
 export function ticketAlertEmail(
-  match: Pick<StoredMatch, "homeName" | "awayName" | "venueName" | "cityName">,
+  match: EmailMatch,
   offer: Pick<StoredOffer, "sellerName" | "sellerDomain" | "url">,
   to: string,
 ): EmailDraft {
-  return {
-    to,
-    subject: `Ticket alert: ${match.homeName} vs ${match.awayName}`,
-    text: [
-      `${match.homeName} vs ${match.awayName}`,
-      `${match.venueName}, ${match.cityName}`,
-      `Seller: ${offer.sellerName}`,
-      `Domain: ${offer.sellerDomain}`,
-      `Link: ${offer.url}`,
-      "This alert does not reserve a ticket.",
-    ].join("\n"),
-  };
+  return { to, ...ticketAlertMessage(match, offer) };
 }
 
 export function approveOffer(

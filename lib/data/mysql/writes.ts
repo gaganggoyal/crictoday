@@ -2,9 +2,10 @@ import { randomUUID } from "node:crypto";
 import type { Pool, PoolConnection, RowDataPacket } from "mysql2/promise";
 import { normalizeName } from "@/lib/domain/duplicates";
 import { slugify, uniqueSlug } from "@/lib/domain/slug";
-import type { Role, StoredAcademy, StoredMatch } from "@/lib/domain/types";
+import type { MatchFormat, Role, StoredAcademy, StoredMatch } from "@/lib/domain/types";
 import { assertHttpsUrl } from "@/lib/domain/urls";
 import { ticketAlertEmail, type EmailDraft } from "@/lib/domain/workflows";
+import type { EmailMatch } from "@/lib/email/messages";
 import { DomainError, withTransaction } from "@/lib/data/mysql/pool";
 import {
   insertAcademy,
@@ -593,7 +594,8 @@ export async function approveOffer(
     );
     const [rows] = await connection.query<RowDataPacket[]>(
       `SELECT o.id, o.url, o.status, o.seller_name, o.seller_domain, o.match_id,
-              m.slug AS match_slug, m.home_name, m.away_name, m.venue_name, m.city_name
+              m.slug AS match_slug, m.home_name, m.away_name, m.venue_name, m.city_name,
+              m.competition_name, m.format, m.starts_at, m.timezone
        FROM ticket_offers o JOIN matches m ON m.id = o.match_id
        WHERE o.id = ? FOR UPDATE`,
       [input.offerId],
@@ -628,11 +630,16 @@ export async function approveOffer(
       "SELECT id, encrypted_email FROM ticket_requests WHERE match_id = ? AND status = 'active' FOR UPDATE",
       [offer.match_id],
     );
-    const match = {
+    const match: EmailMatch = {
+      slug: String(offer.match_slug),
       homeName: String(offer.home_name),
       awayName: String(offer.away_name),
       venueName: String(offer.venue_name),
       cityName: String(offer.city_name),
+      competitionName: String(offer.competition_name),
+      format: offer.format as MatchFormat,
+      startsAt: (offer.starts_at as Date).toISOString(),
+      timezone: String(offer.timezone),
     };
     const sold = {
       sellerName: String(offer.seller_name),

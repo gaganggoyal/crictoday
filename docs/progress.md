@@ -22,6 +22,7 @@ Updated 5 October 2026, after the VPS deployment.
 - Test pass on 5 October 2026. Fixed: an open redirect through the sign-in `next` path, forms that cleared input after a server error (including a review form that fell back to Approve), alert links that changed state on a GET, an invalid `.ics` export, the alert email text and failed-send handling, an unreadable dark-mode hero select, the Next.js 16 scroll warning, and `pnpm ci` in the docs. 18 Playwright and 34 Vitest tests pass.
 - Production runs on the VPS with MySQL since 5 October 2026, at https://cricketmatch.today. The labelled DEMO catalogue is loaded and `admin@cricketmatch.today` is the admin. See [deployment.md](deployment.md).
 - Email is on since 5 October 2026. Resend sends from `hello@cricketmatch.today` with a send-only key, and Spaceship forwards `admin@` and `hello@`. A sign-in email to admin@ and a test to hello@ were both delivered. On the server, `pnpm db sign-in-link <email>` prints a one-time sign-in link without email.
+- Emails are HTML in the site's style, with a plain-text part: the logo, the ball-in-grass banner, and for alerts a match panel with kick-off, venue and seller. `pnpm email:preview` writes or sends samples.
 
 ## Not done
 
