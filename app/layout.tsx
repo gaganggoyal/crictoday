@@ -53,6 +53,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${cabinet.variable} ${satoshi.variable} h-full max-md:scroll-pb-24`}
       suppressHydrationWarning
     >
