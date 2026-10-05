@@ -23,9 +23,14 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
 
   if (state?.ok) {
     return (
-      <div role="status" className="grid gap-2 rounded-2xl border border-line bg-background p-4 text-sm">
+      <div
+        role="status"
+        className="grid gap-2 rounded-2xl border border-line bg-background p-4 text-sm"
+      >
         <p className="font-medium">
-          {state.already ? "You already have an alert for this match." : "Check your email to confirm the alert."}
+          {state.already
+            ? "You already have an alert for this match."
+            : "Check your email to confirm the alert."}
         </p>
         <p className="text-muted">Confirming does not reserve a seat or guarantee an offer.</p>
         {"demoVerify" in state && state.demoVerify ? (
@@ -37,7 +42,10 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
         ) : null}
         {"demoUnsubscribe" in state && state.demoUnsubscribe ? (
           <p>
-            <a className="font-medium text-link" href={`/requests/${state.demoUnsubscribe}?intent=unsubscribe`}>
+            <a
+              className="font-medium text-link"
+              href={`/requests/${state.demoUnsubscribe}?intent=unsubscribe`}
+            >
               Demo inbox: stop this alert
             </a>
           </p>
@@ -61,7 +69,13 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
       <Honeypot />
       <label className="grid gap-1 text-sm font-medium">
         Email
-        <input className="field" type="email" autoComplete="email" {...form.register("email")} aria-invalid={Boolean(form.formState.errors.email || errors.email)} />
+        <input
+          className="field"
+          type="email"
+          autoComplete="email"
+          {...form.register("email")}
+          aria-invalid={Boolean(form.formState.errors.email || errors.email)}
+        />
         <Error message={form.formState.errors.email?.message || errors.email} />
       </label>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -81,11 +95,21 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
         <input className="field" {...form.register("notes")} />
       </label>
       <label className="flex min-h-11 items-start gap-2 text-sm">
-        <input type="checkbox" value="true" className="mt-1 h-5 w-5" {...form.register("consent")} />
-        <span>Email me about this match only. I understand a request does not reserve a ticket.</span>
+        <input
+          type="checkbox"
+          value="true"
+          className="mt-1 h-5 w-5"
+          {...form.register("consent")}
+        />
+        <span>
+          Email me about this match only. I understand a request does not reserve a ticket.
+        </span>
       </label>
       <Error message={form.formState.errors.consent?.message || errors.consent || errors.form} />
-      <button className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white disabled:opacity-60" disabled={pending}>
+      <button
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white disabled:opacity-60"
+        disabled={pending}
+      >
         {pending ? "Sending" : cta}
       </button>
     </form>

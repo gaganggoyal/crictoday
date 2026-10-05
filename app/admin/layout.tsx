@@ -21,12 +21,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">Moderation</p>
       <nav aria-label="Moderation" className="mt-3 flex flex-wrap gap-2">
         {links.map(([href, label]) => (
-          <Link key={href} href={href} className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm">
+          <Link
+            key={href}
+            href={href}
+            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm"
+          >
             {label}
           </Link>
         ))}
         <form action={signOutAction}>
-          <button className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm" type="submit">
+          <button
+            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm"
+            type="submit"
+          >
             Sign out
           </button>
         </form>

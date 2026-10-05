@@ -23,11 +23,17 @@ export default async function LoginPage({
         <h1 className="font-display text-4xl font-extrabold">You are signed in</h1>
         <p className="mt-3 text-sm text-muted">This browser is signed in as {session.email}.</p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/dashboard" className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white">
+          <Link
+            href="/dashboard"
+            className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+          >
             Your account
           </Link>
           <form action={signOutAction}>
-            <button className="inline-flex min-h-11 items-center rounded-full border border-line px-5" type="submit">
+            <button
+              className="inline-flex min-h-11 items-center rounded-full border border-line px-5"
+              type="submit"
+            >
               Sign out
             </button>
           </form>
@@ -39,14 +45,21 @@ export default async function LoginPage({
     <div className="mx-auto w-full max-w-md px-5 py-12">
       <h1 className="font-display text-4xl font-extrabold">Sign in</h1>
       <p className="mt-3 text-sm text-muted">We email a link. There is no password.</p>
-      {linkError ? <p className="mt-4 text-sm" role="alert">That sign-in link is invalid or has expired.</p> : null}
+      {linkError ? (
+        <p className="mt-4 text-sm" role="alert">
+          That sign-in link is invalid or has expired.
+        </p>
+      ) : null}
       <div className="mt-6">
         <LoginForm next={next} />
       </div>
       {demoRolesAllowed() ? (
         <aside className="mt-6 rounded-2xl border border-line bg-surface p-4 text-sm text-muted">
           <p className="font-medium text-foreground">Demo roles</p>
-          <p className="mt-1">admin@cricketmatch.today, moderator@cricketmatch.today, organiser@cricketmatch.today, academy@cricketmatch.today. Any other email is a fan.</p>
+          <p className="mt-1">
+            admin@cricketmatch.today, moderator@cricketmatch.today, organiser@cricketmatch.today,
+            academy@cricketmatch.today. Any other email is a fan.
+          </p>
         </aside>
       ) : null}
     </div>

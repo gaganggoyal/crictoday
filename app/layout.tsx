@@ -51,7 +51,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const demo = dataMode() === "demo";
 
   return (
-    <html lang="en" className={`${cabinet.variable} ${satoshi.variable} h-full max-md:scroll-pb-24`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${cabinet.variable} ${satoshi.variable} h-full max-md:scroll-pb-24`}
+      suppressHydrationWarning
+    >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground antialiased">
         <AppThemeProvider>
           <a

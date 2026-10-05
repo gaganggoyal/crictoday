@@ -61,7 +61,9 @@ export function manualFixtureProvider(): FixtureProvider {
   };
 }
 
-export function sportMonksFixtureProvider(token = process.env.SPORTMONKS_API_TOKEN): FixtureProvider | null {
+export function sportMonksFixtureProvider(
+  token = process.env.SPORTMONKS_API_TOKEN,
+): FixtureProvider | null {
   if (!token) return null;
   return {
     name: "sportmonks",
@@ -97,7 +99,9 @@ export function sportMonksFixtureProvider(token = process.env.SPORTMONKS_API_TOK
   };
 }
 
-export function ticketmasterProvider(apiKey = process.env.TICKETMASTER_API_KEY): TicketProvider | null {
+export function ticketmasterProvider(
+  apiKey = process.env.TICKETMASTER_API_KEY,
+): TicketProvider | null {
   if (!apiKey) return null;
   return {
     name: "ticketmaster",
@@ -106,8 +110,18 @@ export function ticketmasterProvider(apiKey = process.env.TICKETMASTER_API_KEY):
       url.searchParams.set("apikey", apiKey);
       url.searchParams.set("keyword", `${match.home} ${match.away} cricket`);
       url.searchParams.set("classificationName", "sports");
-      url.searchParams.set("startDateTime", new Date(new Date(match.startsAt).getTime() - 36 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, "Z"));
-      url.searchParams.set("endDateTime", new Date(new Date(match.startsAt).getTime() + 36 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, "Z"));
+      url.searchParams.set(
+        "startDateTime",
+        new Date(new Date(match.startsAt).getTime() - 36 * 60 * 60 * 1000)
+          .toISOString()
+          .replace(/\.\d{3}Z$/, "Z"),
+      );
+      url.searchParams.set(
+        "endDateTime",
+        new Date(new Date(match.startsAt).getTime() + 36 * 60 * 60 * 1000)
+          .toISOString()
+          .replace(/\.\d{3}Z$/, "Z"),
+      );
       url.searchParams.set("size", "5");
       const body = (await fetchJson(url.toString())) as {
         _embedded?: { events?: TicketmasterEvent[] };

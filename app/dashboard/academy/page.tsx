@@ -12,7 +12,9 @@ export default async function DashboardAcademyPage() {
         {owned.map((academy) => (
           <li key={academy.slug} className="rounded-2xl border border-line bg-surface p-4">
             <p className="font-medium">{academy.name}</p>
-            <p className="text-sm text-muted">{academy.verificationLabel || academy.verificationStatus}</p>
+            <p className="text-sm text-muted">
+              {academy.verificationLabel || academy.verificationStatus}
+            </p>
             {academy.verificationStatus === "verified" ? (
               <Link href={`/academy/${academy.slug}`}>View public profile</Link>
             ) : null}

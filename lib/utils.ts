@@ -16,6 +16,7 @@ export function firstParam(value: string | string[] | undefined) {
 }
 
 export function safeNextPath(value: string | null | undefined) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\"))
+    return "/dashboard";
   return value;
 }

@@ -28,9 +28,9 @@ export const matchSubmissionSchema = z
     ticketSeller: z.string().trim().max(80).optional().or(z.literal("")),
     entryNotes: z.string().trim().max(500).optional().or(z.literal("")),
     consent: z.preprocess(
-    (value) => value === true || value === "true" || value === "on",
-    z.literal(true, { error: "Confirm you are allowed to submit this fixture." }),
-  ),
+      (value) => value === true || value === "true" || value === "on",
+      z.literal(true, { error: "Confirm you are allowed to submit this fixture." }),
+    ),
     companyWebsite: z.string().optional(),
   })
   .superRefine((value, context) => {
@@ -72,8 +72,16 @@ export const academySubmissionSchema = z.object({
     .refine((value) => !value || Boolean(assertHttpsUrl(value)), "Website must be an HTTPS URL."),
   ageGroups: z.array(z.string().trim().min(1)).min(1, "Select at least one age group."),
   facilities: z.array(z.string().trim().min(1)).min(1, "Select at least one facility."),
-  description: z.string().trim().min(20, "Describe the academy in at least 20 characters.").max(800),
-  evidence: z.string().trim().min(10, "Add a short note about how you can prove ownership.").max(500),
+  description: z
+    .string()
+    .trim()
+    .min(20, "Describe the academy in at least 20 characters.")
+    .max(800),
+  evidence: z
+    .string()
+    .trim()
+    .min(10, "Add a short note about how you can prove ownership.")
+    .max(500),
   claimSlug: z.string().trim().optional().or(z.literal("")),
   consent: z.preprocess(
     (value) => value === true || value === "true" || value === "on",
@@ -102,7 +110,11 @@ export const ticketRequestSchema = z.object({
 export const correctionSchema = z.object({
   matchSlug: z.string().trim().min(1),
   email: z.string().trim().email("Enter a valid email.").optional().or(z.literal("")),
-  details: z.string().trim().min(12, "Describe what is wrong, including the correct detail.").max(800),
+  details: z
+    .string()
+    .trim()
+    .min(12, "Describe what is wrong, including the correct detail.")
+    .max(800),
   companyWebsite: z.string().optional(),
 });
 

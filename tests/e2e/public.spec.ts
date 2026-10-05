@@ -2,8 +2,12 @@ import { expect, test } from "@playwright/test";
 
 test("home states the product", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Find the match. Feel the ground.");
-  await expect(page.getByText("Demo inventory. Fixtures, prices and ticket links are illustrative")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Find the match. Feel the ground.",
+  );
+  await expect(
+    page.getByText("Demo inventory. Fixtures, prices and ticket links are illustrative"),
+  ).toBeVisible();
 });
 
 test("filters stay in the address bar", async ({ page }) => {
@@ -46,7 +50,9 @@ test("a demo admin reaches moderation and the role form on a phone", async ({ pa
   await expect(page.getByRole("heading", { name: "Moderation queue" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Roles" })).toBeVisible();
   await expect(page.getByLabel("Account email or user id")).toBeVisible();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+  );
   expect(overflow).toBe(false);
 });
 

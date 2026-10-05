@@ -13,10 +13,20 @@ export function LoginForm({ next }: { next?: string }) {
       {next ? <input type="hidden" name="next" value={next} /> : null}
       <label className="grid gap-1.5 text-sm font-medium">
         Email
-        <input className="field" type="email" name="email" autoComplete="email" required aria-invalid={Boolean(errors.email)} />
+        <input
+          className="field"
+          type="email"
+          name="email"
+          autoComplete="email"
+          required
+          aria-invalid={Boolean(errors.email)}
+        />
         <Error message={errors.email || errors.form} />
       </label>
-      <button className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white" disabled={pending}>
+      <button
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+        disabled={pending}
+      >
         {pending ? "Sending" : "Email me a sign-in link"}
       </button>
     </form>

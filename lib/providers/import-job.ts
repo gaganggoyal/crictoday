@@ -15,7 +15,9 @@ export async function runImport(now = new Date()) {
   }
   const store = readStore();
   const active = store.importRuns.find(
-    (run) => run.status === "running" && now.getTime() - new Date(run.startedAt).getTime() < 10 * 60 * 1000,
+    (run) =>
+      run.status === "running" &&
+      now.getTime() - new Date(run.startedAt).getTime() < 10 * 60 * 1000,
   );
   if (active) {
     return { status: "skipped", reason: "An import is already running." };
@@ -90,7 +92,9 @@ export async function runImport(now = new Date()) {
     }));
     if (tickets) {
       for (const fixture of plan.inserts) {
-        const created = working.extraMatches.find((item) => item.sourceExternalId === fixture.externalId);
+        const created = working.extraMatches.find(
+          (item) => item.sourceExternalId === fixture.externalId,
+        );
         if (!created) continue;
         try {
           const found = await tickets.findOffers(fixture);
@@ -117,7 +121,10 @@ export async function runImport(now = new Date()) {
           deadLetters.push({
             id: crypto.randomUUID(),
             provider: "ticketmaster",
-            reason: error instanceof Error ? error.message : "Ticket lookup failed. No offer was published.",
+            reason:
+              error instanceof Error
+                ? error.message
+                : "Ticket lookup failed. No offer was published.",
             createdAt: new Date().toISOString(),
           });
         }
@@ -136,7 +143,9 @@ export async function runImport(now = new Date()) {
                 fetchedCount: incoming.length,
                 insertedCount: applied.inserted,
                 updatedCount: applied.updated,
-                failedCount: plan.conflicts.length + deadLetters.filter((item) => item.provider === "ticketmaster").length,
+                failedCount:
+                  plan.conflicts.length +
+                  deadLetters.filter((item) => item.provider === "ticketmaster").length,
                 errorSummary:
                   plan.conflicts.length > 0
                     ? `${plan.conflicts.length} fixtures conflicted with existing records and were not written.`
@@ -148,7 +157,12 @@ export async function runImport(now = new Date()) {
       now,
     );
     writeStore(next);
-    return { status: "succeeded", id: run.id, fetched: incoming.length, conflicts: plan.conflicts.length };
+    return {
+      status: "succeeded",
+      id: run.id,
+      fetched: incoming.length,
+      conflicts: plan.conflicts.length,
+    };
   } catch (error) {
     const current = readStore();
     writeStore({

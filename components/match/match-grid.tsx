@@ -16,13 +16,20 @@ export function EmptyResults({ title = "No matches in this view" }: { title?: st
     <div className="rounded-[1.25rem] border border-dashed border-line bg-surface p-8">
       <h2 className="font-display text-2xl font-extrabold">{title}</h2>
       <p className="mt-2 max-w-lg text-muted">
-        Remove a filter, try another city, or tell us a fixture is missing so a moderator can review it.
+        Remove a filter, try another city, or tell us a fixture is missing so a moderator can review
+        it.
       </p>
       <div className="mt-5 flex flex-wrap gap-3">
-        <a className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white" href="/matches">
+        <a
+          className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+          href="/matches"
+        >
           Clear filters
         </a>
-        <a className="inline-flex min-h-11 items-center rounded-full border border-line px-5 font-medium" href="/submit/match">
+        <a
+          className="inline-flex min-h-11 items-center rounded-full border border-line px-5 font-medium"
+          href="/submit/match"
+        >
           Submit a missing match
         </a>
       </div>

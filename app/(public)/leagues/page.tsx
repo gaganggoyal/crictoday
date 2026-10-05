@@ -16,12 +16,20 @@ export default async function LeaguesPage() {
       <h1 className="font-display text-5xl font-extrabold tracking-tight">Top leagues</h1>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {directory.leagues.map((league) => {
-          const count = directory.matches.filter((match) => match.competitionSlug === league.slug).length;
+          const count = directory.matches.filter(
+            (match) => match.competitionSlug === league.slug,
+          ).length;
           return (
-            <Link key={league.slug} href={`/league/${league.slug}`} className="rounded-[1.25rem] border border-line bg-surface p-5 no-underline">
+            <Link
+              key={league.slug}
+              href={`/league/${league.slug}`}
+              className="rounded-[1.25rem] border border-line bg-surface p-5 no-underline"
+            >
               <h2 className="font-display text-3xl font-extrabold">{league.name}</h2>
               <p className="mt-2 text-sm text-muted">{league.summary}</p>
-              <p className="mt-3 text-sm font-medium">{league.seasonName} · {count} fixtures</p>
+              <p className="mt-3 text-sm font-medium">
+                {league.seasonName} · {count} fixtures
+              </p>
             </Link>
           );
         })}

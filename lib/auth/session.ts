@@ -44,7 +44,11 @@ async function readSupabaseSession(): Promise<Session | null> {
   if (!supabase) return null;
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;
-  const profile = await supabase.from("profiles").select("role, email").eq("id", data.user.id).maybeSingle();
+  const profile = await supabase
+    .from("profiles")
+    .select("role, email")
+    .eq("id", data.user.id)
+    .maybeSingle();
   return {
     userId: data.user.id,
     email: data.user.email || profile.data?.email || "",

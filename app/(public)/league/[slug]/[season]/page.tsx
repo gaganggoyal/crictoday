@@ -4,19 +4,33 @@ import { getDirectory } from "@/lib/data/catalog";
 import { leagues } from "@/lib/data/seed";
 import { pageMetadata } from "@/lib/seo";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string; season: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string; season: string }>;
+}) {
   const { slug, season } = await params;
   const league = leagues.find((item) => item.slug === slug && item.seasonSlug === season);
   if (!league) notFound();
-  return pageMetadata(`${league.name} ${league.seasonName}`, league.summary, `/league/${slug}/${season}`);
+  return pageMetadata(
+    `${league.name} ${league.seasonName}`,
+    league.summary,
+    `/league/${slug}/${season}`,
+  );
 }
 
-export default async function SeasonPage({ params }: { params: Promise<{ slug: string; season: string }> }) {
+export default async function SeasonPage({
+  params,
+}: {
+  params: Promise<{ slug: string; season: string }>;
+}) {
   const { slug, season } = await params;
   const league = leagues.find((item) => item.slug === slug);
   if (!league) notFound();
   const directory = await getDirectory();
-  const matches = directory.matches.filter((match) => match.competitionSlug === slug && match.seasonSlug === season);
+  const matches = directory.matches.filter(
+    (match) => match.competitionSlug === slug && match.seasonSlug === season,
+  );
   if (league.seasonSlug !== season && matches.length === 0) notFound();
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">

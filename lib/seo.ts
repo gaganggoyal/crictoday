@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import type { StoredMatch } from "@/lib/domain/types";
 import { siteUrl } from "@/lib/utils";
 
-export function pageMetadata(title: string, description: string, path: string, index = true): Metadata {
+export function pageMetadata(
+  title: string,
+  description: string,
+  path: string,
+  index = true,
+): Metadata {
   const url = `${siteUrl()}${path}`;
   return {
     title,

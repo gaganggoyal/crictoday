@@ -8,7 +8,12 @@ export default async function AdminHome() {
   const cards = [
     ["Pending submissions", queue.submissions.filter((item) => item.status === "pending").length],
     ["Ticket links waiting", queue.offers.filter((item) => item.offer.status === "pending").length],
-    ["Corrections", queue.submissions.filter((item) => item.entityType === "correction" && item.status === "pending").length],
+    [
+      "Corrections",
+      queue.submissions.filter(
+        (item) => item.entityType === "correction" && item.status === "pending",
+      ).length,
+    ],
     ["Stale fixtures", queue.matches.filter((match) => isStale(match.lastVerifiedAt, now)).length],
     ["Failed imports", queue.importRuns.filter((run) => run.status === "failed").length],
     ["Dead letters", queue.deadLetters.length],
@@ -28,7 +33,8 @@ export default async function AdminHome() {
         <section className="mt-10">
           <h2 className="font-display text-2xl font-bold">Roles</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted">
-            The person must have signed in once. You cannot change your own role from this form. The first admin is still set in the SQL editor.
+            The person must have signed in once. You cannot change your own role from this form. The
+            first admin is still set in the SQL editor.
           </p>
           <RoleForm />
         </section>

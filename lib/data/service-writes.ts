@@ -24,7 +24,13 @@ function rpcFailure(error: { message: string; code?: string } | null): Failure |
 
 function service() {
   const client = supabaseService();
-  if (!client) return { client: null, error: failure({ form: "The server is missing SUPABASE_SECRET_KEY, so this action cannot be saved." }) };
+  if (!client)
+    return {
+      client: null,
+      error: failure({
+        form: "The server is missing SUPABASE_SECRET_KEY, so this action cannot be saved.",
+      }),
+    };
   return { client, error: null };
 }
 
@@ -109,7 +115,10 @@ export async function serviceCreateTicketRequest(input: {
   return { ok: true as const, id: body.id, already: Boolean(body.already) };
 }
 
-export async function serviceOpenTicketRequest(tokenHash: string, intent: "verify" | "unsubscribe") {
+export async function serviceOpenTicketRequest(
+  tokenHash: string,
+  intent: "verify" | "unsubscribe",
+) {
   const { client, error } = service();
   if (!client) return error;
   const { data, error: rpcError } = await client.rpc("open_ticket_request", {
@@ -119,10 +128,18 @@ export async function serviceOpenTicketRequest(tokenHash: string, intent: "verif
   const failed = rpcFailure(rpcError);
   if (failed) return failed;
   const body = asJson<{ match_slug: string; intent: string }>(data);
-  return { ok: true as const, matchSlug: body.match_slug, intent: body.intent === "unsubscribe" ? "unsubscribe" as const : "verify" as const };
+  return {
+    ok: true as const,
+    matchSlug: body.match_slug,
+    intent: body.intent === "unsubscribe" ? ("unsubscribe" as const) : ("verify" as const),
+  };
 }
 
-export async function serviceApproveOffer(input: { offerId: string; matchSlug: string; actorId: string }) {
+export async function serviceApproveOffer(input: {
+  offerId: string;
+  matchSlug: string;
+  actorId: string;
+}) {
   const { client, error } = service();
   if (!client) return error;
   const { data, error: rpcError } = await client.rpc("approve_ticket_offer", {

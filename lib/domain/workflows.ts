@@ -293,7 +293,12 @@ export function createCorrection(
 
 export function createTicketRequest(
   store: StoreShape,
-  input: TicketRequestInput & { emailHash: string; encryptedEmail: string; verifyTokenHash: string; unsubTokenHash: string },
+  input: TicketRequestInput & {
+    emailHash: string;
+    encryptedEmail: string;
+    verifyTokenHash: string;
+    unsubTokenHash: string;
+  },
   now: Date,
 ): WorkflowResult<{ id: string; already: boolean }> {
   const match = mergeMatches(store).find((item) => item.slug === input.matchSlug && item.sourceUrl);
@@ -304,7 +309,9 @@ export function createTicketRequest(
     (request) =>
       request.matchSlug === input.matchSlug &&
       request.emailHash === input.emailHash &&
-      (request.status === "pending_verification" || request.status === "active" || request.status === "notified"),
+      (request.status === "pending_verification" ||
+        request.status === "active" ||
+        request.status === "notified"),
   );
   if (existing) {
     return { ok: true, store, emails: [], result: { id: existing.id, already: true } };
@@ -343,7 +350,11 @@ export function verifyTicketRequest(
     return { ok: false, errors: { form: "This alert was unsubscribed." } };
   }
   const match = mergeMatches(store).find((item) => item.slug === request.matchSlug);
-  if (!match || new Date(match.startsAt).getTime() <= now.getTime() || match.status === "cancelled") {
+  if (
+    !match ||
+    new Date(match.startsAt).getTime() <= now.getTime() ||
+    match.status === "cancelled"
+  ) {
     return {
       ok: false,
       store: {
@@ -374,7 +385,9 @@ export function unsubscribeTicketRequest(
   tokenHash: string,
   now: Date,
 ): WorkflowResult<{ matchSlug: string }> {
-  const request = store.requests.find((item) => item.unsubTokenHash === tokenHash || item.verifyTokenHash === tokenHash);
+  const request = store.requests.find(
+    (item) => item.unsubTokenHash === tokenHash || item.verifyTokenHash === tokenHash,
+  );
   if (!request) return { ok: false, errors: { form: "This unsubscribe link is not valid." } };
   const next: StoreShape = {
     ...store,
@@ -382,14 +395,19 @@ export function unsubscribeTicketRequest(
       item.id === request.id ? { ...item, status: "unsubscribed" as const } : item,
     ),
   };
-  return auditResult(next, {
-    actorEmail: null,
-    action: "ticket_request.unsubscribed",
-    entityType: "ticket_request",
-    entityId: request.id,
-    before: { status: request.status },
-    after: { status: "unsubscribed" },
-  }, now, { matchSlug: request.matchSlug });
+  return auditResult(
+    next,
+    {
+      actorEmail: null,
+      action: "ticket_request.unsubscribed",
+      entityType: "ticket_request",
+      entityId: request.id,
+      before: { status: request.status },
+      after: { status: "unsubscribed" },
+    },
+    now,
+    { matchSlug: request.matchSlug },
+  );
 }
 
 function auditResult<T>(
@@ -427,7 +445,12 @@ export function reviewSubmission(
   }
 
   if (input.action === "reject" || input.action === "changes" || input.action === "merge") {
-    const status = input.action === "reject" ? "rejected" : input.action === "changes" ? "changes_requested" : "approved";
+    const status =
+      input.action === "reject"
+        ? "rejected"
+        : input.action === "changes"
+          ? "changes_requested"
+          : "approved";
     const updated: Submission = {
       ...submission,
       status,
@@ -440,14 +463,19 @@ export function reviewSubmission(
       ...store,
       submissions: store.submissions.map((item) => (item.id === submission.id ? updated : item)),
     };
-    return auditResult(next, {
-      actorEmail: input.actorEmail,
-      action: `submission.${input.action}`,
-      entityType: "submission",
-      entityId: submission.id,
-      before: { status: submission.status },
-      after: { status, reason, mergeTarget: input.mergeTarget || null },
-    }, now, { id: submission.id });
+    return auditResult(
+      next,
+      {
+        actorEmail: input.actorEmail,
+        action: `submission.${input.action}`,
+        entityType: "submission",
+        entityId: submission.id,
+        before: { status: submission.status },
+        after: { status, reason, mergeTarget: input.mergeTarget || null },
+      },
+      now,
+      { id: submission.id },
+    );
   }
 
   if (submission.entityType === "match") {
@@ -537,14 +565,19 @@ export function reviewSubmission(
           : item,
       ),
     };
-    return auditResult(next, {
-      actorEmail: input.actorEmail,
-      action: "submission.approve",
-      entityType: "match",
-      entityId: match.id,
-      before: null,
-      after: { slug: match.slug, sourceUrl: match.sourceUrl },
-    }, now, { id: submission.id });
+    return auditResult(
+      next,
+      {
+        actorEmail: input.actorEmail,
+        action: "submission.approve",
+        entityType: "match",
+        entityId: match.id,
+        before: null,
+        after: { slug: match.slug, sourceUrl: match.sourceUrl },
+      },
+      now,
+      { id: submission.id },
+    );
   }
 
   if (submission.entityType === "academy") {
@@ -602,14 +635,19 @@ export function reviewSubmission(
           : item,
       ),
     };
-    return auditResult(next, {
-      actorEmail: input.actorEmail,
-      action: "submission.approve",
-      entityType: "academy",
-      entityId: academy.id,
-      before: null,
-      after: { slug, verificationLabel: "Contact verified" },
-    }, now, { id: submission.id });
+    return auditResult(
+      next,
+      {
+        actorEmail: input.actorEmail,
+        action: "submission.approve",
+        entityType: "academy",
+        entityId: academy.id,
+        before: null,
+        after: { slug, verificationLabel: "Contact verified" },
+      },
+      now,
+      { id: submission.id },
+    );
   }
 
   const next = {
@@ -626,14 +664,19 @@ export function reviewSubmission(
         : item,
     ),
   };
-  return auditResult(next, {
-    actorEmail: input.actorEmail,
-    action: "submission.approve",
-    entityType: submission.entityType,
-    entityId: submission.id,
-    before: { status: submission.status },
-    after: { status: "approved" },
-  }, now, { id: submission.id });
+  return auditResult(
+    next,
+    {
+      actorEmail: input.actorEmail,
+      action: "submission.approve",
+      entityType: submission.entityType,
+      entityId: submission.id,
+      before: { status: submission.status },
+      after: { status: "approved" },
+    },
+    now,
+    { id: submission.id },
+  );
 }
 
 export function approveOffer(
@@ -705,7 +748,9 @@ export function recordClick(
   input: { offerId: string; referrer: string | null },
   now: Date,
 ): WorkflowResult<{ url: string; sellerName: string; sellerDomain: string; matchSlug: string }> {
-  const match = mergeMatches(store).find((item) => item.offers.some((offer) => offer.id === input.offerId));
+  const match = mergeMatches(store).find((item) =>
+    item.offers.some((offer) => offer.id === input.offerId),
+  );
   const offer = match?.offers.find((item) => item.id === input.offerId);
   if (!match || !offer || !offer.approved || offer.status !== "active") {
     return { ok: false, errors: { form: "That ticket link is not available." } };
@@ -775,18 +820,27 @@ export function markVerified(
   const match = mergeMatches(store).find((item) => item.slug === input.matchSlug);
   if (!match) return { ok: false, errors: { form: "Match not found." } };
   const next = saveMatch(store, { ...match, lastVerifiedAt: now.toISOString() });
-  return auditResult(next, {
-    actorEmail: input.actorEmail,
-    action: "match.verify",
-    entityType: "match",
-    entityId: match.id,
-    before: { lastVerifiedAt: match.lastVerifiedAt },
-    after: { lastVerifiedAt: now.toISOString() },
-  }, now, { slug: match.slug });
+  return auditResult(
+    next,
+    {
+      actorEmail: input.actorEmail,
+      action: "match.verify",
+      entityType: "match",
+      entityId: match.id,
+      before: { lastVerifiedAt: match.lastVerifiedAt },
+      after: { lastVerifiedAt: now.toISOString() },
+    },
+    now,
+    { slug: match.slug },
+  );
 }
 
 /** Turn a provider row into a catalog match. Ticket offers are never attached here. */
-export function materializeProviderMatch(match: NormalizedMatch, taken: Set<string>, now: Date): StoredMatch {
+export function materializeProviderMatch(
+  match: NormalizedMatch,
+  taken: Set<string>,
+  now: Date,
+): StoredMatch {
   const dateKey = match.startsAt.slice(0, 10);
   const slug = uniqueSlug(`${match.home} vs ${match.away} ${match.venue} ${dateKey}`, taken);
   taken.add(slug);
@@ -858,7 +912,8 @@ export function applyImportPlan(
 
   for (const update of plan.updates) {
     const current = mergeMatches(next).find((item) => item.id === update.id);
-    if (!current || current.sourceType === "organiser" || current.sourceType === "academy") continue;
+    if (!current || current.sourceType === "organiser" || current.sourceType === "academy")
+      continue;
     const patch: Partial<StoredMatch> = {
       startsAt: update.match.startsAt,
       status: update.match.status,
@@ -900,11 +955,15 @@ export function assignRole(
   input: { actorEmail: string; actorRole: Role; account: string; role: Role },
   now: Date,
 ): WorkflowResult<{ email: string }> {
-  if (input.actorRole !== "admin") return { ok: false, errors: { form: "Admin access is required." } };
+  if (input.actorRole !== "admin")
+    return { ok: false, errors: { form: "Admin access is required." } };
   const account = input.account.trim();
-  const user = store.users.find((item) => item.id === account || item.email === account.toLowerCase());
+  const user = store.users.find(
+    (item) => item.id === account || item.email === account.toLowerCase(),
+  );
   if (!user) return { ok: false, errors: { form: "That person has not signed in yet." } };
-  if (user.email === input.actorEmail.toLowerCase()) return { ok: false, errors: { form: "Choose another account." } };
+  if (user.email === input.actorEmail.toLowerCase())
+    return { ok: false, errors: { form: "Choose another account." } };
   const next = {
     ...store,
     users: store.users.map((item) => (item.id === user.id ? { ...item, role: input.role } : item)),

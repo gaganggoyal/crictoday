@@ -41,17 +41,33 @@ export function MatchCard({ match, now }: { match: StoredMatch; now: Date }) {
           </span>
         </p>
         <p className="mt-2 flex flex-wrap gap-2 text-xs text-muted">
-          <span className="rounded-full border border-line px-2 py-1">{FORMAT_LABEL[match.format]}</span>
+          <span className="rounded-full border border-line px-2 py-1">
+            {FORMAT_LABEL[match.format]}
+          </span>
           <span className="rounded-full border border-line px-2 py-1">{match.countryName}</span>
-          {match.demo ? <span className="rounded-full border border-line px-2 py-1">DEMO</span> : null}
-          {stale ? <span className="rounded-full border border-warning px-2 py-1 text-warning">Check verification</span> : null}
+          {match.demo ? (
+            <span className="rounded-full border border-line px-2 py-1">DEMO</span>
+          ) : null}
+          {stale ? (
+            <span className="rounded-full border border-warning px-2 py-1 text-warning">
+              Check verification
+            </span>
+          ) : null}
         </p>
       </div>
     </article>
   );
 }
 
-function Team({ name, code, align = "left" }: { name: string; code: string; align?: "left" | "right" }) {
+function Team({
+  name,
+  code,
+  align = "left",
+}: {
+  name: string;
+  code: string;
+  align?: "left" | "right";
+}) {
   return (
     <span className={align === "right" ? "text-right" : "text-left"}>
       <span className="font-display block text-3xl leading-none font-extrabold tracking-tight group-hover:text-link">

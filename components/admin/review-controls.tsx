@@ -4,7 +4,13 @@ import { useActionState } from "react";
 import { approveOfferAction, markVerifiedAction, reviewSubmissionAction } from "@/app/actions";
 import { Error } from "@/components/forms/request-form";
 
-export function ReviewControls({ id, mergeTargets }: { id: string; mergeTargets: Array<{ slug: string; label: string }> }) {
+export function ReviewControls({
+  id,
+  mergeTargets,
+}: {
+  id: string;
+  mergeTargets: Array<{ slug: string; label: string }>;
+}) {
   const [state, action, pending] = useActionState(reviewSubmissionAction, null);
   const errors = state && !state.ok ? state.errors : {};
   return (
@@ -37,7 +43,10 @@ export function ReviewControls({ id, mergeTargets }: { id: string; mergeTargets:
         <Error message={errors.mergeTarget || errors.form} />
       </label>
       {state?.ok ? <p role="status">Decision saved.</p> : null}
-      <button className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white" disabled={pending}>
+      <button
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+        disabled={pending}
+      >
         Save decision
       </button>
     </form>
@@ -50,11 +59,18 @@ export function OfferButton({ matchSlug, offerId }: { matchSlug: string; offerId
     <form action={action}>
       <input type="hidden" name="matchSlug" value={matchSlug} />
       <input type="hidden" name="offerId" value={offerId} />
-      <button className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-4 text-sm font-medium text-white" disabled={pending}>
+      <button
+        className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-4 text-sm font-medium text-white"
+        disabled={pending}
+      >
         Approve link
       </button>
       {state && !state.ok ? <Error message={state.errors.form} /> : null}
-      {state?.ok ? <p role="status">Approved. {state.notified} alert{state.notified === 1 ? "" : "s"} queued.</p> : null}
+      {state?.ok ? (
+        <p role="status">
+          Approved. {state.notified} alert{state.notified === 1 ? "" : "s"} queued.
+        </p>
+      ) : null}
     </form>
   );
 }
@@ -64,7 +80,10 @@ export function VerifyButton({ matchSlug }: { matchSlug: string }) {
   return (
     <form action={action}>
       <input type="hidden" name="matchSlug" value={matchSlug} />
-      <button className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm" disabled={pending}>
+      <button
+        className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm"
+        disabled={pending}
+      >
         Mark verified now
       </button>
       {state?.ok ? <p role="status">Verification time updated.</p> : null}

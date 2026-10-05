@@ -56,18 +56,22 @@ describe("ticket request workflow", () => {
       now,
     );
     expect(first.ok && first.result.already).toBe(false);
-    const second = createTicketRequest(first.ok ? first.store : emptyStore(), {
-      matchSlug: "india-vs-australia-2nd-test-delhi-2026-10-24",
-      email: "fan@example.com",
-      quantity: 2,
-      countryCode: "IN",
-      notes: "",
-      consent: true,
-      emailHash: "hash-1",
-      encryptedEmail: "cipher-text",
-      verifyTokenHash: "other",
-      unsubTokenHash: "other",
-    }, now);
+    const second = createTicketRequest(
+      first.ok ? first.store : emptyStore(),
+      {
+        matchSlug: "india-vs-australia-2nd-test-delhi-2026-10-24",
+        email: "fan@example.com",
+        quantity: 2,
+        countryCode: "IN",
+        notes: "",
+        consent: true,
+        emailHash: "hash-1",
+        encryptedEmail: "cipher-text",
+        verifyTokenHash: "other",
+        unsubTokenHash: "other",
+      },
+      now,
+    );
     expect(second.ok && second.result.already).toBe(true);
 
     const verified = verifyTicketRequest(first.ok ? first.store : emptyStore(), "verify-hash", now);
@@ -91,7 +95,9 @@ describe("ticket request workflow", () => {
   });
 
   it("emails an active alert only after the offer is approved", () => {
-    const base = matches.find((match) => match.slug === "india-vs-australia-2nd-test-delhi-2026-10-24");
+    const base = matches.find(
+      (match) => match.slug === "india-vs-australia-2nd-test-delhi-2026-10-24",
+    );
     expect(base).toBeTruthy();
     const pending = {
       id: "pending-offer",
@@ -108,9 +114,16 @@ describe("ticket request workflow", () => {
     const store = {
       ...emptyStore(),
       extraMatches: [{ ...base!, offers: [pending] }],
-      requests: [request({ status: "active" }), request({ id: "req-2", status: "pending_verification", emailHash: "hash-2" })],
+      requests: [
+        request({ status: "active" }),
+        request({ id: "req-2", status: "pending_verification", emailHash: "hash-2" }),
+      ],
     };
-    const approved = approveOffer(store, { matchSlug: base!.slug, offerId: pending.id, actorEmail: "moderator@cricketmatch.today" }, now);
+    const approved = approveOffer(
+      store,
+      { matchSlug: base!.slug, offerId: pending.id, actorEmail: "moderator@cricketmatch.today" },
+      now,
+    );
     expect(approved.ok).toBe(true);
     if (!approved.ok) return;
     expect(approved.result.notified).toBe(1);
@@ -173,22 +186,42 @@ describe("import application", () => {
     expect(created?.offers).toEqual([]);
     expect(created?.demo).toBe(false);
 
-    const organiser: StoredMatch = { ...created!, sourceType: "organiser", sourceExternalId: "sportmonks:88" };
-    const api: StoredMatch = { ...created!, id: "api-row", slug: "api-row", sourceExternalId: "sportmonks:89" };
+    const organiser: StoredMatch = {
+      ...created!,
+      sourceType: "organiser",
+      sourceExternalId: "sportmonks:88",
+    };
+    const api: StoredMatch = {
+      ...created!,
+      id: "api-row",
+      slug: "api-row",
+      sourceExternalId: "sportmonks:89",
+    };
     const next = applyImportPlan(
       { ...emptyStore(), extraMatches: [organiser, api] },
       {
         inserts: [],
         updates: [
           { id: organiser.id, match: { ...incoming, startsAt: "2026-11-03T11:00:00.000Z" } },
-          { id: api.id, match: { ...incoming, externalId: "sportmonks:89", startsAt: "2026-11-04T11:00:00.000Z" } },
+          {
+            id: api.id,
+            match: {
+              ...incoming,
+              externalId: "sportmonks:89",
+              startsAt: "2026-11-04T11:00:00.000Z",
+            },
+          },
         ],
       },
       now,
     );
     expect(next.updated).toBe(1);
-    expect(next.store.extraMatches.find((match) => match.id === organiser.id)?.startsAt).toBe(organiser.startsAt);
-    expect(next.store.extraMatches.find((match) => match.id === api.id)?.startsAt).toBe("2026-11-04T11:00:00.000Z");
+    expect(next.store.extraMatches.find((match) => match.id === organiser.id)?.startsAt).toBe(
+      organiser.startsAt,
+    );
+    expect(next.store.extraMatches.find((match) => match.id === api.id)?.startsAt).toBe(
+      "2026-11-04T11:00:00.000Z",
+    );
   });
 
   it("expires an active offer and an open alert once the match has started", () => {
@@ -219,7 +252,9 @@ describe("import application", () => {
       requests: [request({ matchSlug: "already-started", status: "active" })],
     };
     const expired = expireDue(store, now);
-    expect(mergeMatches(expired).find((match) => match.slug === "already-started")?.offers[0]?.status).toBe("expired");
+    expect(
+      mergeMatches(expired).find((match) => match.slug === "already-started")?.offers[0]?.status,
+    ).toBe("expired");
     expect(expired.requests[0]?.status).toBe("expired");
   });
 });
@@ -249,24 +284,41 @@ describe("roles", () => {
     };
     const denied = assignRole(
       store,
-      { actorEmail: "fan@example.com", actorRole: "fan", account: "admin@cricketmatch.today", role: "admin" },
+      {
+        actorEmail: "fan@example.com",
+        actorRole: "fan",
+        account: "admin@cricketmatch.today",
+        role: "admin",
+      },
       now,
     );
     expect(denied.ok).toBe(false);
     const self = assignRole(
       store,
-      { actorEmail: "admin@cricketmatch.today", actorRole: "admin", account: "admin@cricketmatch.today", role: "fan" },
+      {
+        actorEmail: "admin@cricketmatch.today",
+        actorRole: "admin",
+        account: "admin@cricketmatch.today",
+        role: "fan",
+      },
       now,
     );
     expect(self.ok).toBe(false);
     const changed = assignRole(
       store,
-      { actorEmail: "admin@cricketmatch.today", actorRole: "admin", account: "fan@example.com", role: "moderator" },
+      {
+        actorEmail: "admin@cricketmatch.today",
+        actorRole: "admin",
+        account: "fan@example.com",
+        role: "moderator",
+      },
       now,
     );
     expect(changed.ok).toBe(true);
     if (!changed.ok) return;
-    expect(changed.store.users.find((user) => user.email === "fan@example.com")?.role).toBe("moderator");
+    expect(changed.store.users.find((user) => user.email === "fan@example.com")?.role).toBe(
+      "moderator",
+    );
   });
 });
 

@@ -9,13 +9,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const match = directory.matches.find((item) => item.homeSlug === slug || item.awaySlug === slug);
   if (!match) notFound();
   const name = match.homeSlug === slug ? match.homeName : match.awayName;
-  return pageMetadata(`${name} fixtures`, `Upcoming cricket for ${name}, with venue and ticket state.`, `/teams/${slug}`);
+  return pageMetadata(
+    `${name} fixtures`,
+    `Upcoming cricket for ${name}, with venue and ticket state.`,
+    `/teams/${slug}`,
+  );
 }
 
 export default async function TeamPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const directory = await getDirectory();
-  const matches = directory.matches.filter((match) => match.homeSlug === slug || match.awaySlug === slug);
+  const matches = directory.matches.filter(
+    (match) => match.homeSlug === slug || match.awaySlug === slug,
+  );
   if (!matches.length) notFound();
   const name = matches[0]!.homeSlug === slug ? matches[0]!.homeName : matches[0]!.awayName;
   return (

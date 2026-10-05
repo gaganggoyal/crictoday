@@ -16,7 +16,9 @@ export default async function AcademiesPage({
   const raw = await searchParams;
   const country = typeof raw.country === "string" ? raw.country : undefined;
   const directory = await getDirectory();
-  const academies = directory.academies.filter((academy) => !country || academy.countrySlug === country);
+  const academies = directory.academies.filter(
+    (academy) => !country || academy.countrySlug === country,
+  );
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
       <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">Academies</p>
@@ -36,12 +38,20 @@ export default async function AcademiesPage({
             ))}
           </select>
         </label>
-        <button className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white">Filter</button>
+        <button className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white">
+          Filter
+        </button>
       </form>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {academies.map((academy) => (
-          <Link key={academy.slug} href={`/academy/${academy.slug}`} className="rounded-[1.25rem] border border-line bg-surface p-5 no-underline">
-            <p className="text-xs font-semibold tracking-[0.14em] text-link uppercase">{academy.verificationLabel}</p>
+          <Link
+            key={academy.slug}
+            href={`/academy/${academy.slug}`}
+            className="rounded-[1.25rem] border border-line bg-surface p-5 no-underline"
+          >
+            <p className="text-xs font-semibold tracking-[0.14em] text-link uppercase">
+              {academy.verificationLabel}
+            </p>
             <h2 className="mt-2 font-display text-2xl font-extrabold">{academy.name}</h2>
             <p className="mt-2 text-sm text-muted">
               {academy.cityName}, {academy.countryName}

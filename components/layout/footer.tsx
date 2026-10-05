@@ -8,7 +8,8 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
         <div>
           <Logo />
           <p className="mt-4 max-w-sm text-sm text-muted">
-            Find cricket you can attend, then leave through a reviewed ticket link. We do not sell seats and we do not run a resale market.
+            Find cricket you can attend, then leave through a reviewed ticket link. We do not sell
+            seats and we do not run a resale market.
           </p>
         </div>
         <FooterColumn

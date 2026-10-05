@@ -26,11 +26,11 @@ Attendance product for upcoming cricket. The public question is where the match 
 
 ## Data modes
 
-| Mode | When | Catalog | Writes |
-|---|---|---|---|
-| demo | Local dev, or `ALLOW_DEMO_DATA=true` | Labelled seed plus the JSON store | JSON store |
-| supabase | URL and publishable key are set | `match_directory`, `academy_directory` | Closed until service-role review functions are called by the server |
-| unconfigured | Production without Supabase | Empty | Closed |
+| Mode         | When                                 | Catalog                                | Writes                                                              |
+| ------------ | ------------------------------------ | -------------------------------------- | ------------------------------------------------------------------- |
+| demo         | Local dev, or `ALLOW_DEMO_DATA=true` | Labelled seed plus the JSON store      | JSON store                                                          |
+| supabase     | URL and publishable key are set      | `match_directory`, `academy_directory` | Closed until service-role review functions are called by the server |
+| unconfigured | Production without Supabase          | Empty                                  | Closed                                                              |
 
 ## Database
 

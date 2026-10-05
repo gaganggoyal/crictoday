@@ -17,8 +17,15 @@ export const UNSOURCED_MATCH = "99999999-9999-4999-8999-999999999999";
 export async function database() {
   const db = new PGlite();
   await db.exec(readFileSync(path.join(root, "supabase/tests/bootstrap.sql"), "utf8"));
-  await db.exec(readFileSync(path.join(root, "supabase/migrations/20261004120000_init.sql"), "utf8"));
-  await db.exec(readFileSync(path.join(root, "supabase/migrations/20261004180000_service_workflows.sql"), "utf8"));
+  await db.exec(
+    readFileSync(path.join(root, "supabase/migrations/20261004120000_init.sql"), "utf8"),
+  );
+  await db.exec(
+    readFileSync(
+      path.join(root, "supabase/migrations/20261004180000_service_workflows.sql"),
+      "utf8",
+    ),
+  );
   await db.exec(`
     INSERT INTO auth.users (id, email) VALUES
       ('${FAN}', 'fan@example.com'),

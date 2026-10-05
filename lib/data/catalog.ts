@@ -57,5 +57,8 @@ export async function getAcademy(slug: string) {
   const directory = await getDirectory();
   const store = dataMode() === "demo" ? readStore() : null;
   const all = store ? mergeAcademies(store) : directory.academies;
-  return all.find((academy) => academy.slug === slug && academy.verificationStatus === "verified") ?? null;
+  return (
+    all.find((academy) => academy.slug === slug && academy.verificationStatus === "verified") ??
+    null
+  );
 }

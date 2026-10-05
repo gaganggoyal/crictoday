@@ -2,12 +2,7 @@ export type Role = "fan" | "academy_owner" | "organiser" | "moderator" | "admin"
 
 export type MatchFormat = "test" | "odi" | "t20" | "t10" | "hundred" | "other";
 export type MatchStatus =
-  | "draft"
-  | "pending"
-  | "published"
-  | "postponed"
-  | "cancelled"
-  | "completed";
+  "draft" | "pending" | "published" | "postponed" | "cancelled" | "completed";
 export type AttendanceType = "ticketed" | "free" | "private" | "unknown";
 export type CompetitionKind = "international" | "league" | "domestic" | "academy";
 export type SourceType = "api" | "organiser" | "academy" | "admin";
@@ -123,11 +118,7 @@ export type LeagueInfo = {
 };
 
 export type SubmissionStatus =
-  | "pending"
-  | "in_review"
-  | "approved"
-  | "rejected"
-  | "changes_requested";
+  "pending" | "in_review" | "approved" | "rejected" | "changes_requested";
 
 export type Submission = {
   id: string;
@@ -143,11 +134,7 @@ export type Submission = {
 };
 
 export type TicketRequestStatus =
-  | "pending_verification"
-  | "active"
-  | "notified"
-  | "unsubscribed"
-  | "expired";
+  "pending_verification" | "active" | "notified" | "unsubscribed" | "expired";
 
 export type TicketRequestRecord = {
   id: string;

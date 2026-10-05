@@ -3,7 +3,11 @@ import { ReviewControls, VerifyButton } from "@/components/admin/review-controls
 import { moderationSnapshot } from "@/lib/data/moderation";
 import { findDuplicateCandidates } from "@/lib/domain/duplicates";
 
-export default async function SubmissionReviewPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function SubmissionReviewPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const queue = await moderationSnapshot();
   const submission = queue.submissions.find((item) => item.id === id);
@@ -36,12 +40,19 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div>
         <h1 className="font-display text-4xl font-extrabold">Review</h1>
-        <p className="mt-2 text-sm text-muted capitalize">{submission.entityType} · {submission.status.replaceAll("_", " ")}</p>
+        <p className="mt-2 text-sm text-muted capitalize">
+          {submission.entityType} · {submission.status.replaceAll("_", " ")}
+        </p>
         <dl className="mt-6 grid gap-3">
           {Object.entries(payload).map(([key, value]) => (
-            <div key={key} className="grid gap-1 border-b border-line py-2 sm:grid-cols-[180px_1fr]">
+            <div
+              key={key}
+              className="grid gap-1 border-b border-line py-2 sm:grid-cols-[180px_1fr]"
+            >
               <dt className="text-sm text-muted">{key}</dt>
-              <dd className="break-words text-sm">{typeof value === "string" ? value : JSON.stringify(value)}</dd>
+              <dd className="break-words text-sm">
+                {typeof value === "string" ? value : JSON.stringify(value)}
+              </dd>
             </div>
           ))}
         </dl>
@@ -63,11 +74,17 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
         <h2 className="mt-8 font-display text-2xl font-bold">Audit</h2>
         <ul className="mt-3 grid gap-2 text-sm">
           {history.map((entry) => (
-            <li key={entry.id}>{entry.createdAt} · {entry.action} · {entry.actorEmail}</li>
+            <li key={entry.id}>
+              {entry.createdAt} · {entry.action} · {entry.actorEmail}
+            </li>
           ))}
           {!history.length ? <li>No audit entries yet.</li> : null}
         </ul>
-        {typeof payload.matchSlug === "string" ? <div className="mt-4"><VerifyButton matchSlug={payload.matchSlug} /></div> : null}
+        {typeof payload.matchSlug === "string" ? (
+          <div className="mt-4">
+            <VerifyButton matchSlug={payload.matchSlug} />
+          </div>
+        ) : null}
       </div>
       <ReviewControls
         id={submission.id}

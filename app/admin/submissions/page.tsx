@@ -9,10 +9,15 @@ export default async function SubmissionsPage() {
       <ul className="mt-6 grid gap-3">
         {submissions.map((item) => (
           <li key={item.id}>
-            <Link href={`/admin/submissions/${item.id}`} className="block rounded-2xl border border-line bg-surface p-4 no-underline">
+            <Link
+              href={`/admin/submissions/${item.id}`}
+              className="block rounded-2xl border border-line bg-surface p-4 no-underline"
+            >
               <span className="font-medium capitalize">{item.entityType}</span>
               <span className="text-muted"> · {item.status.replaceAll("_", " ")}</span>
-              <span className="mt-1 block text-sm text-muted">{item.submitterEmail || "No email"} · {new Date(item.createdAt).toUTCString()}</span>
+              <span className="mt-1 block text-sm text-muted">
+                {item.submitterEmail || "No email"} · {new Date(item.createdAt).toUTCString()}
+              </span>
             </Link>
           </li>
         ))}

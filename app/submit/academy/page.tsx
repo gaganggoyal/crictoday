@@ -20,7 +20,9 @@ export default async function SubmitAcademyPage({
       <h1 className="font-display text-5xl font-extrabold tracking-tight">
         {claim ? "Claim an academy" : "List an academy"}
       </h1>
-      <p className="mt-3 text-muted">Tell us who to contact and how you can prove the listing is yours.</p>
+      <p className="mt-3 text-muted">
+        Tell us who to contact and how you can prove the listing is yours.
+      </p>
       <div className="mt-8">
         <AcademyWizard claimSlug={claim} />
       </div>
