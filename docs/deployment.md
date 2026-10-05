@@ -31,15 +31,16 @@ Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cr
 - `pnpm db migrate` applies `db/mysql/*.sql` files that have not run.
 - `pnpm db seed-demo` loads the labelled DEMO catalogue. `pnpm db remove-demo` deletes it, with its offers, alerts and clicks. Run it when real fixtures are listed.
 - `pnpm db set-role <email> <role>` creates the account if needed and sets its role. `admin@cricketmatch.today` is the first admin.
+- `pnpm db sign-in-link <email>` prints a one-time sign-in link, valid for 30 minutes. Use it when email cannot reach that address.
 
 Back up the database with the server's other MySQL backups: `mysqldump --single-transaction cricketmatch`.
 
 ### Email
 
-Until SMTP is configured, mail is written to the service log. To sign in before then, request a link at `/login` and read it there:
+Until email is configured, mail is written to the service log, `journalctl -u cricketmatch`. To sign in without email at any time, print a link on the server:
 
 ```bash
-journalctl -u cricketmatch --since "15 min ago" | grep "Sign in:"
+cd /var/www/cricketmatch && runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch corepack pnpm db sign-in-link admin@cricketmatch.today
 ```
 
 cricketmatch.today handles mail the way kidspc.online does: Resend sends it and ImprovMX receives it. The domain's DNS is at Spaceship.

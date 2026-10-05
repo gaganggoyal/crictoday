@@ -1,9 +1,11 @@
 import { existsSync } from "node:fs";
-import { upsertUserRole } from "@/lib/data/mysql/auth";
+import { createMagicLink, upsertUserRole } from "@/lib/data/mysql/auth";
 import { removeDemo, seedDemo } from "@/lib/data/mysql/demo";
 import { migrate } from "@/lib/data/mysql/migrate";
 import { createPool } from "@/lib/data/mysql/pool";
 import type { Role } from "@/lib/domain/types";
+import { hashToken, newToken } from "@/lib/security/crypto";
+import { siteUrl } from "@/lib/utils";
 
 const ROLES: Role[] = ["fan", "academy_owner", "organiser", "moderator", "admin"];
 
@@ -14,6 +16,8 @@ const USAGE = `Usage: pnpm db <command>
   remove-demo               delete every DEMO match and academy
   set-role <email> <role>   create the account if needed and set its role
                             roles: ${ROLES.join(", ")}
+  sign-in-link <email>      print a one-time sign-in link, valid for 30 minutes,
+                            for when email cannot reach that address
 
 Reads DATABASE_URL (mysql://user:password@host:3306/database) from the
 environment, then .env.local, then .env.`;
@@ -55,6 +59,12 @@ async function main() {
       }
       const user = await upsertUserRole(pool, email, role as Role, new Date());
       console.log(`${user.email} is ${user.role}.`);
+    } else if (command === "sign-in-link") {
+      const [email] = args;
+      if (!email?.includes("@")) throw new Error("Usage: pnpm db sign-in-link <email>");
+      const token = newToken();
+      await createMagicLink(pool, { email, tokenHash: hashToken(token) }, new Date());
+      console.log(`${siteUrl()}/login/verify?token=${token}`);
     } else {
       throw new Error(`Unknown command "${command}".\n\n${USAGE}`);
     }
