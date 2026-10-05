@@ -17,9 +17,10 @@ export default function DemoDataPage() {
           are not a live feed and they are not an offer to sell a seat.
         </p>
         <p>
-          A production deployment without Supabase shows an empty directory instead of this
-          catalogue. Connecting a database replaces the seed. Provider imports never overwrite an
-          organiser-verified record without moderation.
+          The live site lists only fixtures taken from official sources, each linked to its source.
+          The DEMO catalogue appears there only if an operator loads it on purpose, and a banner
+          says so while it is listed. Provider imports never overwrite an organiser-verified record
+          without moderation.
         </p>
         <p>
           The source link on a demo match returns to this page so the origin of the listing stays
