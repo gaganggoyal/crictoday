@@ -6,7 +6,7 @@ set -euo pipefail
 APP=/var/www/cricketmatch
 REF="${1:-main}"
 as_app() {
-  runuser -u cricketmatch -- env HOME="$APP" COREPACK_ENABLE_DOWNLOAD_PROMPT=0 "$@"
+  runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch COREPACK_ENABLE_DOWNLOAD_PROMPT=0 "$@"
 }
 
 cd "$APP"

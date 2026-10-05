@@ -26,7 +26,7 @@ It checks out `origin/main` (or the branch or commit you pass as the first argum
 
 ### Database commands
 
-Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cricketmatch -- env HOME=/var/www/cricketmatch corepack pnpm db migrate`.
+Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch corepack pnpm db migrate`.
 
 - `pnpm db migrate` applies `db/mysql/*.sql` files that have not run.
 - `pnpm db seed-demo` loads the labelled DEMO catalogue. `pnpm db remove-demo` deletes it, with its offers, alerts and clicks. Run it when real fixtures are listed.
@@ -50,7 +50,7 @@ To send real mail the way kidspc.online does:
 
 ### First install
 
-`deploy/vps/` documents the steps that were run once: create the `cricketmatch` system user and MySQL user, clone into `/var/www/cricketmatch`, write `.env`, `pnpm install`, `pnpm build`, `pnpm db migrate`, install and enable `cricketmatch.service` and `cricketmatch-sync.timer`, open 3300 to the Docker bridge in ufw, append `deploy/vps/Caddyfile` to the cricketverse Caddyfile, and `caddy reload` in the container.
+`deploy/vps/` documents the steps that were run once: create the `cricketmatch` system user (home `/var/lib/cricketmatch`, so pnpm caches stay out of the checkout) and MySQL user, clone into `/var/www/cricketmatch`, write `.env`, `pnpm install`, `pnpm build`, `pnpm db migrate`, install and enable `cricketmatch.service` and `cricketmatch-sync.timer`, open 3300 to the Docker bridge in ufw, append `deploy/vps/Caddyfile` to the cricketverse Caddyfile, and `caddy reload` in the container.
 
 ## 2. Alternative: Supabase and Vercel
 
