@@ -43,14 +43,14 @@ Until email is configured, mail is written to the service log, `journalctl -u cr
 cd /var/www/cricketmatch && runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch corepack pnpm db sign-in-link admin@cricketmatch.today
 ```
 
-cricketmatch.today handles mail the way kidspc.online does: Resend sends it and ImprovMX receives it. The domain's DNS is at Spaceship.
+cricketmatch.today sends mail with Resend, as kidspc.online does, and receives it with Spaceship's free email forwarding. The domain's DNS is at Spaceship.
 
-1. **Sending.** Add cricketmatch.today to Resend in the region kidspc.online uses (`ap-northeast-1`). Add the records Resend lists: a DKIM TXT record at `resend._domainkey`, and an MX record and an SPF TXT record at `send`. Create a sending-only API key for the domain.
-2. **Receiving.** Add the domain to ImprovMX, point its MX records at `mx1.improvmx.com` (priority 10) and `mx2.improvmx.com` (priority 20), and forward `admin@` and `hello@` to a real inbox. ImprovMX's free plan holds one domain and kidspc.online uses it, so this needs the Light plan or above, or a second account.
-3. Add a DMARC record: TXT at `_dmarc`, `v=DMARC1; p=none; rua=mailto:hello@cricketmatch.today`.
-4. In `.env`, set `RESEND_API_KEY` and `EMAIL_FROM`, for example `cricketmatch.today <hello@cricketmatch.today>`, then run `systemctl restart cricketmatch`.
+1. **Sending.** cricketmatch.today is a Resend domain in `ap-northeast-1`, with open and click tracking off so sign-in links are not rewritten. Its records are a DKIM TXT record at `resend._domainkey`, an MX record and an SPF TXT record at `send`, and a CNAME at `rsend`. The server's `RESEND_API_KEY` can only send, and only for this domain.
+2. **Receiving.** Spaceship's Email Forwarding sends `admin@` and `hello@` to a real inbox. Spaceship adds its own MX and SPF records at the root.
+3. **DMARC.** A TXT record at `_dmarc`: `v=DMARC1; p=none; rua=mailto:hello@cricketmatch.today`.
+4. **Settings.** `.env` has `RESEND_API_KEY` and `EMAIL_FROM="cricketmatch.today <hello@cricketmatch.today>"`. After changing `.env`, run `systemctl restart cricketmatch`.
 
-Any SMTP server can send instead. Set `SMTP_HOST`, `SMTP_PORT` (465 is TLS from the start, 587 is STARTTLS), `SMTP_USER` and `SMTP_PASS`. SMTP is used ahead of Resend when both are set. ImprovMX's paid plans include SMTP at `smtp.improvmx.com`.
+Any SMTP server can send instead. Set `SMTP_HOST`, `SMTP_PORT` (465 is TLS from the start, 587 is STARTTLS), `SMTP_USER` and `SMTP_PASS`. SMTP is used ahead of Resend when both are set.
 
 ### First install
 

@@ -21,11 +21,11 @@ Updated 5 October 2026, after the VPS deployment.
 - Rate limits use `rate_limits` when Supabase is configured, and the in-memory limiter otherwise.
 - Test pass on 5 October 2026. Fixed: an open redirect through the sign-in `next` path, forms that cleared input after a server error (including a review form that fell back to Approve), alert links that changed state on a GET, an invalid `.ics` export, the alert email text and failed-send handling, an unreadable dark-mode hero select, the Next.js 16 scroll warning, and `pnpm ci` in the docs. 18 Playwright and 34 Vitest tests pass.
 - Production runs on the VPS with MySQL since 5 October 2026, at https://cricketmatch.today. The labelled DEMO catalogue is loaded and `admin@cricketmatch.today` is the admin. See [deployment.md](deployment.md).
+- Mail to `admin@` and `hello@cricketmatch.today` is forwarded by Spaceship. On the server, `pnpm db sign-in-link <email>` prints a one-time sign-in link without email.
 
 ## Not done
 
-- Sending is not on yet. cricketmatch.today is in Resend (`ap-northeast-1`, tracking off) and the server's `.env` has a send-only key for it. Once Resend verifies the domain's DNS records at Spaceship, set `EMAIL_FROM` and restart. Until then, mail goes to `journalctl -u cricketmatch`.
-- Receiving is not set up. cricketmatch.today has no MX records, so `admin@cricketmatch.today` gets no mail; `pnpm db sign-in-link` signs the admin in meanwhile. The ImprovMX account is on the free plan, which holds one domain, and kidspc.online uses it.
+- Sending waits on Resend, which is verifying the domain's DNS records. The server's `.env` has a send-only key; once the domain is verified, set `EMAIL_FROM` and restart. Until then, mail goes to `journalctl -u cricketmatch`.
 - The public catalogue is the DEMO seed. No real fixture is listed yet.
 - No live provider tokens are configured.
 - A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs the request's token hashes to be rotated.
@@ -36,7 +36,7 @@ Updated 5 October 2026, after the VPS deployment.
 ## Next
 
 1. Review and merge PR #1, then PR #2, and deploy `main` with `deploy/vps/deploy.sh`.
-2. Email, as on kidspc.online: add the Resend DNS records at Spaceship, then set `EMAIL_FROM` and restart. To receive mail, move ImprovMX to the Light plan or use a second account, then add its MX records and an `admin@` forward. The steps are in [deployment.md](deployment.md#email).
+2. Email: once Resend verifies cricketmatch.today, set `EMAIL_FROM` in `/var/www/cricketmatch/.env` and restart. See [deployment.md](deployment.md#email).
 3. Approve real fixtures through `/submit/match` and `/admin`, then run `pnpm db remove-demo`.
 4. Add the `cricketmatch` database to the server's MySQL backups.
 5. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
