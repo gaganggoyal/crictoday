@@ -1,7 +1,7 @@
 import "server-only";
 import nodemailer, { type Transporter } from "nodemailer";
 
-export type EmailMessage = { to: string; subject: string; text: string };
+export type EmailMessage = { to: string; subject: string; text: string; html?: string };
 
 export interface EmailService {
   send(message: EmailMessage): Promise<void>;
@@ -31,6 +31,7 @@ export class ResendEmailService implements EmailService {
         to: [message.to],
         subject: message.subject,
         text: message.text,
+        ...(message.html ? { html: message.html } : {}),
       }),
     });
     if (!response.ok) {
@@ -51,6 +52,7 @@ export class SmtpEmailService implements EmailService {
       to: message.to,
       subject: message.subject,
       text: message.text,
+      html: message.html,
     });
   }
 }

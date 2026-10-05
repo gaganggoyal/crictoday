@@ -20,6 +20,13 @@ import {
   serviceOpenTicketRequest,
   serviceReview,
 } from "@/lib/data/service-writes";
+import { getMatch } from "@/lib/data/catalog";
+import {
+  ALERT_CLOSED,
+  alertConfirmationMessage,
+  plainMessageHtml,
+  signInMessage,
+} from "@/lib/email/messages";
 import { emailService } from "@/lib/email/service";
 import {
   decryptString,
@@ -100,10 +107,6 @@ async function gate(scope: string, limit: number, windowMs: number, tooMany: str
   return null;
 }
 
-// The request is marked notified when its alert is drafted, so this is its only email.
-const ALERT_CLOSED =
-  "You asked for one alert for this match, so this request is now closed. We will not email you about it again.";
-
 /** Send approved-offer alerts. One failed send does not stop the rest. Returns the failure count. */
 async function deliverAlerts(emails: EmailDraft[]) {
   const service = emailService();
@@ -111,7 +114,16 @@ async function deliverAlerts(emails: EmailDraft[]) {
   for (const email of emails) {
     try {
       const to = email.to.includes("@") ? email.to : decryptString(email.to);
-      await service.send({ ...email, to, text: `${email.text}\n${ALERT_CLOSED}` });
+      const text = `${email.text}\n${ALERT_CLOSED}`;
+      // Supabase drafts its alerts as text; those get the site's layout around the text.
+      const html =
+        email.html ??
+        plainMessageHtml(
+          email.subject,
+          text,
+          "You asked for a ticket alert on cricketmatch.today.",
+        );
+      await service.send({ to, subject: email.subject, text, html });
     } catch (error) {
       failed += 1;
       console.error(
@@ -206,11 +218,7 @@ export async function requestMagicLinkAction(_state: unknown, formData: FormData
   }
   const link = `${siteUrl()}/login/verify?token=${token}&next=${encodeURIComponent(next)}`;
   try {
-    await emailService().send({
-      to: parsed.data.email,
-      subject: "Your cricketmatch.today sign-in link",
-      text: `Sign in: ${link}\nThis link expires in 30 minutes.`,
-    });
+    await emailService().send({ to: parsed.data.email, ...signInMessage(link) });
   } catch (error) {
     console.error("[email] sign-in link not sent:", error instanceof Error ? error.message : error);
     return failure({ form: "We could not send a sign-in link. Try again later." });
@@ -386,7 +394,7 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
     });
     if (!result.ok) return result;
     if (!result.already) {
-      if (!(await sendAlertConfirmation(parsed.data.email, verify, unsub))) {
+      if (!(await sendAlertConfirmation(parsed.data.email, parsed.data.matchSlug, verify, unsub))) {
         return confirmationNotSent();
       }
       await track("ticket_request_started", { match: parsed.data.matchSlug });
@@ -411,7 +419,7 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   );
   if (!result.ok) return failure(result.errors);
   if (!result.result.already) {
-    if (!(await sendAlertConfirmation(parsed.data.email, verify, unsub))) {
+    if (!(await sendAlertConfirmation(parsed.data.email, parsed.data.matchSlug, verify, unsub))) {
       return confirmationNotSent();
     }
     await track("ticket_request_started", { match: parsed.data.matchSlug });
@@ -423,15 +431,19 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
 }
 
 /** Returns false when the email provider rejects the message. The request is already saved. */
-async function sendAlertConfirmation(email: string, verify: string, unsub: string) {
-  const verifyLink = `${siteUrl()}/requests/${verify}`;
-  const unsubLink = `${siteUrl()}/requests/${unsub}?intent=unsubscribe`;
+async function sendAlertConfirmation(
+  email: string,
+  matchSlug: string,
+  verify: string,
+  unsub: string,
+) {
   try {
-    await emailService().send({
-      to: email,
-      subject: "Confirm your cricket ticket alert",
-      text: `Confirm this alert: ${verifyLink}\nA request does not reserve a ticket.\nUnsubscribe: ${unsubLink}`,
+    const message = alertConfirmationMessage({
+      match: await getMatch(matchSlug).catch(() => null),
+      verifyUrl: `${siteUrl()}/requests/${verify}`,
+      unsubscribeUrl: `${siteUrl()}/requests/${unsub}?intent=unsubscribe`,
     });
+    await emailService().send({ to: email, ...message });
     return true;
   } catch (error) {
     console.error(

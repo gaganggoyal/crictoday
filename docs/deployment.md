@@ -50,6 +50,8 @@ cricketmatch.today sends mail with Resend, as kidspc.online does, and receives i
 3. **DMARC.** A TXT record at `_dmarc`: `v=DMARC1; p=none; rua=mailto:hello@cricketmatch.today`.
 4. **Settings.** `.env` has `RESEND_API_KEY` and `EMAIL_FROM="cricketmatch.today <hello@cricketmatch.today>"`. After changing `.env`, run `systemctl restart cricketmatch`.
 
+Each email has an HTML part in the site's style and a plain-text part. The templates are in `lib/email/messages.ts`, and the images they load are in `public/email/`. `pnpm email:preview` writes every email, filled in with a DEMO match, to `.email-preview/`; `pnpm email:preview --send you@example.com` also sends them through the configured provider.
+
 Any SMTP server can send instead. Set `SMTP_HOST`, `SMTP_PORT` (465 is TLS from the start, 587 is STARTTLS), `SMTP_USER` and `SMTP_PASS`. SMTP is used ahead of Resend when both are set.
 
 ### First install

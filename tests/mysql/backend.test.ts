@@ -198,14 +198,10 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
       now,
     );
     expect(approved.ok && approved.notified).toBe(1);
+    // The alert shows the listed match, kick-off included.
     expect(approved.ok && approved.emails[0]).toEqual(
       ticketAlertEmail(
-        {
-          homeName: "Harbour XI",
-          awayName: "Coastal XI",
-          venueName: "Campal Ground",
-          cityName: "Panaji",
-        },
+        listed!,
         {
           sellerName: "Harbour Club",
           sellerDomain: "tickets.example.com",
