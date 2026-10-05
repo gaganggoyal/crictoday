@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getDirectory } from "@/lib/data/catalog";
-import { dataMode } from "@/lib/data/mode";
+import { dataMode, usesDatabase } from "@/lib/data/mode";
 import { serviceRecordClick } from "@/lib/data/service-writes";
 import { readStore, writeStore } from "@/lib/data/store";
 import { recordClick } from "@/lib/domain/workflows";
@@ -30,7 +30,7 @@ export default async function GoPage({ params }: { params: Promise<{ offerId: st
     const result = recordClick(readStore(), { offerId, referrer: null }, new Date());
     if (result.ok) writeStore(result.store);
   }
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const headerStore = await headers();
     const logged = await serviceRecordClick(offerId, headerStore.get("referer"));
     if (!logged.ok) console.error(logged.errors.form);

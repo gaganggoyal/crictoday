@@ -1,0 +1,14 @@
+[Unit]
+Description=cricketmatch.today fixture sync and alert expiry
+After=cricketmatch.service
+
+[Service]
+Type=oneshot
+User=cricketmatch
+Group=cricketmatch
+EnvironmentFile=/var/www/cricketmatch/.env
+ExecStart=/var/www/cricketmatch/deploy/vps/sync.sh
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

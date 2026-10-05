@@ -679,6 +679,26 @@ export function reviewSubmission(
   );
 }
 
+/** The alert for an approved offer. approve_ticket_offer in the Supabase migration sends the same text. */
+export function ticketAlertEmail(
+  match: Pick<StoredMatch, "homeName" | "awayName" | "venueName" | "cityName">,
+  offer: Pick<StoredOffer, "sellerName" | "sellerDomain" | "url">,
+  to: string,
+): EmailDraft {
+  return {
+    to,
+    subject: `Ticket alert: ${match.homeName} vs ${match.awayName}`,
+    text: [
+      `${match.homeName} vs ${match.awayName}`,
+      `${match.venueName}, ${match.cityName}`,
+      `Seller: ${offer.sellerName}`,
+      `Domain: ${offer.sellerDomain}`,
+      `Link: ${offer.url}`,
+      "This alert does not reserve a ticket.",
+    ].join("\n"),
+  };
+}
+
 export function approveOffer(
   store: StoreShape,
   input: { matchSlug: string; offerId: string; actorEmail: string },
@@ -711,18 +731,7 @@ export function approveOffer(
   const emails: EmailDraft[] = [];
   const requests = next.requests.map((request) => {
     if (request.matchSlug !== match.slug || request.status !== "active") return request;
-    emails.push({
-      to: request.encryptedEmail,
-      subject: `Ticket alert: ${match.homeName} vs ${match.awayName}`,
-      text: [
-        `${match.homeName} vs ${match.awayName}`,
-        `${match.venueName}, ${match.cityName}`,
-        `Seller: ${updatedOffer.sellerName}`,
-        `Domain: ${updatedOffer.sellerDomain}`,
-        `Link: ${updatedOffer.url}`,
-        "This alert does not reserve a ticket.",
-      ].join("\n"),
-    });
+    emails.push(ticketAlertEmail(match, updatedOffer, request.encryptedEmail));
     return { ...request, status: "notified" as const };
   });
   next = { ...next, requests };

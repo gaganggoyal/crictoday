@@ -1,4 +1,4 @@
-import { demoRolesAllowed } from "@/lib/data/mode";
+import { devInboxAllowed } from "@/lib/data/mode";
 import { pageMetadata } from "@/lib/seo";
 import { firstParam, safeNextPath } from "@/lib/utils";
 
@@ -27,7 +27,7 @@ export default async function SentPage({
           : "If that address can receive mail, a sign-in link is on the way."}{" "}
         The link expires in 30 minutes.
       </p>
-      {demoRolesAllowed() && token ? (
+      {devInboxAllowed() && token ? (
         <p className="mt-6">
           <a
             className="font-medium text-link"

@@ -3,12 +3,21 @@ import { planImport } from "@/lib/domain/providers";
 import type { ImportRun, StoredOffer } from "@/lib/domain/types";
 import { applyImportPlan, expireDue, mergeMatches } from "@/lib/domain/workflows";
 import { dataMode } from "@/lib/data/mode";
+import { runMysqlImport } from "@/lib/data/mysql/import";
+import { mysqlPool } from "@/lib/data/mysql/pool";
 import { readStore, writeStore } from "@/lib/data/store";
 import { sportMonksFixtureProvider, ticketmasterProvider } from "@/lib/providers/fetchers";
 import { runSupabaseImport } from "@/lib/providers/supabase-import";
 
 export async function runImport(now = new Date()) {
   const mode = dataMode();
+  if (mode === "mysql") {
+    return runMysqlImport(
+      mysqlPool(),
+      { fixtures: sportMonksFixtureProvider(), tickets: ticketmasterProvider() },
+      now,
+    );
+  }
   if (mode === "supabase") return runSupabaseImport(now);
   if (mode === "unconfigured") {
     return { status: "skipped", reason: "No database is configured." };

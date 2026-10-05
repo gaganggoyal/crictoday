@@ -2,6 +2,8 @@ import "server-only";
 import { cookies } from "next/headers";
 import { supabaseServer } from "@/lib/auth/supabase-server";
 import { dataMode } from "@/lib/data/mode";
+import { findUser } from "@/lib/data/mysql/auth";
+import { mysqlPool } from "@/lib/data/mysql/pool";
 import { readStore } from "@/lib/data/store";
 import type { Role } from "@/lib/domain/types";
 import { signPayload, verifyPayload } from "@/lib/security/crypto";
@@ -58,9 +60,15 @@ async function readSupabaseSession(): Promise<Session | null> {
 }
 
 export async function getSession(): Promise<Session | null> {
-  if (dataMode() === "supabase") return readSupabaseSession();
+  const mode = dataMode();
+  if (mode === "supabase") return readSupabaseSession();
   const session = await readCookieSession();
-  if (!session || dataMode() !== "demo") return session;
+  if (session && mode === "mysql") {
+    // Roles change in the database, so the cookie's copy is only a hint.
+    const user = await findUser(mysqlPool(), session.userId);
+    return user ? { ...session, email: user.email, role: user.role } : null;
+  }
+  if (!session || mode !== "demo") return session;
   const user = readStore().users.find((item) => item.id === session.userId);
   if (!user || !isRole(user.role)) return session;
   return { ...session, email: user.email, role: user.role };

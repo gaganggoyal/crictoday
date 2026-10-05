@@ -2,6 +2,8 @@ import "server-only";
 import type { Session } from "@/lib/auth/session";
 import { supabaseServer } from "@/lib/auth/supabase-server";
 import { dataMode } from "@/lib/data/mode";
+import { mysqlPool } from "@/lib/data/mysql/pool";
+import { loadAccount } from "@/lib/data/mysql/reads";
 import { readStore } from "@/lib/data/store";
 import type { Submission } from "@/lib/domain/types";
 import { mergeAcademies } from "@/lib/domain/workflows";
@@ -47,6 +49,13 @@ function mapSubmission(row: {
 }
 
 export async function accountSnapshot(session: Session): Promise<AccountSnapshot> {
+  if (dataMode() === "mysql") {
+    return loadAccount(mysqlPool(), {
+      userId: session.userId,
+      email: session.email,
+      emailHash: hashEmail(session.email),
+    });
+  }
   if (dataMode() !== "supabase") {
     const store = readStore();
     const email = session.email.toLowerCase();
