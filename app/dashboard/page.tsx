@@ -2,11 +2,18 @@ import { accountSnapshot } from "@/lib/data/account";
 import { getSession } from "@/lib/auth/session";
 import { pageMetadata } from "@/lib/seo";
 
-export const metadata = pageMetadata("Your account", "Alerts and submissions.", "/dashboard", false);
+export const metadata = pageMetadata(
+  "Your account",
+  "Alerts and submissions.",
+  "/dashboard",
+  false,
+);
 
 export default async function DashboardPage() {
   const session = await getSession();
-  const account = session ? await accountSnapshot(session) : { submissions: [], alertCount: 0, academies: [] };
+  const account = session
+    ? await accountSnapshot(session)
+    : { submissions: [], alertCount: 0, academies: [] };
   return (
     <>
       <h1 className="font-display text-4xl font-extrabold">Your account</h1>

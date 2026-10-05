@@ -32,7 +32,11 @@ export type NormalizedTicketOffer = {
 
 export interface FixtureProvider {
   name: FixtureProviderName;
-  fetchBetween(input: { from: Date; to: Date; competitionIds?: string[] }): Promise<NormalizedMatch[]>;
+  fetchBetween(input: {
+    from: Date;
+    to: Date;
+    competitionIds?: string[];
+  }): Promise<NormalizedMatch[]>;
   fetchByExternalId(id: string): Promise<NormalizedMatch | null>;
 }
 
@@ -81,7 +85,10 @@ export function normalizeSportMonksFixture(raw: SportMonksFixture): NormalizedMa
   const away = raw.visitorteam?.name?.trim();
   const start = raw.starting_at?.trim();
   if (!raw.id || !home || !away || !start || home.toLowerCase() === away.toLowerCase()) return null;
-  const startsAt = start.endsWith("Z") || /[+-]\d{2}:\d{2}$/.test(start) ? new Date(start).toISOString() : `${start.replace(" ", "T")}Z`;
+  const startsAt =
+    start.endsWith("Z") || /[+-]\d{2}:\d{2}$/.test(start)
+      ? new Date(start).toISOString()
+      : `${start.replace(" ", "T")}Z`;
   if (Number.isNaN(new Date(startsAt).getTime())) return null;
   const country =
     typeof raw.venue?.country === "string"
@@ -185,15 +192,28 @@ export function planImport(existing: ExistingImportRow[], incoming: NormalizedMa
     }
     const start = new Date(match.startsAt).getTime();
     const pair = [match.home, match.away]
-      .map((name) => name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim())
+      .map((name) =>
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim(),
+      )
       .sort()
       .join("|");
     const duplicate = existing.find((row) => {
       const rowPair = [row.home, row.away]
-        .map((name) => name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim())
+        .map((name) =>
+          name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim(),
+        )
         .sort()
         .join("|");
-      return rowPair === pair && Math.abs(new Date(row.startsAt).getTime() - start) <= 12 * 60 * 60 * 1000;
+      return (
+        rowPair === pair &&
+        Math.abs(new Date(row.startsAt).getTime() - start) <= 12 * 60 * 60 * 1000
+      );
     });
     if (duplicate) {
       conflicts.push({

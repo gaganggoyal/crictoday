@@ -43,7 +43,7 @@ Point the domain at Vercel. The production build sends HSTS (`max-age=63072000; 
 ## 4. Local production-like check
 
 ```bash
-pnpm ci
+pnpm run ci
 ALLOW_DEMO_DATA=true pnpm dev
 ```
 

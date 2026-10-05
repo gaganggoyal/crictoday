@@ -8,13 +8,20 @@ import { recordClick } from "@/lib/domain/workflows";
 import { pageMetadata } from "@/lib/seo";
 import { track } from "@/lib/analytics/track";
 
-export const metadata = pageMetadata("Leaving cricketmatch.today", "Review the seller domain before you continue.", "/go", false);
+export const metadata = pageMetadata(
+  "Leaving cricketmatch.today",
+  "Review the seller domain before you continue.",
+  "/go",
+  false,
+);
 
 export default async function GoPage({ params }: { params: Promise<{ offerId: string }> }) {
   const { offerId } = await params;
   const directory = await getDirectory();
   const match = directory.matches.find((item) =>
-    item.offers.some((offer) => offer.id === offerId && offer.approved && offer.status === "active"),
+    item.offers.some(
+      (offer) => offer.id === offerId && offer.approved && offer.status === "active",
+    ),
   );
   const offer = match?.offers.find((item) => item.id === offerId);
   if (!match || !offer) notFound();
@@ -37,7 +44,9 @@ export default async function GoPage({ params }: { params: Promise<{ offerId: st
       <dl className="mt-6 grid gap-3 rounded-[1.25rem] border border-line bg-surface p-5">
         <div>
           <dt className="text-sm text-muted">Match</dt>
-          <dd className="font-medium">{match.homeName} vs {match.awayName}</dd>
+          <dd className="font-medium">
+            {match.homeName} vs {match.awayName}
+          </dd>
         </div>
         <div>
           <dt className="text-sm text-muted">Seller</dt>

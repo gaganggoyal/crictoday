@@ -23,11 +23,11 @@ The sign-in page shows the magic link when demo roles are allowed. Nothing is em
 ## Checks
 
 ```bash
-pnpm ci
+pnpm run ci
 pnpm test:e2e
 ```
 
-`pnpm ci` is lint, typecheck, unit tests, and the production build. Playwright installs a browser on first run and drives `pnpm dev`.
+`pnpm run ci` is lint, typecheck, unit tests, and the production build. Playwright installs a browser on first run and drives `pnpm dev`.
 
 ## Production
 

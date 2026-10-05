@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { findDuplicateCandidates } from "@/lib/domain/duplicates";
 import { filterMatches, parseFilters, pickHero } from "@/lib/domain/filters";
-import { planImport, normalizeSportMonksFixture, normalizeTicketmasterEvent } from "@/lib/domain/providers";
+import {
+  planImport,
+  normalizeSportMonksFixture,
+  normalizeTicketmasterEvent,
+} from "@/lib/domain/providers";
 import { priceLabel, resolveAttendance } from "@/lib/domain/ticket-state";
 import { zonedTimeToUtc } from "@/lib/domain/time";
 import { assertHttpsUrl } from "@/lib/domain/urls";
@@ -29,7 +33,9 @@ function offer(patch: Partial<StoredOffer> = {}): StoredOffer {
 
 describe("attendance and price", () => {
   it("uses one state and hides a price that was not checked in the last 7 days", () => {
-    const match = matches.find((item) => item.slug === "india-vs-australia-1st-test-ahmedabad-2026-10-16");
+    const match = matches.find(
+      (item) => item.slug === "india-vs-australia-1st-test-ahmedabad-2026-10-16",
+    );
     expect(match).toBeTruthy();
     expect(resolveAttendance(match!, match!.offers)).toBe("OFFICIAL_LINK");
     expect(priceLabel(match!.offers[0], now)).toContain("1,500");
@@ -115,22 +121,36 @@ describe("duplicates and import planning", () => {
       sourceUrl: "https://www.sportmonks.com/",
     };
     const plan = planImport(existing, [
-      { ...fresh, externalId: "sportmonks:1", home: "India", away: "Australia", startsAt: "2026-10-16T05:00:00.000Z" },
+      {
+        ...fresh,
+        externalId: "sportmonks:1",
+        home: "India",
+        away: "Australia",
+        startsAt: "2026-10-16T05:00:00.000Z",
+      },
       { ...fresh, externalId: "sportmonks:9", home: "Mumbai", away: "Karnataka" },
-      { ...fresh, externalId: "sportmonks:3", home: "Australia", away: "India", startsAt: "2026-10-16T08:00:00.000Z" },
+      {
+        ...fresh,
+        externalId: "sportmonks:3",
+        home: "Australia",
+        away: "India",
+        startsAt: "2026-10-16T08:00:00.000Z",
+      },
       fresh,
       fresh,
     ]);
     expect(plan.updates.map((item) => item.id)).toEqual(["seed-1"]);
     expect(plan.inserts.map((item) => item.externalId)).toEqual(["sportmonks:2"]);
     expect(plan.conflicts).toHaveLength(2);
-    expect(findDuplicateCandidates(existing, {
-      home: "Australia",
-      away: "India",
-      venue: "Other",
-      competition: "Other",
-      startsAt: "2026-10-16T06:00:00.000Z",
-    })).toHaveLength(1);
+    expect(
+      findDuplicateCandidates(existing, {
+        home: "Australia",
+        away: "India",
+        venue: "Other",
+        competition: "Other",
+        startsAt: "2026-10-16T06:00:00.000Z",
+      }),
+    ).toHaveLength(1);
   });
 });
 
@@ -202,7 +222,9 @@ describe("submission schema", () => {
 
   it("rejects the same side, a shortener, and a missing consent", () => {
     expect(matchSubmissionSchema.safeParse({ ...valid, awayTeam: "North" }).success).toBe(false);
-    expect(matchSubmissionSchema.safeParse({ ...valid, ticketUrl: "https://bit.ly/abc" }).success).toBe(false);
+    expect(
+      matchSubmissionSchema.safeParse({ ...valid, ticketUrl: "https://bit.ly/abc" }).success,
+    ).toBe(false);
     expect(matchSubmissionSchema.safeParse({ ...valid, consent: false }).success).toBe(false);
     expect(matchSubmissionSchema.safeParse(valid).success).toBe(true);
   });

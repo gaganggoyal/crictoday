@@ -37,21 +37,31 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
       <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">{country.iso2}</p>
-      <h1 className="font-display text-5xl font-extrabold tracking-tight">Cricket in {country.name}</h1>
+      <h1 className="font-display text-5xl font-extrabold tracking-tight">
+        Cricket in {country.name}
+      </h1>
       <p className="mt-3 max-w-2xl text-muted">{country.blurb}</p>
       <p className="mt-3 max-w-2xl text-sm">{country.ticketGuidance}</p>
       <div className="mt-6 flex flex-wrap gap-2">
         {cities.map((city) => (
-          <Link key={city.citySlug} href={`/country/${slug}/${city.citySlug}`} className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm">
+          <Link
+            key={city.citySlug}
+            href={`/country/${slug}/${city.citySlug}`}
+            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm"
+          >
             {city.cityName}
           </Link>
         ))}
       </div>
       <div className="mt-10 grid gap-10">
-        {matches.length === 0 ? <EmptyResults title={`No listed matches in ${country.name}`} /> : null}
+        {matches.length === 0 ? (
+          <EmptyResults title={`No listed matches in ${country.name}`} />
+        ) : null}
         {[...groups.entries()].map(([day, dayMatches]) => (
           <section key={day}>
-            <h2 className="mb-4 font-display text-2xl font-extrabold">{formatDateHeading(dayMatches[0]!.startsAt, country.timezone)}</h2>
+            <h2 className="mb-4 font-display text-2xl font-extrabold">
+              {formatDateHeading(dayMatches[0]!.startsAt, country.timezone)}
+            </h2>
             <MatchGrid matches={dayMatches} now={now} />
           </section>
         ))}

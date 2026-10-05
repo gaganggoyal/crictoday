@@ -74,7 +74,8 @@ export const leagues: LeagueInfo[] = [
     name: "Indian Premier League",
     kind: "league",
     officialUrl: "https://www.iplt20.com/",
-    summary: "The IPL season hub collects fixtures, grounds and the ticket state we have actually reviewed.",
+    summary:
+      "The IPL season hub collects fixtures, grounds and the ticket state we have actually reviewed.",
     ticketGuidance:
       "Franchise tickets are not published from a search feed. A link appears only after the seller domain is approved.",
     seasonSlug: "ipl-2027",
@@ -87,8 +88,10 @@ export const leagues: LeagueInfo[] = [
     name: "Big Bash League",
     kind: "league",
     officialUrl: "https://www.bigbash.com.au/",
-    summary: "BBL fixtures across the Australian grounds, with partner links kept separate from club sales.",
-    ticketGuidance: "Partner inventory is labelled. Sold-out matches offer an update list, not a resale market.",
+    summary:
+      "BBL fixtures across the Australian grounds, with partner links kept separate from club sales.",
+    ticketGuidance:
+      "Partner inventory is labelled. Sold-out matches offer an update list, not a resale market.",
     seasonSlug: "bbl-2026-27",
     seasonName: "BBL 2026-27",
     startsAt: "2026-12-01",
@@ -99,8 +102,10 @@ export const leagues: LeagueInfo[] = [
     name: "The Hundred",
     kind: "league",
     officialUrl: "https://www.thehundred.com/",
-    summary: "Hundred fixtures with the ground, local time and whether a reviewed ticket route exists.",
-    ticketGuidance: "If the official sale is closed, the match is marked sold out or not yet on sale.",
+    summary:
+      "Hundred fixtures with the ground, local time and whether a reviewed ticket route exists.",
+    ticketGuidance:
+      "If the official sale is closed, the match is marked sold out or not yet on sale.",
     seasonSlug: "the-hundred-2026",
     seasonName: "The Hundred 2026",
     startsAt: "2026-08-01",
@@ -111,8 +116,10 @@ export const leagues: LeagueInfo[] = [
     name: "SA20",
     kind: "league",
     officialUrl: "https://www.sa20.co.za/",
-    summary: "SA20 grounds and fixtures for the coming season, ready for ticket alerts before sales open.",
-    ticketGuidance: "No price is shown until an approved seller provides a currency and a fresh check.",
+    summary:
+      "SA20 grounds and fixtures for the coming season, ready for ticket alerts before sales open.",
+    ticketGuidance:
+      "No price is shown until an approved seller provides a currency and a fresh check.",
     seasonSlug: "sa20-2027",
     seasonName: "SA20 2027",
     startsAt: "2027-01-09",
@@ -245,7 +252,8 @@ export const matches: StoredMatch[] = [
     featuredRank: 20,
     lastVerifiedAt: VERIFIED,
     publishedAt: VERIFIED,
-    entryNotes: "Public stands open from 08:30. No ticket. Bring photo identification. Re-entry is not allowed after lunch.",
+    entryNotes:
+      "Public stands open from 08:30. No ticket. Bring photo identification. Re-entry is not allowed after lunch.",
     demo: true,
     academySlug: null,
     offers: [],
@@ -332,7 +340,8 @@ export const matches: StoredMatch[] = [
     featuredRank: 5,
     lastVerifiedAt: VERIFIED,
     publishedAt: VERIFIED,
-    entryNotes: "Registered trialists only. Parents may wait outside the nets. Contact the academy to be added to the list.",
+    entryNotes:
+      "Registered trialists only. Parents may wait outside the nets. Contact the academy to be added to the list.",
     demo: true,
     academySlug: "maidan-pace-lab",
     offers: [],
@@ -371,7 +380,8 @@ export const matches: StoredMatch[] = [
     featuredRank: 15,
     lastVerifiedAt: VERIFIED,
     publishedAt: VERIFIED,
-    entryNotes: "Gates open at 08:15. Free entry for families. Nets session for U14 and U16 after the match. No outside catering.",
+    entryNotes:
+      "Gates open at 08:15. Free entry for families. Nets session for U14 and U16 after the match. No outside catering.",
     demo: true,
     academySlug: "chandigarh-cricket-academy",
     offers: [],
@@ -1132,7 +1142,8 @@ export const academies: StoredAcademy[] = [
     id: "a-maidan",
     slug: "maidan-pace-lab",
     name: "Maidan Pace Lab",
-    description: "Lane-bowling sessions on the Maidan for players who already attend a club. Trials are private.",
+    description:
+      "Lane-bowling sessions on the Maidan for players who already attend a club. Trials are private.",
     address: "Cross Maidan, Churchgate, Mumbai",
     cityName: "Mumbai",
     citySlug: "mumbai",
@@ -1153,7 +1164,8 @@ export const academies: StoredAcademy[] = [
     id: "a-delhi",
     slug: "south-delhi-cricket-school",
     name: "South Delhi Cricket School",
-    description: "After-school groups and a Saturday match for school sides. Spectators are welcome at the open fixtures.",
+    description:
+      "After-school groups and a Saturday match for school sides. Spectators are welcome at the open fixtures.",
     address: "Saket, New Delhi",
     cityName: "Delhi",
     citySlug: "delhi",
@@ -1174,7 +1186,8 @@ export const academies: StoredAcademy[] = [
     id: "a-lords",
     slug: "marylebone-indoor-academy",
     name: "Marylebone Indoor Academy",
-    description: "Indoor nets near Lord's for junior and adult squads. Membership is separate from match tickets.",
+    description:
+      "Indoor nets near Lord's for junior and adult squads. Membership is separate from match tickets.",
     address: "St John's Wood, London",
     cityName: "London",
     citySlug: "london",
@@ -1195,7 +1208,8 @@ export const academies: StoredAcademy[] = [
     id: "a-melbourne",
     slug: "melbourne-grade-academy",
     name: "Melbourne Grade Academy",
-    description: "Winter and summer squads feeding local grade clubs. Open training is listed when the club confirms it.",
+    description:
+      "Winter and summer squads feeding local grade clubs. Open training is listed when the club confirms it.",
     address: "Jolimont, Melbourne",
     cityName: "Melbourne",
     citySlug: "melbourne",
@@ -1216,7 +1230,8 @@ export const academies: StoredAcademy[] = [
     id: "a-birmingham",
     slug: "birmingham-pathfinders",
     name: "Birmingham Pathfinders",
-    description: "A community academy at Edgbaston's edge, with girls' and boys' groups and a short summer camp.",
+    description:
+      "A community academy at Edgbaston's edge, with girls' and boys' groups and a short summer camp.",
     address: "Edgbaston, Birmingham",
     cityName: "Birmingham",
     citySlug: "birmingham",
@@ -1258,7 +1273,8 @@ export const academies: StoredAcademy[] = [
     id: "a-sydney-hidden",
     slug: "sydney-harbour-cricket-school",
     name: "Sydney Harbour Cricket School",
-    description: "Submitted academy still waiting for contact verification. Hidden from the public directory.",
+    description:
+      "Submitted academy still waiting for contact verification. Hidden from the public directory.",
     address: "Moore Park, Sydney",
     cityName: "Sydney",
     citySlug: "sydney",

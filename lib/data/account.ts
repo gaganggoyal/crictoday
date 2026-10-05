@@ -71,9 +71,18 @@ export async function accountSnapshot(session: Session): Promise<AccountSnapshot
   const [byUser, byEmail, alerts, owned, contacted] = await Promise.all([
     supabase.from("moderation_submissions").select("*").eq("submitter_id", session.userId),
     supabase.from("moderation_submissions").select("*").eq("submitter_email", email),
-    supabase.from("ticket_requests").select("id", { count: "exact", head: true }).eq("user_id", session.userId),
-    supabase.from("academies").select("slug, name, verification_status, verification_label").eq("owner_id", session.userId),
-    supabase.from("academies").select("slug, name, verification_status, verification_label").eq("contact_email", email),
+    supabase
+      .from("ticket_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", session.userId),
+    supabase
+      .from("academies")
+      .select("slug, name, verification_status, verification_label")
+      .eq("owner_id", session.userId),
+    supabase
+      .from("academies")
+      .select("slug, name, verification_status, verification_label")
+      .eq("contact_email", email),
   ]);
   const failed = byUser.error || byEmail.error || alerts.error || owned.error || contacted.error;
   if (failed) throw new Error(failed.message);

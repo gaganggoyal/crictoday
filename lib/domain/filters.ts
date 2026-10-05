@@ -39,13 +39,16 @@ export const TICKET_QUERY: Record<string, AttendanceState> = {
 };
 
 export function parseFilters(input: Record<string, string | undefined>): MatchFilters {
-  const kind = input.kind && KINDS.has(input.kind as CompetitionKind)
-    ? (input.kind as CompetitionKind)
-    : undefined;
-  const format = input.format && FORMATS.has(input.format as MatchFormat)
-    ? (input.format as MatchFormat)
-    : undefined;
-  const sort = input.sort && SORTS.has(input.sort as MatchSort) ? (input.sort as MatchSort) : "featured";
+  const kind =
+    input.kind && KINDS.has(input.kind as CompetitionKind)
+      ? (input.kind as CompetitionKind)
+      : undefined;
+  const format =
+    input.format && FORMATS.has(input.format as MatchFormat)
+      ? (input.format as MatchFormat)
+      : undefined;
+  const sort =
+    input.sort && SORTS.has(input.sort as MatchSort) ? (input.sort as MatchSort) : "featured";
   const page = Math.max(1, Number.parseInt(input.page || "1", 10) || 1);
   const tickets = input.tickets && TICKET_QUERY[input.tickets] ? input.tickets : undefined;
   return {
@@ -109,10 +112,16 @@ export function filterMatches(matches: StoredMatch[], filters: MatchFilters, now
     if (filters.kind && match.kind !== filters.kind) return false;
     if (filters.format && match.format !== filters.format) return false;
     if (query && !haystack(match).includes(query)) return false;
-    if (filters.from && new Date(match.startsAt).getTime() < new Date(`${filters.from}T00:00:00.000Z`).getTime()) {
+    if (
+      filters.from &&
+      new Date(match.startsAt).getTime() < new Date(`${filters.from}T00:00:00.000Z`).getTime()
+    ) {
       return false;
     }
-    if (filters.to && new Date(match.startsAt).getTime() > new Date(`${filters.to}T23:59:59.999Z`).getTime()) {
+    if (
+      filters.to &&
+      new Date(match.startsAt).getTime() > new Date(`${filters.to}T23:59:59.999Z`).getTime()
+    ) {
       return false;
     }
     if (wanted && resolveAttendance(match, match.offers) !== wanted) return false;
@@ -138,7 +147,8 @@ function compareMatches(a: StoredMatch, b: StoredMatch, sort: MatchSort) {
   }
   if (sort === "tickets") {
     const rank =
-      ticketSortRank(resolveAttendance(a, a.offers)) - ticketSortRank(resolveAttendance(b, b.offers));
+      ticketSortRank(resolveAttendance(a, a.offers)) -
+      ticketSortRank(resolveAttendance(b, b.offers));
     if (rank !== 0) return rank;
     return +new Date(a.startsAt) - +new Date(b.startsAt);
   }
@@ -155,7 +165,6 @@ export function pickHero(matches: StoredMatch[], now: Date) {
         new Date(match.startsAt).getTime() >= now.getTime() - 6 * 60 * 60 * 1000,
     )
     .sort(
-      (a, b) =>
-        b.featuredRank - a.featuredRank || +new Date(a.startsAt) - +new Date(b.startsAt),
+      (a, b) => b.featuredRank - a.featuredRank || +new Date(a.startsAt) - +new Date(b.startsAt),
     )[0];
 }

@@ -33,7 +33,9 @@ export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
             <p>
               <span className="text-muted">From: </span>
               <span className="font-medium">{price}</span>
-              <span className="text-muted">, checked {offer.lastCheckedAt ? new Date(offer.lastCheckedAt).toUTCString() : ""}</span>
+              <span className="text-muted">
+                , checked {offer.lastCheckedAt ? new Date(offer.lastCheckedAt).toUTCString() : ""}
+              </span>
             </p>
           ) : (
             <p className="text-muted">No current price is shown.</p>
@@ -53,7 +55,8 @@ export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
       ) : null}
       {alert ? <RequestForm matchSlug={match.slug} cta={copy.cta} /> : null}
       <p className="text-xs leading-5 text-muted">
-        cricketmatch.today does not sell tickets. Leaving this site is your choice, and only after the seller domain is shown.
+        cricketmatch.today does not sell tickets. Leaving this site is your choice, and only after
+        the seller domain is shown.
       </p>
     </aside>
   );

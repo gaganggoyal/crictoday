@@ -26,11 +26,11 @@ Attendance product for upcoming cricket. The public question is where the match 
 
 ## Data modes
 
-| Mode | When | Catalog | Writes |
-|---|---|---|---|
-| demo | Local dev, or `ALLOW_DEMO_DATA=true` | Labelled seed plus the JSON store | JSON store |
-| supabase | URL and publishable key are set | `match_directory`, `academy_directory` | Closed until service-role review functions are called by the server |
-| unconfigured | Production without Supabase | Empty | Closed |
+| Mode         | When                                 | Catalog                                | Writes                                                              |
+| ------------ | ------------------------------------ | -------------------------------------- | ------------------------------------------------------------------- |
+| demo         | Local dev, or `ALLOW_DEMO_DATA=true` | Labelled seed plus the JSON store      | JSON store                                                          |
+| supabase     | URL and publishable key are set      | `match_directory`, `academy_directory` | Closed until service-role review functions are called by the server |
+| unconfigured | Production without Supabase          | Empty                                  | Closed                                                              |
 
 ## Database
 
@@ -44,4 +44,4 @@ India, England, and Australia are the launch countries. The featured demo match 
 
 ## Verification
 
-`pnpm ci` runs lint, typecheck, unit tests, and the production build. `pnpm test:e2e` runs Playwright against `pnpm dev`. There is no interactive browser tool in this environment, so end-to-end coverage is Playwright and HTTP checks.
+`pnpm run ci` runs lint, typecheck, unit tests, and the production build. `pnpm test:e2e` runs Playwright against `pnpm dev`. There is no interactive browser tool in this environment, so end-to-end coverage is Playwright and HTTP checks.

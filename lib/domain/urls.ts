@@ -37,9 +37,7 @@ export function assertHttpsUrl(value: string) {
 
 export function isDeniedDomain(host: string, deny: string[]) {
   const normalized = host.replace(/^www\./, "").toLowerCase();
-  return deny.some(
-    (item) => normalized === item || normalized.endsWith(`.${item}`),
-  );
+  return deny.some((item) => normalized === item || normalized.endsWith(`.${item}`));
 }
 
 export function isAllowedDomain(host: string, allow: string[]) {

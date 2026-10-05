@@ -19,7 +19,13 @@ import {
   serviceReview,
 } from "@/lib/data/service-writes";
 import { emailService } from "@/lib/email/service";
-import { decryptString, encryptString, hashEmail, hashToken, newToken } from "@/lib/security/crypto";
+import {
+  decryptString,
+  encryptString,
+  hashEmail,
+  hashToken,
+  newToken,
+} from "@/lib/security/crypto";
 import { limitHit } from "@/lib/security/limit";
 import {
   academySubmissionSchema,
@@ -74,7 +80,9 @@ function failure(errors: Record<string, string>) {
 
 function requireWritable() {
   if (dataMode() === "unconfigured") {
-    return failure({ form: "This action needs a database. Connect Supabase before production use." });
+    return failure({
+      form: "This action needs a database. Connect Supabase before production use.",
+    });
   }
   return null;
 }
@@ -82,18 +90,35 @@ function requireWritable() {
 async function gate(scope: string, limit: number, windowMs: number, tooMany: string) {
   const result = await limitHit(await clientKey(scope), limit, windowMs);
   if (result.unavailable) {
-    return failure({ form: "This action is paused because the shared rate limit store is unavailable." });
+    return failure({
+      form: "This action is paused because the shared rate limit store is unavailable.",
+    });
   }
   if (!result.ok) return failure({ form: tooMany });
   return null;
 }
 
-async function deliver(emails: EmailDraft[]) {
+// The request is marked notified when its alert is drafted, so this is its only email.
+const ALERT_CLOSED =
+  "You asked for one alert for this match, so this request is now closed. We will not email you about it again.";
+
+/** Send approved-offer alerts. One failed send does not stop the rest. Returns the failure count. */
+async function deliverAlerts(emails: EmailDraft[]) {
   const service = emailService();
+  let failed = 0;
   for (const email of emails) {
-    const to = email.to.includes("@") ? email.to : decryptString(email.to);
-    await service.send({ ...email, to });
+    try {
+      const to = email.to.includes("@") ? email.to : decryptString(email.to);
+      await service.send({ ...email, to, text: `${email.text}\n${ALERT_CLOSED}` });
+    } catch (error) {
+      failed += 1;
+      console.error(
+        "[email] ticket alert not sent:",
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
+  return failed;
 }
 
 function readForm(formData: FormData) {
@@ -115,14 +140,21 @@ function readForm(formData: FormData) {
 }
 
 function withoutHoneypot<T extends { companyWebsite?: string }>(data: T) {
-  return Object.fromEntries(Object.entries(data).filter(([key]) => key !== "companyWebsite")) as Omit<T, "companyWebsite">;
+  return Object.fromEntries(
+    Object.entries(data).filter(([key]) => key !== "companyWebsite"),
+  ) as Omit<T, "companyWebsite">;
 }
 
 export async function requestMagicLinkAction(_state: unknown, formData: FormData) {
   const parsed = magicLinkSchema.safeParse(readForm(formData));
   if (!parsed.success) return failure(zodErrors(parsed.error));
   if (honeypot(parsed.data.companyWebsite)) return { ok: true as const, demo: false };
-  const limited = await gate(`auth:${parsed.data.email}`, 5, 60 * 60 * 1000, "Too many sign-in attempts. Try again later.");
+  const limited = await gate(
+    `auth:${parsed.data.email}`,
+    5,
+    60 * 60 * 1000,
+    "Too many sign-in attempts. Try again later.",
+  );
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
@@ -165,7 +197,9 @@ export async function requestMagicLinkAction(_state: unknown, formData: FormData
     text: `Sign in: ${link}\nThis link expires in 30 minutes.`,
   });
   if (demoRolesAllowed()) {
-    redirect(`/login/sent?email=${encodeURIComponent(parsed.data.email)}&token=${token}&next=${encodeURIComponent(next)}`);
+    redirect(
+      `/login/sent?email=${encodeURIComponent(parsed.data.email)}&token=${token}&next=${encodeURIComponent(next)}`,
+    );
   }
   redirect("/login/sent");
 }
@@ -194,7 +228,12 @@ export async function submitMatchAction(_state: unknown, formData: FormData) {
   const parsed = matchSubmissionSchema.safeParse(readForm(formData));
   if (!parsed.success) return failure(zodErrors(parsed.error));
   if (honeypot(parsed.data.companyWebsite)) return { ok: true as const, id: "ignored" };
-  const limited = await gate(`match:${parsed.data.contactEmail}`, 8, 60 * 60 * 1000, "Too many submissions. Try again in an hour.");
+  const limited = await gate(
+    `match:${parsed.data.contactEmail}`,
+    8,
+    60 * 60 * 1000,
+    "Too many submissions. Try again in an hour.",
+  );
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
@@ -224,7 +263,12 @@ export async function submitAcademyAction(_state: unknown, formData: FormData) {
   const parsed = academySubmissionSchema.safeParse(readForm(formData));
   if (!parsed.success) return failure(zodErrors(parsed.error));
   if (honeypot(parsed.data.companyWebsite)) return { ok: true as const, id: "ignored" };
-  const limited = await gate(`academy:${parsed.data.contactEmail}`, 8, 60 * 60 * 1000, "Too many submissions. Try again in an hour.");
+  const limited = await gate(
+    `academy:${parsed.data.contactEmail}`,
+    8,
+    60 * 60 * 1000,
+    "Too many submissions. Try again in an hour.",
+  );
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
@@ -251,7 +295,12 @@ export async function submitCorrectionAction(_state: unknown, formData: FormData
   const parsed = correctionSchema.safeParse(readForm(formData));
   if (!parsed.success) return failure(zodErrors(parsed.error));
   if (honeypot(parsed.data.companyWebsite)) return { ok: true as const, id: "ignored" };
-  const limited = await gate("correction", 10, 60 * 60 * 1000, "Too many reports. Try again later.");
+  const limited = await gate(
+    "correction",
+    10,
+    60 * 60 * 1000,
+    "Too many reports. Try again later.",
+  );
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
@@ -274,7 +323,11 @@ export async function submitCorrectionAction(_state: unknown, formData: FormData
   const result = commit(
     createCorrection(
       readStore(),
-      { matchSlug: parsed.data.matchSlug, email: parsed.data.email || undefined, details: parsed.data.details },
+      {
+        matchSlug: parsed.data.matchSlug,
+        email: parsed.data.email || undefined,
+        details: parsed.data.details,
+      },
       new Date(),
     ),
   );
@@ -288,7 +341,12 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   const parsed = ticketRequestSchema.safeParse(readForm(formData));
   if (!parsed.success) return failure(zodErrors(parsed.error));
   if (honeypot(parsed.data.companyWebsite)) return { ok: true as const, already: false };
-  const limited = await gate(`ticket:${parsed.data.email}`, 6, 60 * 60 * 1000, "Too many alert requests. Try again later.");
+  const limited = await gate(
+    `ticket:${parsed.data.email}`,
+    6,
+    60 * 60 * 1000,
+    "Too many alert requests. Try again later.",
+  );
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
@@ -309,7 +367,9 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
     });
     if (!result.ok) return result;
     if (!result.already) {
-      await sendAlertConfirmation(parsed.data.email, verify, unsub);
+      if (!(await sendAlertConfirmation(parsed.data.email, verify, unsub))) {
+        return confirmationNotSent();
+      }
       await track("ticket_request_started", { match: parsed.data.matchSlug });
     }
     return { ok: true as const, already: result.already };
@@ -329,7 +389,9 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   );
   if (!result.ok) return failure(result.errors);
   if (!result.result.already) {
-    await sendAlertConfirmation(parsed.data.email, verify, unsub);
+    if (!(await sendAlertConfirmation(parsed.data.email, verify, unsub))) {
+      return confirmationNotSent();
+    }
     await track("ticket_request_started", { match: parsed.data.matchSlug });
   }
   if (demoRolesAllowed() && !result.result.already) {
@@ -338,21 +400,37 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   return { ok: true as const, already: result.result.already };
 }
 
+/** Returns false when the email provider rejects the message. The request is already saved. */
 async function sendAlertConfirmation(email: string, verify: string, unsub: string) {
   const verifyLink = `${siteUrl()}/requests/${verify}`;
   const unsubLink = `${siteUrl()}/requests/${unsub}?intent=unsubscribe`;
-  await emailService().send({
-    to: email,
-    subject: "Confirm your cricket ticket alert",
-    text: `Confirm this alert: ${verifyLink}\nA request does not reserve a ticket.\nUnsubscribe: ${unsubLink}`,
+  try {
+    await emailService().send({
+      to: email,
+      subject: "Confirm your cricket ticket alert",
+      text: `Confirm this alert: ${verifyLink}\nA request does not reserve a ticket.\nUnsubscribe: ${unsubLink}`,
+    });
+    return true;
+  } catch (error) {
+    console.error(
+      "[email] alert confirmation not sent:",
+      error instanceof Error ? error.message : error,
+    );
+    return false;
+  }
+}
+
+function confirmationNotSent() {
+  return failure({
+    form: "We saved your request, but the confirmation email did not send, so the alert is not active yet.",
   });
 }
 
-export async function openRequestTokenAction(token: string, intent: string | undefined) {
+export async function openRequestTokenAction(_state: unknown, formData: FormData) {
   const blocked = requireWritable();
   if (blocked) return blocked;
-  const hashed = hashToken(token);
-  const unsubscribe = intent === "unsubscribe";
+  const hashed = hashToken(String(formData.get("token") || ""));
+  const unsubscribe = formData.get("intent") === "unsubscribe";
   if (dataMode() === "supabase") {
     const result = await serviceOpenTicketRequest(hashed, unsubscribe ? "unsubscribe" : "verify");
     if (!result.ok) return result;
@@ -367,7 +445,11 @@ export async function openRequestTokenAction(token: string, intent: string | und
   if (result.ok && unsubscribe) await track("ticket_request_unsubscribed");
   if (result.ok && !unsubscribe) await track("ticket_request_verified");
   return result.ok
-    ? { ok: true as const, matchSlug: result.result.matchSlug, intent: unsubscribe ? "unsubscribe" as const : "verify" as const }
+    ? {
+        ok: true as const,
+        matchSlug: result.result.matchSlug,
+        intent: unsubscribe ? ("unsubscribe" as const) : ("verify" as const),
+      }
     : failure(result.errors);
 }
 
@@ -421,17 +503,19 @@ export async function approveOfferAction(_state: unknown, formData: FormData) {
   if (dataMode() === "supabase") {
     const result = await serviceApproveOffer({ offerId, matchSlug, actorId: session.userId });
     if (!result.ok) return result;
-    await deliver(result.emails);
+    const failed = await deliverAlerts(result.emails);
     revalidatePath(`/match/${matchSlug}`);
     revalidatePath("/admin/ticket-links");
-    return { ok: true as const, notified: result.notified };
+    return { ok: true as const, notified: result.notified, failed };
   }
-  const result = commit(approveOffer(readStore(), { matchSlug, offerId, actorEmail: session.email }, new Date()));
+  const result = commit(
+    approveOffer(readStore(), { matchSlug, offerId, actorEmail: session.email }, new Date()),
+  );
   if (!result.ok) return failure(result.errors);
-  await deliver(result.emails);
+  const failed = await deliverAlerts(result.emails);
   revalidatePath(`/match/${matchSlug}`);
   revalidatePath("/admin/ticket-links");
-  return { ok: true as const, notified: result.result.notified };
+  return { ok: true as const, notified: result.result.notified, failed };
 }
 
 export async function markVerifiedAction(_state: unknown, formData: FormData) {
@@ -446,7 +530,9 @@ export async function markVerifiedAction(_state: unknown, formData: FormData) {
     revalidatePath(`/match/${matchSlug}`);
     return { ok: true as const };
   }
-  const result = commit(markVerified(readStore(), { matchSlug, actorEmail: session.email }, new Date()));
+  const result = commit(
+    markVerified(readStore(), { matchSlug, actorEmail: session.email }, new Date()),
+  );
   if (!result.ok) return failure(result.errors);
   revalidatePath(`/match/${matchSlug}`);
   return { ok: true as const };
@@ -462,12 +548,20 @@ export async function setUserRoleAction(_state: unknown, formData: FormData) {
   if (!ROLES.includes(role as Role)) return failure({ form: "Choose a role." });
   if (account.length < 3) return failure({ form: "Enter the account email or user id." });
   if (dataMode() === "supabase") {
-    const result = await serviceAssignRole({ account, role: role as Role, actorId: session.userId });
+    const result = await serviceAssignRole({
+      account,
+      role: role as Role,
+      actorId: session.userId,
+    });
     revalidatePath("/admin");
     return result;
   }
   const result = commit(
-    assignRole(readStore(), { actorEmail: session.email, actorRole: session.role, account, role: role as Role }, new Date()),
+    assignRole(
+      readStore(),
+      { actorEmail: session.email, actorRole: session.role, account, role: role as Role },
+      new Date(),
+    ),
   );
   revalidatePath("/admin");
   if (!result.ok) return failure(result.errors);

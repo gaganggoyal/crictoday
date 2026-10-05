@@ -10,7 +10,9 @@ describe("row level security", () => {
     });
     expect(rows.map((row) => row.slug)).toEqual(["india-australia-public"]);
     const directory = await asRole(db, "anon", null, async () => {
-      const result = await db.query<{ slug: string }>("SELECT slug FROM match_directory ORDER BY slug");
+      const result = await db.query<{ slug: string }>(
+        "SELECT slug FROM match_directory ORDER BY slug",
+      );
       return result.rows;
     });
     expect(directory.map((row) => row.slug)).toEqual(["india-australia-public"]);
@@ -32,16 +34,18 @@ describe("row level security", () => {
         `),
       ),
     ).rejects.toThrow(/permission denied|row-level security/i);
-    await expect(asRole(db, "anon", null, () => db.query("SELECT id FROM audit_log"))).rejects.toThrow(
-      /permission denied/i,
-    );
+    await expect(
+      asRole(db, "anon", null, () => db.query("SELECT id FROM audit_log")),
+    ).rejects.toThrow(/permission denied/i);
     await db.close();
   });
 
   it("stops a fan from changing their role and lets them change their display name", async () => {
     const db = await database();
     await expect(
-      asRole(db, "authenticated", FAN, () => db.query(`UPDATE profiles SET role = 'admin' WHERE id = '${FAN}'`)),
+      asRole(db, "authenticated", FAN, () =>
+        db.query(`UPDATE profiles SET role = 'admin' WHERE id = '${FAN}'`),
+      ),
     ).rejects.toThrow(/permission denied|role cannot be changed/i);
     await asRole(db, "authenticated", FAN, () =>
       db.query(`UPDATE profiles SET display_name = 'Asha' WHERE id = '${FAN}'`),
@@ -61,14 +65,18 @@ describe("row level security", () => {
       ),
     );
     const id = created.rows[0]?.create_submission;
-    const row = await db.query<{ status: string }>(`SELECT status::text AS status FROM submissions WHERE id = '${id}'`);
+    const row = await db.query<{ status: string }>(
+      `SELECT status::text AS status FROM submissions WHERE id = '${id}'`,
+    );
     expect(row.rows[0]?.status).toBe("pending");
     await db.close();
   });
 
   it("lets a moderator read the audit log", async () => {
     const db = await database();
-    const rows = await asRole(db, "authenticated", MOD, () => db.query("SELECT action FROM audit_log"));
+    const rows = await asRole(db, "authenticated", MOD, () =>
+      db.query("SELECT action FROM audit_log"),
+    );
     expect(rows.rows).toEqual([{ action: "match.publish" }]);
     await db.close();
   });

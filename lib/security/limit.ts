@@ -15,6 +15,9 @@ export async function limitHit(key: string, limit: number, windowMs: number): Pr
     p_window_ms: windowMs,
   });
   if (error || data == null) return { ok: false, retryAfterMs: windowMs, unavailable: true };
-  const body = (typeof data === "string" ? JSON.parse(data) : data) as { ok?: boolean; retry_after_ms?: number };
+  const body = (typeof data === "string" ? JSON.parse(data) : data) as {
+    ok?: boolean;
+    retry_after_ms?: number;
+  };
   return { ok: Boolean(body.ok), retryAfterMs: Number(body.retry_after_ms) || 0 };
 }

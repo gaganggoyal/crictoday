@@ -9,7 +9,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const league = leagues.find((item) => item.slug === slug);
   if (!league) notFound();
-  return pageMetadata(`${league.name} fixtures and official ticket links`, league.summary, `/league/${league.slug}`);
+  return pageMetadata(
+    `${league.name} fixtures and official ticket links`,
+    league.summary,
+    `/league/${league.slug}`,
+  );
 }
 
 export default async function LeaguePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,9 +29,12 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
       <h1 className="font-display text-5xl font-extrabold tracking-tight">{league.name}</h1>
       <p className="mt-3 max-w-2xl text-muted">{league.summary}</p>
       <p className="mt-3 text-sm">
-        Season: <Link href={`/league/${league.slug}/${league.seasonSlug}`}>{league.seasonName}</Link>
+        Season:{" "}
+        <Link href={`/league/${league.slug}/${league.seasonSlug}`}>{league.seasonName}</Link>
         {" · "}
-        <a href={league.officialUrl} target="_blank" rel="noopener noreferrer">Official site</a>
+        <a href={league.officialUrl} target="_blank" rel="noopener noreferrer">
+          Official site
+        </a>
       </p>
       <p className="mt-4 max-w-2xl text-sm">{league.ticketGuidance}</p>
       <p className="mt-4 text-sm text-muted">{teams.length} sides in the current listings.</p>
@@ -35,7 +42,9 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
         {matches.length ? (
           <MatchGrid matches={matches} now={new Date()} />
         ) : (
-          <p className="rounded-2xl border border-dashed border-line p-6">No fixtures are listed for this league yet.</p>
+          <p className="rounded-2xl border border-dashed border-line p-6">
+            No fixtures are listed for this league yet.
+          </p>
         )}
       </div>
     </div>

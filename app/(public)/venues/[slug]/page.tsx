@@ -24,10 +24,17 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
   const mapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.venueName}, ${venue.venueAddress}`)}`;
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
-      <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">{venue.cityName}</p>
+      <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">
+        {venue.cityName}
+      </p>
       <h1 className="font-display text-5xl font-extrabold tracking-tight">{venue.venueName}</h1>
       <p className="mt-3 text-muted">{venue.venueAddress}</p>
-      <a className="mt-4 inline-flex min-h-11 items-center text-link" href={mapHref} target="_blank" rel="noopener noreferrer">
+      <a
+        className="mt-4 inline-flex min-h-11 items-center text-link"
+        href={mapHref}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         Open map
       </a>
       <div className="mt-8">

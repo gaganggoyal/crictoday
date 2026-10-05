@@ -2,7 +2,7 @@
 
 Do not point cricketmatch.today at the public internet until these are true.
 
-- [ ] `pnpm ci` passes on the commit being deployed.
+- [ ] `pnpm run ci` passes on the commit being deployed.
 - [ ] `ALLOW_DEMO_DATA` is unset. The homepage does not show the demo banner or a DEMO fixture.
 - [ ] Supabase URL, publishable key, and secret key are set, and both migrations have been applied.
 - [ ] `ENCRYPTION_KEY` and `CRON_SECRET` are unique production secrets.

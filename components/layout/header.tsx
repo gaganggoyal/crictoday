@@ -45,12 +45,19 @@ export function Header({ email, staff }: { email: string | null; staff: boolean 
           })}
         </nav>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <Link href="/matches?tickets=alert" className="hidden min-h-11 items-center px-2 text-sm font-medium lg:inline-flex">
+          <Link
+            href="/matches?tickets=alert"
+            className="hidden min-h-11 items-center px-2 text-sm font-medium lg:inline-flex"
+          >
             Request tickets
           </Link>
           <ThemeToggle />
           {email ? (
-            <Button href={staff ? "/admin" : "/dashboard"} variant="outline" className="hidden sm:inline-flex">
+            <Button
+              href={staff ? "/admin" : "/dashboard"}
+              variant="outline"
+              className="hidden sm:inline-flex"
+            >
               Account
             </Button>
           ) : (

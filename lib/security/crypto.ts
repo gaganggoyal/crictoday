@@ -38,10 +38,7 @@ export function decryptString(payload: string) {
   if (!ivPart || !tagPart || !body) throw new Error("Invalid ciphertext.");
   const decipher = createDecipheriv("aes-256-gcm", keyBytes(), Buffer.from(ivPart, "base64url"));
   decipher.setAuthTag(Buffer.from(tagPart, "base64url"));
-  const plain = Buffer.concat([
-    decipher.update(Buffer.from(body, "base64url")),
-    decipher.final(),
-  ]);
+  const plain = Buffer.concat([decipher.update(Buffer.from(body, "base64url")), decipher.final()]);
   return plain.toString("utf8");
 }
 

@@ -20,7 +20,8 @@ export const ATTENDANCE_COPY: Record<
   REQUEST_ALERT: {
     label: "Sale not found/open",
     cta: "Request ticket alert",
-    description: "We email you if an approved offer is later listed. A request does not reserve a seat.",
+    description:
+      "We email you if an approved offer is later listed. A request does not reserve a seat.",
   },
   FREE_ENTRY: {
     label: "Free entry",

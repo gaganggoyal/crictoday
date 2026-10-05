@@ -8,7 +8,9 @@ describe("service role workflows", () => {
   it("hides review, role changes, and rate limits from anonymous and fan sessions", async () => {
     const db = await database();
     await expect(
-      asRole(db, "anon", null, () => db.query(`SELECT review_submission('${PUBLIC_MATCH}', 'approve', '', '', '${MOD}')`)),
+      asRole(db, "anon", null, () =>
+        db.query(`SELECT review_submission('${PUBLIC_MATCH}', 'approve', '', '', '${MOD}')`),
+      ),
     ).rejects.toThrow(/permission denied/i);
     await expect(
       asRole(db, "authenticated", FAN, () =>
@@ -108,7 +110,9 @@ describe("service role workflows", () => {
       `),
     );
     expect(request.rows[0]?.create_ticket_request.already).toBe(false);
-    await asService(db, () => db.query(`SELECT open_ticket_request('${"c".repeat(64)}', 'verify')`));
+    await asService(db, () =>
+      db.query(`SELECT open_ticket_request('${"c".repeat(64)}', 'verify')`),
+    );
     const approved = await asService(db, () =>
       db.query<{ approve_ticket_offer: { notified: number; emails: Array<{ to: string }> } }>(`
         SELECT approve_ticket_offer('${offer.rows[0]?.id}', 'india-australia-public', '${MOD}') AS approve_ticket_offer
@@ -132,7 +136,11 @@ describe("service role workflows", () => {
 
   it("upserts a provider fixture without publishing a ticket offer, and shares a rate limit", async () => {
     const db = await database();
-    const run = await asService(db, () => db.query<{ begin_import_run: string }>(`SELECT begin_import_run('sportmonks') AS begin_import_run`));
+    const run = await asService(db, () =>
+      db.query<{ begin_import_run: string }>(
+        `SELECT begin_import_run('sportmonks') AS begin_import_run`,
+      ),
+    );
     expect(run.rows[0]?.begin_import_run).toBeTruthy();
     const applied = await asService(db, () =>
       db.query<{ apply_provider_plan: { inserted: number; skipped: number } }>(`
@@ -227,13 +235,19 @@ describe("service role workflows", () => {
 
     const key = createHash("sha256").update("auth:person@example.com").digest("hex");
     const first = await asService(db, () =>
-      db.query<{ rate_limit_hit: { ok: boolean } }>(`SELECT rate_limit_hit('${key}', 2, 60000) AS rate_limit_hit`),
+      db.query<{ rate_limit_hit: { ok: boolean } }>(
+        `SELECT rate_limit_hit('${key}', 2, 60000) AS rate_limit_hit`,
+      ),
     );
     const second = await asService(db, () =>
-      db.query<{ rate_limit_hit: { ok: boolean } }>(`SELECT rate_limit_hit('${key}', 2, 60000) AS rate_limit_hit`),
+      db.query<{ rate_limit_hit: { ok: boolean } }>(
+        `SELECT rate_limit_hit('${key}', 2, 60000) AS rate_limit_hit`,
+      ),
     );
     const third = await asService(db, () =>
-      db.query<{ rate_limit_hit: { ok: boolean } }>(`SELECT rate_limit_hit('${key}', 2, 60000) AS rate_limit_hit`),
+      db.query<{ rate_limit_hit: { ok: boolean } }>(
+        `SELECT rate_limit_hit('${key}', 2, 60000) AS rate_limit_hit`,
+      ),
     );
     expect(first.rows[0]?.rate_limit_hit.ok).toBe(true);
     expect(second.rows[0]?.rate_limit_hit.ok).toBe(true);
@@ -242,8 +256,12 @@ describe("service role workflows", () => {
     await expect(
       asService(db, () => db.query(`SELECT set_user_role('${FAN}', 'admin', '${FAN}')`)),
     ).rejects.toThrow(/not allowed|Choose another account/i);
-    await asService(db, () => db.query(`SELECT set_user_role_for_account('fan@example.com', 'organiser', '${MOD}')`));
-    const role = await db.query<{ role: string }>(`SELECT role::text FROM profiles WHERE id = '${FAN}'`);
+    await asService(db, () =>
+      db.query(`SELECT set_user_role_for_account('fan@example.com', 'organiser', '${MOD}')`),
+    );
+    const role = await db.query<{ role: string }>(
+      `SELECT role::text FROM profiles WHERE id = '${FAN}'`,
+    );
     expect(role.rows[0]?.role).toBe("organiser");
     await db.close();
   });

@@ -2,7 +2,16 @@ import { countries } from "@/lib/data/seed";
 
 export function SearchForm({ compact = false }: { compact?: boolean }) {
   return (
-    <form action="/matches" method="get" className={compact ? "grid gap-3" : "grid gap-3 rounded-[1.25rem] bg-surface p-3 shadow-lg sm:grid-cols-[1fr_180px_auto] sm:items-center"} role="search">
+    <form
+      action="/matches"
+      method="get"
+      className={
+        compact
+          ? "grid gap-3 text-foreground"
+          : "grid gap-3 rounded-[1.25rem] bg-surface p-3 text-foreground shadow-lg sm:grid-cols-[1fr_180px_auto] sm:items-center"
+      }
+      role="search"
+    >
       <label className="grid gap-1 text-sm font-medium text-foreground">
         <span className="sr-only">Team, league, city or venue</span>
         <input
@@ -23,7 +32,10 @@ export function SearchForm({ compact = false }: { compact?: boolean }) {
           ))}
         </select>
       </label>
-      <button className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white hover:bg-[#105535]" type="submit">
+      <button
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white hover:bg-[#105535]"
+        type="submit"
+      >
         Search matches
       </button>
     </form>

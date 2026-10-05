@@ -12,7 +12,11 @@ export function MatchFiltersForm({
   cities: Array<{ slug: string; name: string; countrySlug: string }>;
 }) {
   return (
-    <form action="/matches" method="get" className="grid gap-4 rounded-[1.25rem] border border-line bg-surface p-4 lg:sticky lg:top-24">
+    <form
+      action="/matches"
+      method="get"
+      className="grid gap-4 rounded-[1.25rem] border border-line bg-surface p-4 lg:sticky lg:top-24"
+    >
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-xl font-bold">Filters</h2>
         <Link href="/matches" className="text-sm font-medium text-link">
@@ -20,7 +24,12 @@ export function MatchFiltersForm({
         </Link>
       </div>
       <Field label="Search" name="q" defaultValue={filters.q} placeholder="Team, ground, league" />
-      <Select label="Country" name="country" defaultValue={filters.country} options={countries.map((country) => [country.slug, country.name])} />
+      <Select
+        label="Country"
+        name="country"
+        defaultValue={filters.country}
+        options={countries.map((country) => [country.slug, country.name])}
+      />
       <Select
         label="City"
         name="city"
@@ -29,8 +38,18 @@ export function MatchFiltersForm({
       />
       <Field label="From" name="from" type="date" defaultValue={filters.from} />
       <Field label="To" name="to" type="date" defaultValue={filters.to} />
-      <Select label="Competition" name="kind" defaultValue={filters.kind} options={Object.entries(KIND_LABEL)} />
-      <Select label="Format" name="format" defaultValue={filters.format} options={Object.entries(FORMAT_LABEL)} />
+      <Select
+        label="Competition"
+        name="kind"
+        defaultValue={filters.kind}
+        options={Object.entries(KIND_LABEL)}
+      />
+      <Select
+        label="Format"
+        name="format"
+        defaultValue={filters.format}
+        options={Object.entries(FORMAT_LABEL)}
+      />
       <Select
         label="Ticket state"
         name="tickets"
@@ -58,10 +77,15 @@ export function MatchFiltersForm({
         ]}
         includeBlank={false}
       />
-      <button className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white" type="submit">
+      <button
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+        type="submit"
+      >
         Apply filters
       </button>
-      <p className="text-xs text-muted">Filter links stay in the address bar, so a result can be shared or crawled.</p>
+      <p className="text-xs text-muted">
+        Filter links stay in the address bar, so a result can be shared or crawled.
+      </p>
     </form>
   );
 }
@@ -86,7 +110,13 @@ function Field({
   return (
     <label className="grid gap-1.5 text-sm font-medium">
       {label}
-      <input className="field" name={name} type={type} defaultValue={defaultValue || ""} placeholder={placeholder} />
+      <input
+        className="field"
+        name={name}
+        type={type}
+        defaultValue={defaultValue || ""}
+        placeholder={placeholder}
+      />
     </label>
   );
 }

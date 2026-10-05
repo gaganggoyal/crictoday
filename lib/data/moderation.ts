@@ -4,7 +4,15 @@ import { supabaseServer } from "@/lib/auth/supabase-server";
 import { getDirectory } from "@/lib/data/catalog";
 import { dataMode } from "@/lib/data/mode";
 import { readStore } from "@/lib/data/store";
-import type { AuditRecord, ImportRun, StoredMatch, StoredOffer, Submission, TicketKind, TicketOfferStatus } from "@/lib/domain/types";
+import type {
+  AuditRecord,
+  ImportRun,
+  StoredMatch,
+  StoredOffer,
+  Submission,
+  TicketKind,
+  TicketOfferStatus,
+} from "@/lib/domain/types";
 import { mergeMatches } from "@/lib/domain/workflows";
 
 export type OfferQueueItem = {
@@ -93,9 +101,17 @@ export async function moderationSnapshot(): Promise<ModerationSnapshot> {
   const [submissions, offers, audit, imports, letters, directory] = await Promise.all([
     supabase.from("moderation_submissions").select("*").order("created_at", { ascending: false }),
     supabase.from("moderation_offers").select("*").order("match_slug"),
-    supabase.from("moderation_audit").select("*").order("created_at", { ascending: false }).limit(200),
+    supabase
+      .from("moderation_audit")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200),
     supabase.from("import_runs").select("*").order("started_at", { ascending: false }).limit(50),
-    supabase.from("dead_letters").select("id, provider, reason").order("created_at", { ascending: false }).limit(100),
+    supabase
+      .from("dead_letters")
+      .select("id, provider, reason")
+      .order("created_at", { ascending: false })
+      .limit(100),
     getDirectory(),
   ]);
   const failed = submissions.error || offers.error || audit.error || imports.error || letters.error;
