@@ -81,6 +81,11 @@ test("directories, leagues, and a missing match resolve", async ({ page }) => {
 
   await page.goto("/league/ipl");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Indian Premier League");
+  await page.goto("/league/ipl/ipl-2027");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Indian Premier League · IPL 2027",
+  );
+  expect((await page.goto("/league/ipl/ipl-1999"))?.status()).toBe(404);
   await page.goto("/teams/india");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("India");
   await page.goto("/venues/narendra-modi-stadium");
