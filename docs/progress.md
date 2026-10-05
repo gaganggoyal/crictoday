@@ -1,6 +1,6 @@
 # Progress
 
-Updated 4 October 2026.
+Updated 5 October 2026.
 
 ## Done
 
@@ -19,6 +19,7 @@ Updated 4 October 2026.
 - SportMonks upserts run inside `import_runs`. Ticketmaster offers stay pending.
 - Supabase Auth magic links replace the demo cookie when Supabase is configured. Demo sign-in stays on the local store, and `/login/verify` sets that cookie on a same-host redirect.
 - Rate limits use `rate_limits` when Supabase is configured, and the in-memory limiter otherwise.
+- Test pass on 5 October 2026. Fixed: an open redirect through the sign-in `next` path, forms that cleared input after a server error (including a review form that fell back to Approve), alert links that changed state on a GET, an invalid `.ics` export, the alert email text and failed-send handling, an unreadable dark-mode hero select, the Next.js 16 scroll warning, and `pnpm ci` in the docs. 18 Playwright and 34 Vitest tests pass.
 
 ## Not done
 
@@ -26,6 +27,9 @@ Updated 4 October 2026.
 - No live provider tokens are configured, so local `pnpm dev` still uses the labelled demo inventory.
 - The first admin is created in the SQL editor. The admin form can change roles only after that person exists.
 - Supabase Auth, Resend, and the redirect allow list are configuration, not code. They stay idle until the env vars and dashboard settings are filled in.
+- A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs `create_ticket_request` to rotate the token hashes.
+- On a phone, `/matches` shows ten filter fields before the first result.
+- supabase-js warns that Node 20 is deprecated. Use Node 22 for builds and the host.
 
 ## Next
 
