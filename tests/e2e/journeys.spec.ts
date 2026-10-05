@@ -119,7 +119,15 @@ test("a fan can request, confirm, and stop a ticket alert", async ({ page }) => 
     .getByRole("link", { name: "Demo inbox: stop this alert" })
     .getAttribute("href");
   expect(stopHref).toContain("intent=unsubscribe");
-  await page.getByRole("link", { name: "Demo inbox: open the confirmation link" }).click();
+  const confirmHref = await page
+    .getByRole("link", { name: "Demo inbox: open the confirmation link" })
+    .getAttribute("href");
+  // Mail scanners open every link in a message. Opening one must not change the alert.
+  await page.goto(stopHref || "/");
+  await expect(page.getByRole("heading", { name: "Stop this ticket alert?" })).toBeVisible();
+  await page.goto(confirmHref || "/");
+  await expect(page.getByRole("heading", { name: "Confirm your ticket alert" })).toBeVisible();
+  await page.getByRole("button", { name: "Confirm alert" }).click();
   await expect(page.getByRole("heading", { name: "Alert confirmed" })).toBeVisible();
   await page.getByRole("link", { name: "Back to the match" }).click();
   await expect(page).toHaveURL(/delhi-2026-10-24/);
@@ -133,6 +141,7 @@ test("a fan can request, confirm, and stop a ticket alert", async ({ page }) => 
   await page.getByRole("button", { name: "Request ticket alert" }).click();
   await expect(page.getByText("You already have an alert for this match.")).toBeVisible();
   await page.goto(stopHref || "/");
+  await page.getByRole("button", { name: "Stop alert" }).click();
   await expect(page.getByRole("heading", { name: "Alert stopped" })).toBeVisible();
 });
 

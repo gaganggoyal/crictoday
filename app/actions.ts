@@ -391,11 +391,11 @@ async function sendAlertConfirmation(email: string, verify: string, unsub: strin
   });
 }
 
-export async function openRequestTokenAction(token: string, intent: string | undefined) {
+export async function openRequestTokenAction(_state: unknown, formData: FormData) {
   const blocked = requireWritable();
   if (blocked) return blocked;
-  const hashed = hashToken(token);
-  const unsubscribe = intent === "unsubscribe";
+  const hashed = hashToken(String(formData.get("token") || ""));
+  const unsubscribe = formData.get("intent") === "unsubscribe";
   if (dataMode() === "supabase") {
     const result = await serviceOpenTicketRequest(hashed, unsubscribe ? "unsubscribe" : "verify");
     if (!result.ok) return result;
