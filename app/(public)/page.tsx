@@ -28,7 +28,7 @@ export default async function HomePage() {
       <section className="relative isolate min-h-[92svh] overflow-hidden">
         <Image
           src="/images/hero.jpg"
-          alt="A batter playing a shot in a crowded cricket stadium"
+          alt="A worn red cricket ball resting in the grass"
           fill
           priority
           sizes="100vw"
@@ -46,7 +46,7 @@ export default async function HomePage() {
             Upcoming cricket you can actually attend, from international stadiums to verified
             academy grounds, and the safest ticket route we have checked.
           </p>
-          <div className="mt-8 max-w-3xl text-[#162018]">
+          <div className="mt-8 max-w-3xl">
             <SearchForm />
           </div>
           {hero ? (

@@ -7,8 +7,8 @@ export function SearchForm({ compact = false }: { compact?: boolean }) {
       method="get"
       className={
         compact
-          ? "grid gap-3"
-          : "grid gap-3 rounded-[1.25rem] bg-surface p-3 shadow-lg sm:grid-cols-[1fr_180px_auto] sm:items-center"
+          ? "grid gap-3 text-foreground"
+          : "grid gap-3 rounded-[1.25rem] bg-surface p-3 text-foreground shadow-lg sm:grid-cols-[1fr_180px_auto] sm:items-center"
       }
       role="search"
     >

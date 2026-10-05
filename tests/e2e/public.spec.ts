@@ -98,3 +98,26 @@ test("a ticket alert is checked in the browser before it is sent", async ({ page
   await expect(page.getByLabel("Your country")).toHaveValue("India");
   expect(posted).toBe(false);
 });
+
+test("the hero search stays readable in dark mode", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("theme", "dark"));
+  await page.goto("/");
+  for (const name of ["Team, league, city or venue", "Country"]) {
+    const ratio = await page
+      .getByLabel(name)
+      .first()
+      .evaluate((element) => {
+        const luminance = (color: string) => {
+          const [r, g, b] = (color.match(/[\d.]+/g) ?? []).slice(0, 3).map((part) => {
+            const value = Number(part) / 255;
+            return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+          });
+          return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+        };
+        const style = getComputedStyle(element);
+        const [text, background] = [luminance(style.color), luminance(style.backgroundColor)];
+        return (Math.max(text, background) + 0.05) / (Math.min(text, background) + 0.05);
+      });
+    expect(ratio, name).toBeGreaterThan(4.5);
+  }
+});
