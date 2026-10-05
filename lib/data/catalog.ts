@@ -2,6 +2,8 @@ import "server-only";
 import { connection } from "next/server";
 import { countries, leagues } from "@/lib/data/seed";
 import { dataMode } from "@/lib/data/mode";
+import { mysqlPool } from "@/lib/data/mysql/pool";
+import { hasDemoListings, loadDirectory } from "@/lib/data/mysql/reads";
 import { readStore } from "@/lib/data/store";
 import { mapAcademyRow, mapMatchRow, supabaseAnon } from "@/lib/data/supabase";
 import { isPublicMatch, type StoredAcademy, type StoredMatch } from "@/lib/domain/types";
@@ -18,6 +20,10 @@ export type Directory = {
 export async function getDirectory(): Promise<Directory> {
   await connection();
   const mode = dataMode();
+  if (mode === "mysql") {
+    const { matches, academies } = await loadDirectory(mysqlPool());
+    return { mode, matches, academies, countries, leagues };
+  }
   if (mode === "supabase") {
     const client = supabaseAnon();
     if (!client) throw new Error("Supabase is not configured.");
@@ -61,4 +67,12 @@ export async function getAcademy(slug: string) {
     all.find((academy) => academy.slug === slug && academy.verificationStatus === "verified") ??
     null
   );
+}
+
+/** The site-wide DEMO banner shows while any illustrative fixture is listed. */
+export async function showDemoBanner() {
+  const mode = dataMode();
+  if (mode === "demo") return true;
+  if (mode === "mysql") return hasDemoListings(mysqlPool());
+  return false;
 }

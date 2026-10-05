@@ -5,10 +5,12 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { safeNextPath, siteUrl } from "@/lib/utils";
 import { supabaseServer } from "@/lib/auth/supabase-server";
-import { consumeDemoSignIn } from "@/lib/auth/demo-signin";
+import { consumeSignInLink } from "@/lib/auth/sign-in-link";
 import { clearSession, getSession, isStaff, setSession } from "@/lib/auth/session";
 import { readStore, writeStore } from "@/lib/data/store";
-import { dataMode, demoRolesAllowed } from "@/lib/data/mode";
+import { dataMode, demoRolesAllowed, devInboxAllowed, usesDatabase } from "@/lib/data/mode";
+import { createMagicLink } from "@/lib/data/mysql/auth";
+import { mysqlPool } from "@/lib/data/mysql/pool";
 import {
   serviceApproveOffer,
   serviceAssignRole,
@@ -182,21 +184,38 @@ export async function requestMagicLinkAction(_state: unknown, formData: FormData
   const token = newToken();
   const next = safeNextPath(parsed.data.next);
   const now = new Date();
-  const result = commit(
-    requestMagicLink(
-      readStore(),
-      { email: parsed.data.email, tokenHash: hashToken(token), allowDemoRoles: demoRolesAllowed() },
+  if (dataMode() === "mysql") {
+    await createMagicLink(
+      mysqlPool(),
+      { email: parsed.data.email, tokenHash: hashToken(token) },
       now,
-    ),
-  );
-  if (!result.ok) return failure(result.errors);
+    );
+  } else {
+    const result = commit(
+      requestMagicLink(
+        readStore(),
+        {
+          email: parsed.data.email,
+          tokenHash: hashToken(token),
+          allowDemoRoles: demoRolesAllowed(),
+        },
+        now,
+      ),
+    );
+    if (!result.ok) return failure(result.errors);
+  }
   const link = `${siteUrl()}/login/verify?token=${token}&next=${encodeURIComponent(next)}`;
-  await emailService().send({
-    to: parsed.data.email,
-    subject: "Your cricketmatch.today sign-in link",
-    text: `Sign in: ${link}\nThis link expires in 30 minutes.`,
-  });
-  if (demoRolesAllowed()) {
+  try {
+    await emailService().send({
+      to: parsed.data.email,
+      subject: "Your cricketmatch.today sign-in link",
+      text: `Sign in: ${link}\nThis link expires in 30 minutes.`,
+    });
+  } catch (error) {
+    console.error("[email] sign-in link not sent:", error instanceof Error ? error.message : error);
+    return failure({ form: "We could not send a sign-in link. Try again later." });
+  }
+  if (devInboxAllowed()) {
     redirect(
       `/login/sent?email=${encodeURIComponent(parsed.data.email)}&token=${token}&next=${encodeURIComponent(next)}`,
     );
@@ -205,7 +224,7 @@ export async function requestMagicLinkAction(_state: unknown, formData: FormData
 }
 
 export async function verifyMagicLinkAction(token: string) {
-  const result = consumeDemoSignIn(token);
+  const result = await consumeSignInLink(token);
   if (!result.ok) return failure(result.errors);
   await setSession({
     userId: result.result.userId,
@@ -237,7 +256,7 @@ export async function submitMatchAction(_state: unknown, formData: FormData) {
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const session = await getSession();
     const result = await serviceCreateSubmission({
       entityType: "match",
@@ -272,7 +291,7 @@ export async function submitAcademyAction(_state: unknown, formData: FormData) {
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const session = await getSession();
     const result = await serviceCreateSubmission({
       entityType: "academy",
@@ -304,7 +323,7 @@ export async function submitCorrectionAction(_state: unknown, formData: FormData
   if (limited) return limited;
   const blocked = requireWritable();
   if (blocked) return blocked;
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const session = await getSession();
     const result = await serviceCreateSubmission({
       entityType: "correction",
@@ -352,7 +371,7 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   if (blocked) return blocked;
   const verify = newToken();
   const unsub = newToken();
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const session = await getSession();
     const result = await serviceCreateTicketRequest({
       matchSlug: parsed.data.matchSlug,
@@ -371,6 +390,9 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
         return confirmationNotSent();
       }
       await track("ticket_request_started", { match: parsed.data.matchSlug });
+      if (devInboxAllowed()) {
+        return { ok: true as const, already: false, demoVerify: verify, demoUnsubscribe: unsub };
+      }
     }
     return { ok: true as const, already: result.already };
   }
@@ -394,7 +416,7 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
     }
     await track("ticket_request_started", { match: parsed.data.matchSlug });
   }
-  if (demoRolesAllowed() && !result.result.already) {
+  if (devInboxAllowed() && !result.result.already) {
     return { ok: true as const, already: false, demoVerify: verify, demoUnsubscribe: unsub };
   }
   return { ok: true as const, already: result.result.already };
@@ -431,7 +453,7 @@ export async function openRequestTokenAction(_state: unknown, formData: FormData
   if (blocked) return blocked;
   const hashed = hashToken(String(formData.get("token") || ""));
   const unsubscribe = formData.get("intent") === "unsubscribe";
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const result = await serviceOpenTicketRequest(hashed, unsubscribe ? "unsubscribe" : "verify");
     if (!result.ok) return result;
     if (result.intent === "unsubscribe") await track("ticket_request_unsubscribed");
@@ -460,7 +482,7 @@ export async function reviewSubmissionAction(_state: unknown, formData: FormData
   if (blocked) return blocked;
   const parsed = reviewSchema.safeParse(readForm(formData));
   if (!parsed.success) return failure(zodErrors(parsed.error));
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const result = await serviceReview({
       id: parsed.data.id,
       action: parsed.data.action,
@@ -500,7 +522,7 @@ export async function approveOfferAction(_state: unknown, formData: FormData) {
   if (blocked) return blocked;
   const matchSlug = String(formData.get("matchSlug") || "");
   const offerId = String(formData.get("offerId") || "");
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const result = await serviceApproveOffer({ offerId, matchSlug, actorId: session.userId });
     if (!result.ok) return result;
     const failed = await deliverAlerts(result.emails);
@@ -524,7 +546,7 @@ export async function markVerifiedAction(_state: unknown, formData: FormData) {
   const blocked = requireWritable();
   if (blocked) return blocked;
   const matchSlug = String(formData.get("matchSlug") || "");
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const result = await serviceMarkVerified({ matchSlug, actorId: session.userId });
     if (!result.ok) return result;
     revalidatePath(`/match/${matchSlug}`);
@@ -547,7 +569,7 @@ export async function setUserRoleAction(_state: unknown, formData: FormData) {
   const role = String(formData.get("role") || "");
   if (!ROLES.includes(role as Role)) return failure({ form: "Choose a role." });
   if (account.length < 3) return failure({ form: "Enter the account email or user id." });
-  if (dataMode() === "supabase") {
+  if (usesDatabase()) {
     const result = await serviceAssignRole({
       account,
       role: role as Role,
