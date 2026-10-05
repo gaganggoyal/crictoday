@@ -29,7 +29,8 @@ It checks out `origin/main` (or the branch or commit you pass as the first argum
 Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch corepack pnpm db migrate`.
 
 - `pnpm db migrate` applies `db/mysql/*.sql` files that have not run.
-- `pnpm db seed-demo` loads the labelled DEMO catalogue. `pnpm db remove-demo` deletes it, with its offers, alerts and clicks. Run it when real fixtures are listed.
+- `pnpm db load-fixtures data/fixtures/2026-27.json` adds the real fixtures in that file and updates the ones it loaded before. Add `--dry-run` to check the file first. [data/fixtures/README.md](../data/fixtures/README.md) explains the format and the sourcing rules.
+- `pnpm db seed-demo` loads the labelled DEMO catalogue. `pnpm db remove-demo` deletes it, with its offers, alerts and clicks.
 - `pnpm db set-role <email> <role>` creates the account if needed and sets its role. `admin@cricketmatch.today` is the first admin.
 - `pnpm db sign-in-link <email>` prints a one-time sign-in link, valid for 30 minutes. Use it when email cannot reach that address.
 

@@ -66,6 +66,49 @@ export const countries: CountryInfo[] = [
     ticketGuidance:
       "CPL and international links are reviewed per ground. Confirm the island and the start time before you travel.",
   },
+  {
+    slug: "new-zealand",
+    name: "New Zealand",
+    iso2: "NZ",
+    timezone: "Pacific/Auckland",
+    launch: false,
+    blurb:
+      "Internationals at Eden Park, Hagley Oval, the Basin Reserve and the other New Zealand grounds, in local time.",
+    ticketGuidance:
+      "Home internationals are sold through New Zealand Cricket. If no approved link is listed, request an alert instead of buying from an unknown seller.",
+  },
+  {
+    slug: "pakistan",
+    name: "Pakistan",
+    iso2: "PK",
+    timezone: "Asia/Karachi",
+    launch: false,
+    blurb:
+      "Home internationals in Rawalpindi, Lahore and the other Pakistan grounds, in local time.",
+    ticketGuidance:
+      "Home internationals are sold through the Pakistan Cricket Board. If no approved link is listed, request an alert.",
+  },
+  {
+    slug: "bangladesh",
+    name: "Bangladesh",
+    iso2: "BD",
+    timezone: "Asia/Dhaka",
+    launch: false,
+    blurb: "Home internationals at Mirpur, Sylhet and the other Bangladesh grounds, in local time.",
+    ticketGuidance:
+      "Home internationals are sold through the Bangladesh Cricket Board. If no approved link is listed, request an alert.",
+  },
+  {
+    slug: "united-arab-emirates",
+    name: "United Arab Emirates",
+    iso2: "AE",
+    timezone: "Asia/Dubai",
+    launch: false,
+    blurb:
+      "Neutral-venue internationals in Abu Dhabi and Sharjah, including Afghanistan's home series.",
+    ticketGuidance:
+      "Tickets for UAE matches are sold per event. If no approved link is listed, request an alert.",
+  },
 ];
 
 export const leagues: LeagueInfo[] = [
@@ -93,9 +136,23 @@ export const leagues: LeagueInfo[] = [
     ticketGuidance:
       "Partner inventory is labelled. Sold-out matches offer an update list, not a resale market.",
     seasonSlug: "bbl-2026-27",
-    seasonName: "BBL 2026-27",
-    startsAt: "2026-12-01",
-    endsAt: "2027-01-25",
+    seasonName: "BBL|16",
+    startsAt: "2026-12-12",
+    endsAt: "2027-01-26",
+  },
+  {
+    slug: "wbbl",
+    name: "Women's Big Bash League",
+    kind: "league",
+    officialUrl: "https://www.cricket.com.au/matches/series/CA:4687/weber-wbbl-12",
+    summary:
+      "WBBL fixtures across the Australian grounds, from the opening double-header to the final series.",
+    ticketGuidance:
+      "Cricket Australia lists the ticket seller for each match. A link appears here only after its domain is approved.",
+    seasonSlug: "wbbl-2026",
+    seasonName: "WBBL|12",
+    startsAt: "2026-10-29",
+    endsAt: "2026-12-05",
   },
   {
     slug: "the-hundred",
@@ -122,8 +179,8 @@ export const leagues: LeagueInfo[] = [
       "No price is shown until an approved seller provides a currency and a fresh check.",
     seasonSlug: "sa20-2027",
     seasonName: "SA20 2027",
-    startsAt: "2027-01-09",
-    endsAt: "2027-02-08",
+    startsAt: "2027-01-17",
+    endsAt: "2027-02-21",
   },
   {
     slug: "cpl",

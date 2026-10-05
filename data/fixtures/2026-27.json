@@ -1,0 +1,2706 @@
+{
+  "checkedAt": "2026-10-06T06:00:00.000Z",
+  "countries": {
+    "india": "India",
+    "australia": "Australia",
+    "south-africa": "South Africa",
+    "new-zealand": "New Zealand",
+    "pakistan": "Pakistan",
+    "united-arab-emirates": "United Arab Emirates",
+    "bangladesh": "Bangladesh"
+  },
+  "teams": {
+    "adelaide-strikers": {
+      "name": "Adelaide Strikers",
+      "short": "STR"
+    },
+    "adelaide-strikers-women": {
+      "name": "Adelaide Strikers Women",
+      "short": "STR"
+    },
+    "afghanistan": {
+      "name": "Afghanistan",
+      "short": "AFG"
+    },
+    "australia": {
+      "name": "Australia",
+      "short": "AUS"
+    },
+    "australia-women": {
+      "name": "Australia Women",
+      "short": "AUS-W"
+    },
+    "bangladesh": {
+      "name": "Bangladesh",
+      "short": "BAN"
+    },
+    "bangladesh-women": {
+      "name": "Bangladesh Women",
+      "short": "BAN-W"
+    },
+    "brisbane-heat": {
+      "name": "Brisbane Heat",
+      "short": "HEA"
+    },
+    "brisbane-heat-women": {
+      "name": "Brisbane Heat Women",
+      "short": "HEA"
+    },
+    "durbans-super-giants": {
+      "name": "Durban's Super Giants",
+      "short": "DSG"
+    },
+    "england": {
+      "name": "England",
+      "short": "ENG"
+    },
+    "hobart-hurricanes": {
+      "name": "Hobart Hurricanes",
+      "short": "HUR"
+    },
+    "hobart-hurricanes-women": {
+      "name": "Hobart Hurricanes Women",
+      "short": "HUR"
+    },
+    "india": {
+      "name": "India",
+      "short": "IND"
+    },
+    "india-women": {
+      "name": "India Women",
+      "short": "IND-W"
+    },
+    "joburg-super-kings": {
+      "name": "Joburg Super Kings",
+      "short": "JSK"
+    },
+    "melbourne-renegades": {
+      "name": "Melbourne Renegades",
+      "short": "REN"
+    },
+    "melbourne-renegades-women": {
+      "name": "Melbourne Renegades Women",
+      "short": "REN"
+    },
+    "melbourne-stars": {
+      "name": "Melbourne Stars",
+      "short": "STA"
+    },
+    "melbourne-stars-women": {
+      "name": "Melbourne Stars Women",
+      "short": "STA"
+    },
+    "mi-cape-town": {
+      "name": "MI Cape Town",
+      "short": "MICT"
+    },
+    "new-zealand": {
+      "name": "New Zealand",
+      "short": "NZ"
+    },
+    "new-zealand-women": {
+      "name": "New Zealand Women",
+      "short": "NZ-W"
+    },
+    "paarl-royals": {
+      "name": "Paarl Royals",
+      "short": "PR"
+    },
+    "pakistan": {
+      "name": "Pakistan",
+      "short": "PAK"
+    },
+    "perth-scorchers": {
+      "name": "Perth Scorchers",
+      "short": "SCO"
+    },
+    "perth-scorchers-women": {
+      "name": "Perth Scorchers Women",
+      "short": "SCO"
+    },
+    "pretoria-capitals": {
+      "name": "Pretoria Capitals",
+      "short": "PC"
+    },
+    "south-africa": {
+      "name": "South Africa",
+      "short": "SA"
+    },
+    "south-africa-women": {
+      "name": "South Africa Women",
+      "short": "SA-W"
+    },
+    "sri-lanka": {
+      "name": "Sri Lanka",
+      "short": "SL"
+    },
+    "sunrisers-eastern-cape": {
+      "name": "Sunrisers Eastern Cape",
+      "short": "SEC"
+    },
+    "sydney-sixers": {
+      "name": "Sydney Sixers",
+      "short": "SIX"
+    },
+    "sydney-sixers-women": {
+      "name": "Sydney Sixers Women",
+      "short": "SIX"
+    },
+    "sydney-thunder": {
+      "name": "Sydney Thunder",
+      "short": "THU"
+    },
+    "sydney-thunder-women": {
+      "name": "Sydney Thunder Women",
+      "short": "THU"
+    },
+    "west-indies": {
+      "name": "West Indies",
+      "short": "WI"
+    },
+    "zimbabwe": {
+      "name": "Zimbabwe",
+      "short": "ZIM"
+    },
+    "zimbabwe-women": {
+      "name": "Zimbabwe Women",
+      "short": "ZIM-W"
+    }
+  },
+  "venues": {
+    "adelaide-oval": {
+      "name": "Adelaide Oval",
+      "city": "Adelaide",
+      "country": "australia",
+      "timezone": "Australia/Adelaide"
+    },
+    "allan-border-field": {
+      "name": "Allan Border Field",
+      "city": "Brisbane",
+      "country": "australia",
+      "timezone": "Australia/Brisbane"
+    },
+    "arun-jaitley-stadium": {
+      "name": "Arun Jaitley Stadium",
+      "city": "Delhi",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "barabati-stadium": {
+      "name": "Barabati Stadium",
+      "city": "Cuttack",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "barsapara-cricket-stadium": {
+      "name": "Barsapara Cricket Stadium",
+      "city": "Guwahati",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "basin-reserve": {
+      "name": "Basin Reserve",
+      "city": "Wellington",
+      "country": "new-zealand",
+      "timezone": "Pacific/Auckland"
+    },
+    "bay-oval": {
+      "name": "Bay Oval",
+      "city": "Tauranga",
+      "country": "new-zealand",
+      "timezone": "Pacific/Auckland"
+    },
+    "bca-stadium-kotambi": {
+      "name": "BCA Stadium, Kotambi",
+      "city": "Vadodara",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "bellerive-oval": {
+      "name": "Bellerive Oval",
+      "city": "Hobart",
+      "country": "australia",
+      "timezone": "Australia/Hobart"
+    },
+    "boland-park": {
+      "name": "Boland Park",
+      "city": "Paarl",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "buffalo-park": {
+      "name": "Buffalo Park",
+      "city": "East London",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "carrara-stadium": {
+      "name": "Carrara Stadium",
+      "city": "Gold Coast",
+      "country": "australia",
+      "timezone": "Australia/Brisbane"
+    },
+    "drummoyne-oval": {
+      "name": "Drummoyne Oval",
+      "city": "Sydney",
+      "country": "australia",
+      "timezone": "Australia/Sydney"
+    },
+    "eden-gardens": {
+      "name": "Eden Gardens",
+      "city": "Kolkata",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "eden-park": {
+      "name": "Eden Park",
+      "city": "Auckland",
+      "country": "new-zealand",
+      "timezone": "Pacific/Auckland"
+    },
+    "ekana-cricket-stadium": {
+      "name": "Ekana Cricket Stadium",
+      "city": "Lucknow",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "gaddafi-stadium": {
+      "name": "Gaddafi Stadium",
+      "city": "Lahore",
+      "country": "pakistan",
+      "timezone": "Asia/Karachi"
+    },
+    "hagley-oval": {
+      "name": "Hagley Oval",
+      "city": "Christchurch",
+      "country": "new-zealand",
+      "timezone": "Pacific/Auckland"
+    },
+    "holkar-cricket-stadium": {
+      "name": "Holkar Cricket Stadium",
+      "city": "Indore",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "jb-marks-oval": {
+      "name": "JB Marks Oval",
+      "city": "Potchefstroom",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "jsca-international-stadium-complex": {
+      "name": "JSCA International Stadium Complex",
+      "city": "Ranchi",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "junction-oval": {
+      "name": "Junction Oval",
+      "city": "Melbourne",
+      "country": "australia",
+      "timezone": "Australia/Melbourne"
+    },
+    "karen-rolton-oval": {
+      "name": "Karen Rolton Oval",
+      "city": "Adelaide",
+      "country": "australia",
+      "timezone": "Australia/Adelaide"
+    },
+    "kimberley-oval": {
+      "name": "Kimberley Oval",
+      "city": "Kimberley",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "kingsmead": {
+      "name": "Kingsmead",
+      "city": "Durban",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "m-chinnaswamy-stadium": {
+      "name": "M. Chinnaswamy Stadium",
+      "city": "Bengaluru",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "ma-chidambaram-stadium": {
+      "name": "M. A. Chidambaram Stadium",
+      "city": "Chennai",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "maharashtra-cricket-association-stadium": {
+      "name": "Maharashtra Cricket Association Stadium",
+      "city": "Pune",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "mangaung-oval": {
+      "name": "Mangaung Oval",
+      "city": "Bloemfontein",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "manuka-oval": {
+      "name": "Manuka Oval",
+      "city": "Canberra",
+      "country": "australia",
+      "timezone": "Australia/Sydney"
+    },
+    "mcg": {
+      "name": "Melbourne Cricket Ground",
+      "city": "Melbourne",
+      "country": "australia",
+      "timezone": "Australia/Melbourne"
+    },
+    "narendra-modi-stadium": {
+      "name": "Narendra Modi Stadium",
+      "city": "Ahmedabad",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "newlands": {
+      "name": "Newlands",
+      "city": "Cape Town",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "niranjan-shah-stadium": {
+      "name": "Niranjan Shah Stadium",
+      "city": "Rajkot",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "north-sydney-oval": {
+      "name": "North Sydney Oval",
+      "city": "Sydney",
+      "country": "australia",
+      "timezone": "Australia/Sydney"
+    },
+    "perth-stadium": {
+      "name": "Perth Stadium",
+      "city": "Perth",
+      "country": "australia",
+      "timezone": "Australia/Perth"
+    },
+    "rajiv-gandhi-international-cricket-stadium": {
+      "name": "Rajiv Gandhi International Cricket Stadium",
+      "city": "Hyderabad",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "rawalpindi-cricket-stadium": {
+      "name": "Rawalpindi Cricket Stadium",
+      "city": "Rawalpindi",
+      "country": "pakistan",
+      "timezone": "Asia/Karachi"
+    },
+    "scg": {
+      "name": "Sydney Cricket Ground",
+      "city": "Sydney",
+      "country": "australia",
+      "timezone": "Australia/Sydney"
+    },
+    "seddon-park": {
+      "name": "Seddon Park",
+      "city": "Hamilton",
+      "country": "new-zealand",
+      "timezone": "Pacific/Auckland"
+    },
+    "shaheed-veer-narayan-singh-international-cricket-stadium": {
+      "name": "Shaheed Veer Narayan Singh International Cricket Stadium",
+      "city": "Raipur",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "sharjah-cricket-stadium": {
+      "name": "Sharjah Cricket Stadium",
+      "city": "Sharjah",
+      "country": "united-arab-emirates",
+      "timezone": "Asia/Dubai"
+    },
+    "sheikh-zayed-cricket-stadium": {
+      "name": "Sheikh Zayed Cricket Stadium",
+      "city": "Abu Dhabi",
+      "country": "united-arab-emirates",
+      "timezone": "Asia/Dubai"
+    },
+    "sher-e-bangla-national-cricket-stadium": {
+      "name": "Sher-e-Bangla National Cricket Stadium",
+      "city": "Dhaka",
+      "country": "bangladesh",
+      "timezone": "Asia/Dhaka"
+    },
+    "st-georges-park": {
+      "name": "St George's Park",
+      "city": "Gqeberha",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "supersport-park": {
+      "name": "SuperSport Park",
+      "city": "Centurion",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "sydney-showground-stadium": {
+      "name": "Sydney Showground Stadium",
+      "city": "Sydney",
+      "country": "australia",
+      "timezone": "Australia/Sydney"
+    },
+    "sylhet-international-cricket-stadium": {
+      "name": "Sylhet International Cricket Stadium",
+      "city": "Sylhet",
+      "country": "bangladesh",
+      "timezone": "Asia/Dhaka"
+    },
+    "the-gabba": {
+      "name": "The Gabba",
+      "city": "Brisbane",
+      "country": "australia",
+      "timezone": "Australia/Brisbane"
+    },
+    "vidarbha-cricket-association-stadium": {
+      "name": "Vidarbha Cricket Association Stadium",
+      "city": "Nagpur",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "waca-ground": {
+      "name": "WACA Ground",
+      "city": "Perth",
+      "country": "australia",
+      "timezone": "Australia/Perth"
+    },
+    "wanderers-stadium": {
+      "name": "Wanderers Stadium",
+      "city": "Johannesburg",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "wankhede-stadium": {
+      "name": "Wankhede Stadium",
+      "city": "Mumbai",
+      "country": "india",
+      "timezone": "Asia/Kolkata"
+    },
+    "wellington-regional-stadium": {
+      "name": "Wellington Regional Stadium",
+      "city": "Wellington",
+      "country": "new-zealand",
+      "timezone": "Pacific/Auckland"
+    },
+    "willowmoore-park": {
+      "name": "Willowmoore Park",
+      "city": "Benoni",
+      "country": "south-africa",
+      "timezone": "Africa/Johannesburg"
+    },
+    "york-park": {
+      "name": "York Park",
+      "city": "Launceston",
+      "country": "australia",
+      "timezone": "Australia/Hobart"
+    }
+  },
+  "series": [
+    {
+      "id": "west-indies-in-india-2026-27",
+      "competition": "West Indies tour of India",
+      "competitionSlug": "west-indies-tour-of-india",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "west-indies-tour-of-india-2026-27",
+      "source": {
+        "url": "https://www.bcci.tv/news/article/fixtures-unveiled-for-team-india-s-international-home-season-2026-27",
+        "label": "BCCI home season fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "west-indies",
+          "venue": "ekana-cricket-stadium",
+          "start": "2026-10-06T19:00"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "west-indies",
+          "venue": "jsca-international-stadium-complex",
+          "start": "2026-10-09T19:00"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "west-indies",
+          "venue": "holkar-cricket-stadium",
+          "start": "2026-10-11T19:00"
+        },
+        {
+          "key": "t20i-4",
+          "label": "4th T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "west-indies",
+          "venue": "rajiv-gandhi-international-cricket-stadium",
+          "start": "2026-10-14T19:00"
+        },
+        {
+          "key": "t20i-5",
+          "label": "5th T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "west-indies",
+          "venue": "m-chinnaswamy-stadium",
+          "start": "2026-10-17T19:00"
+        }
+      ]
+    },
+    {
+      "id": "sri-lanka-in-india-2026-27",
+      "competition": "Sri Lanka tour of India",
+      "competitionSlug": "sri-lanka-tour-of-india",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "sri-lanka-tour-of-india-2026-27",
+      "source": {
+        "url": "https://www.bcci.tv/news/article/fixtures-unveiled-for-team-india-s-international-home-season-2026-27",
+        "label": "BCCI home season fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "india",
+          "away": "sri-lanka",
+          "venue": "arun-jaitley-stadium",
+          "start": "2026-12-13T14:00"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "india",
+          "away": "sri-lanka",
+          "venue": "m-chinnaswamy-stadium",
+          "start": "2026-12-16T14:00"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "india",
+          "away": "sri-lanka",
+          "venue": "narendra-modi-stadium",
+          "start": "2026-12-19T14:00"
+        },
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "sri-lanka",
+          "venue": "niranjan-shah-stadium",
+          "start": "2026-12-22T19:00"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "sri-lanka",
+          "venue": "barabati-stadium",
+          "start": "2026-12-24T19:00"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "india",
+          "away": "sri-lanka",
+          "venue": "maharashtra-cricket-association-stadium",
+          "start": "2026-12-27T19:00"
+        }
+      ]
+    },
+    {
+      "id": "zimbabwe-in-india-2026-27",
+      "competition": "Zimbabwe tour of India",
+      "competitionSlug": "zimbabwe-tour-of-india",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "zimbabwe-tour-of-india-2026-27",
+      "source": {
+        "url": "https://www.bcci.tv/news/article/fixtures-unveiled-for-team-india-s-international-home-season-2026-27",
+        "label": "BCCI home season fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "india",
+          "away": "zimbabwe",
+          "venue": "eden-gardens",
+          "start": "2027-01-03T14:00"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "india",
+          "away": "zimbabwe",
+          "venue": "rajiv-gandhi-international-cricket-stadium",
+          "start": "2027-01-06T14:00"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "india",
+          "away": "zimbabwe",
+          "venue": "wankhede-stadium",
+          "start": "2027-01-09T14:00"
+        }
+      ]
+    },
+    {
+      "id": "australia-in-india-2026-27",
+      "competition": "Border-Gavaskar Trophy",
+      "competitionSlug": "border-gavaskar-trophy",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "border-gavaskar-trophy-2026-27",
+      "source": {
+        "url": "https://www.bcci.tv/news/article/fixtures-unveiled-for-team-india-s-international-home-season-2026-27",
+        "label": "BCCI home season fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "india",
+          "away": "australia",
+          "venue": "vidarbha-cricket-association-stadium",
+          "start": "2027-01-21T09:30"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "india",
+          "away": "australia",
+          "venue": "ma-chidambaram-stadium",
+          "start": "2027-01-29T09:30"
+        },
+        {
+          "key": "test-3",
+          "label": "3rd Test",
+          "format": "test",
+          "home": "india",
+          "away": "australia",
+          "venue": "barsapara-cricket-stadium",
+          "start": "2027-02-11T09:00"
+        },
+        {
+          "key": "test-4",
+          "label": "4th Test",
+          "format": "test",
+          "home": "india",
+          "away": "australia",
+          "venue": "jsca-international-stadium-complex",
+          "start": "2027-02-19T09:30"
+        },
+        {
+          "key": "test-5",
+          "label": "5th Test",
+          "format": "test",
+          "home": "india",
+          "away": "australia",
+          "venue": "narendra-modi-stadium",
+          "start": "2027-02-27T09:30"
+        }
+      ]
+    },
+    {
+      "id": "zimbabwe-women-in-india-2026-27",
+      "competition": "Zimbabwe Women tour of India",
+      "competitionSlug": "zimbabwe-women-tour-of-india",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "zimbabwe-women-tour-of-india-2026-27",
+      "source": {
+        "url": "https://www.bcci.tv/articles/2026/news/55556339/bcci-announces-venues-and-fixtures-for-team-india-senior-women-india-a-and-india-u19-bilateral-series",
+        "label": "BCCI fixtures announcement"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "india-women",
+          "away": "zimbabwe-women",
+          "venue": "shaheed-veer-narayan-singh-international-cricket-stadium",
+          "start": "2026-10-16T19:00"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "india-women",
+          "away": "zimbabwe-women",
+          "venue": "shaheed-veer-narayan-singh-international-cricket-stadium",
+          "start": "2026-10-18T19:00"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "india-women",
+          "away": "zimbabwe-women",
+          "venue": "shaheed-veer-narayan-singh-international-cricket-stadium",
+          "start": "2026-10-20T19:00"
+        },
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "india-women",
+          "away": "zimbabwe-women",
+          "venue": "bca-stadium-kotambi",
+          "start": "2026-10-23T14:00"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "india-women",
+          "away": "zimbabwe-women",
+          "venue": "bca-stadium-kotambi",
+          "start": "2026-10-25T14:00"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "india-women",
+          "away": "zimbabwe-women",
+          "venue": "bca-stadium-kotambi",
+          "start": "2026-10-28T14:00"
+        }
+      ]
+    },
+    {
+      "id": "australia-in-south-africa-2026-27",
+      "competition": "Australia tour of South Africa",
+      "competitionSlug": "australia-tour-of-south-africa",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "australia-tour-of-south-africa-2026-27",
+      "source": {
+        "url": "https://cricket.co.za/csa-announces-unmissable-2026-27-home-season-for-the-proteas-men/",
+        "label": "Cricket South Africa fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "australia",
+          "venue": "kingsmead",
+          "start": "2026-10-09T09:30"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "australia",
+          "venue": "st-georges-park",
+          "start": "2026-10-18T10:00"
+        },
+        {
+          "key": "test-3",
+          "label": "3rd Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "australia",
+          "venue": "newlands",
+          "start": "2026-10-27T10:00"
+        }
+      ]
+    },
+    {
+      "id": "bangladesh-in-south-africa-2026-27",
+      "competition": "Bangladesh tour of South Africa",
+      "competitionSlug": "bangladesh-tour-of-south-africa",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "bangladesh-tour-of-south-africa-2026-27",
+      "source": {
+        "url": "https://cricket.co.za/csa-announces-unmissable-2026-27-home-season-for-the-proteas-men/",
+        "label": "Cricket South Africa fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "wanderers-stadium",
+          "start": "2026-11-15T10:00"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "supersport-park",
+          "start": "2026-11-23T10:00"
+        },
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "buffalo-park",
+          "start": "2026-12-01T13:30"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "st-georges-park",
+          "start": "2026-12-04T13:30"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "newlands",
+          "start": "2026-12-07T13:30"
+        },
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "kimberley-oval",
+          "start": "2026-12-10T18:00"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "willowmoore-park",
+          "start": "2026-12-12T14:30"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "south-africa",
+          "away": "bangladesh",
+          "venue": "supersport-park",
+          "start": "2026-12-13T14:30"
+        }
+      ]
+    },
+    {
+      "id": "england-in-south-africa-2026-27",
+      "competition": "England tour of South Africa",
+      "competitionSlug": "england-tour-of-south-africa",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "england-tour-of-south-africa-2026-27",
+      "source": {
+        "url": "https://cricket.co.za/csa-announces-unmissable-2026-27-home-season-for-the-proteas-men/",
+        "label": "Cricket South Africa fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "england",
+          "venue": "wanderers-stadium",
+          "start": "2026-12-17T10:00"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "england",
+          "venue": "supersport-park",
+          "start": "2026-12-26T10:00"
+        },
+        {
+          "key": "test-3",
+          "label": "3rd Test",
+          "format": "test",
+          "home": "south-africa",
+          "away": "england",
+          "venue": "newlands",
+          "start": "2027-01-03T10:30"
+        },
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "south-africa",
+          "away": "england",
+          "venue": "boland-park",
+          "start": "2027-01-10T10:00"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "south-africa",
+          "away": "england",
+          "venue": "mangaung-oval",
+          "start": "2027-01-13T13:30"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "south-africa",
+          "away": "england",
+          "venue": "mangaung-oval",
+          "start": "2027-01-15T10:00"
+        }
+      ]
+    },
+    {
+      "id": "australia-women-in-south-africa-2026-27",
+      "competition": "Australia Women tour of South Africa",
+      "competitionSlug": "australia-women-tour-of-south-africa",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "australia-women-tour-of-south-africa-2026-27",
+      "source": {
+        "url": "https://womenscricket.co.za/fixtures/",
+        "label": "Cricket South Africa women's fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "kimberley-oval",
+          "start": "2027-03-18T18:00"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "willowmoore-park",
+          "start": "2027-03-21T14:00"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "buffalo-park",
+          "start": "2027-03-23T18:00"
+        },
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "st-georges-park",
+          "start": "2027-03-27T10:00"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "boland-park",
+          "start": "2027-03-31T14:00"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "kingsmead",
+          "start": "2027-04-03T14:00"
+        },
+        {
+          "key": "test",
+          "label": "Only Test",
+          "format": "test",
+          "home": "south-africa-women",
+          "away": "australia-women",
+          "venue": "jb-marks-oval",
+          "start": "2027-04-08T10:00"
+        }
+      ]
+    },
+    {
+      "id": "england-in-australia-2026-27",
+      "competition": "England tour of Australia",
+      "competitionSlug": "england-tour-of-australia",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "england-tour-of-australia-2026-27",
+      "source": {
+        "url": "https://www.cricket.com.au/news/4473637/australian-cricket-schedule-2026-27-summer-tests-odi-t20i-bangladesh-new-zealand-england-150th-women-fixtures-dates-start-times",
+        "label": "Cricket Australia fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "australia",
+          "away": "england",
+          "venue": "perth-stadium",
+          "start": "2026-11-13T11:30"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "australia",
+          "away": "england",
+          "venue": "adelaide-oval",
+          "start": "2026-11-15T14:00"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "australia",
+          "away": "england",
+          "venue": "bellerive-oval",
+          "start": "2026-11-18T14:30"
+        },
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "australia",
+          "away": "england",
+          "venue": "mcg",
+          "start": "2026-11-21T19:15"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "australia",
+          "away": "england",
+          "venue": "carrara-stadium",
+          "start": "2026-11-24T18:15"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "australia",
+          "away": "england",
+          "venue": "the-gabba",
+          "start": "2026-11-27T18:15"
+        },
+        {
+          "key": "t20i-4",
+          "label": "4th T20I",
+          "format": "t20",
+          "home": "australia",
+          "away": "england",
+          "venue": "scg",
+          "start": "2026-11-29T19:15"
+        },
+        {
+          "key": "t20i-5",
+          "label": "5th T20I",
+          "format": "t20",
+          "home": "australia",
+          "away": "england",
+          "venue": "manuka-oval",
+          "start": "2026-12-02T19:15"
+        }
+      ]
+    },
+    {
+      "id": "new-zealand-in-australia-2026-27",
+      "competition": "New Zealand tour of Australia",
+      "competitionSlug": "new-zealand-tour-of-australia",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "new-zealand-tour-of-australia-2026-27",
+      "source": {
+        "url": "https://www.cricket.com.au/news/4473637/australian-cricket-schedule-2026-27-summer-tests-odi-t20i-bangladesh-new-zealand-england-150th-women-fixtures-dates-start-times",
+        "label": "Cricket Australia fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "australia",
+          "away": "new-zealand",
+          "venue": "perth-stadium",
+          "start": "2026-12-09T10:20"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "australia",
+          "away": "new-zealand",
+          "venue": "adelaide-oval",
+          "start": "2026-12-17T11:00"
+        },
+        {
+          "key": "test-3",
+          "label": "3rd Test",
+          "format": "test",
+          "home": "australia",
+          "away": "new-zealand",
+          "venue": "mcg",
+          "start": "2026-12-26T10:30"
+        },
+        {
+          "key": "test-4",
+          "label": "4th Test",
+          "format": "test",
+          "home": "australia",
+          "away": "new-zealand",
+          "venue": "scg",
+          "start": "2027-01-04T10:30"
+        }
+      ]
+    },
+    {
+      "id": "australia-v-england-150th-anniversary-test",
+      "competition": "150th Anniversary Test",
+      "competitionSlug": "150th-anniversary-test",
+      "kind": "international",
+      "season": "2027",
+      "seasonSlug": "150th-anniversary-test-2027",
+      "source": {
+        "url": "https://www.cricket.com.au/news/4473637/australian-cricket-schedule-2026-27-summer-tests-odi-t20i-bangladesh-new-zealand-england-150th-women-fixtures-dates-start-times",
+        "label": "Cricket Australia fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test",
+          "label": "Day-night Test",
+          "format": "test",
+          "home": "australia",
+          "away": "england",
+          "venue": "mcg",
+          "start": "2027-03-11T14:00"
+        }
+      ]
+    },
+    {
+      "id": "bangladesh-women-in-australia-2026-27",
+      "competition": "Bangladesh Women tour of Australia",
+      "competitionSlug": "bangladesh-women-tour-of-australia",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "bangladesh-women-tour-of-australia-2026-27",
+      "source": {
+        "url": "https://www.cricket.com.au/news/4517610/australia-womens-cricket-reschedule-summer-2026-27-bangladesh-new-zealand-icc-champions-trophy-clash",
+        "label": "Cricket Australia revised women's fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "australia-women",
+          "away": "bangladesh-women",
+          "venue": "allan-border-field",
+          "start": "2026-10-09T13:50"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "australia-women",
+          "away": "bangladesh-women",
+          "venue": "allan-border-field",
+          "start": "2026-10-11T13:50"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "australia-women",
+          "away": "bangladesh-women",
+          "venue": "allan-border-field",
+          "start": "2026-10-14T13:50"
+        }
+      ]
+    },
+    {
+      "id": "new-zealand-women-in-australia-2026-27",
+      "competition": "New Zealand Women tour of Australia",
+      "competitionSlug": "new-zealand-women-tour-of-australia",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "new-zealand-women-tour-of-australia-2026-27",
+      "source": {
+        "url": "https://www.cricket.com.au/news/4517610/australia-womens-cricket-reschedule-summer-2026-27-bangladesh-new-zealand-icc-champions-trophy-clash",
+        "label": "Cricket Australia revised women's fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "australia-women",
+          "away": "new-zealand-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-10-18T19:15"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "australia-women",
+          "away": "new-zealand-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-10-20T19:15"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "australia-women",
+          "away": "new-zealand-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-10-22T19:15"
+        },
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "australia-women",
+          "away": "new-zealand-women",
+          "venue": "manuka-oval",
+          "start": "2027-03-06T14:50"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "australia-women",
+          "away": "new-zealand-women",
+          "venue": "junction-oval",
+          "start": "2027-03-08T14:50"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "australia-women",
+          "away": "new-zealand-women",
+          "venue": "junction-oval",
+          "start": "2027-03-10T10:05"
+        }
+      ]
+    },
+    {
+      "id": "india-in-new-zealand-2026-27",
+      "competition": "India tour of New Zealand",
+      "competitionSlug": "india-tour-of-new-zealand",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "india-tour-of-new-zealand-2026-27",
+      "source": {
+        "url": "https://www.nzc.nz/news-items/historic-india-mega-tour-headlines-international-home-schedule/",
+        "label": "New Zealand Cricket home schedule"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "hagley-oval",
+          "start": "2026-10-22T20:00"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "hagley-oval",
+          "start": "2026-10-24T20:00"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "wellington-regional-stadium",
+          "start": "2026-10-27T20:00"
+        },
+        {
+          "key": "t20i-4",
+          "label": "4th T20I",
+          "format": "t20",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "eden-park",
+          "start": "2026-10-30T20:00"
+        },
+        {
+          "key": "t20i-5",
+          "label": "5th T20I",
+          "format": "t20",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "seddon-park",
+          "start": "2026-11-01T20:00"
+        },
+        {
+          "key": "odi-1",
+          "label": "1st ODI",
+          "format": "odi",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "eden-park",
+          "start": "2026-11-04T15:00"
+        },
+        {
+          "key": "odi-2",
+          "label": "2nd ODI",
+          "format": "odi",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "wellington-regional-stadium",
+          "start": "2026-11-07T15:00"
+        },
+        {
+          "key": "odi-3",
+          "label": "3rd ODI",
+          "format": "odi",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "seddon-park",
+          "start": "2026-11-10T15:00"
+        },
+        {
+          "key": "odi-4",
+          "label": "4th ODI",
+          "format": "odi",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "bay-oval",
+          "start": "2026-11-13T15:00"
+        },
+        {
+          "key": "odi-5",
+          "label": "5th ODI",
+          "format": "odi",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "bay-oval",
+          "start": "2026-11-15T15:00"
+        },
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "basin-reserve",
+          "start": "2026-11-19T11:00"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "new-zealand",
+          "away": "india",
+          "venue": "hagley-oval",
+          "start": "2026-11-27T11:00"
+        }
+      ]
+    },
+    {
+      "id": "pakistan-odi-tri-series-2026",
+      "competition": "Pakistan ODI Tri-Series",
+      "competitionSlug": "pakistan-odi-tri-series",
+      "kind": "international",
+      "season": "2026",
+      "seasonSlug": "pakistan-odi-tri-series-2026",
+      "source": {
+        "url": "https://www.pcb.com.pk/press-release-detail/pakistan-to-host-sri-lanka-and-england-for-t20is-odi-tri-series-and-tests.html",
+        "label": "PCB home season announcement"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "match-1",
+          "label": "Match 1",
+          "format": "odi",
+          "home": "pakistan",
+          "away": "sri-lanka",
+          "venue": "rawalpindi-cricket-stadium",
+          "start": "2026-10-18T13:00"
+        },
+        {
+          "key": "match-2",
+          "label": "Match 2",
+          "format": "odi",
+          "home": "pakistan",
+          "away": "england",
+          "venue": "rawalpindi-cricket-stadium",
+          "start": "2026-10-20T13:00"
+        },
+        {
+          "key": "match-3",
+          "label": "Match 3",
+          "format": "odi",
+          "home": "sri-lanka",
+          "away": "england",
+          "venue": "rawalpindi-cricket-stadium",
+          "start": "2026-10-22T13:00"
+        },
+        {
+          "key": "match-4",
+          "label": "Match 4",
+          "format": "odi",
+          "home": "pakistan",
+          "away": "england",
+          "venue": "gaddafi-stadium",
+          "start": "2026-10-25T13:00"
+        },
+        {
+          "key": "match-5",
+          "label": "Match 5",
+          "format": "odi",
+          "home": "pakistan",
+          "away": "sri-lanka",
+          "venue": "gaddafi-stadium",
+          "start": "2026-10-27T13:00"
+        },
+        {
+          "key": "match-6",
+          "label": "Match 6",
+          "format": "odi",
+          "home": "sri-lanka",
+          "away": "england",
+          "venue": "gaddafi-stadium",
+          "start": "2026-10-29T13:00"
+        }
+      ]
+    },
+    {
+      "id": "sri-lanka-in-pakistan-2026-27",
+      "competition": "Sri Lanka tour of Pakistan",
+      "competitionSlug": "sri-lanka-tour-of-pakistan",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "sri-lanka-tour-of-pakistan-2026-27",
+      "source": {
+        "url": "https://www.pcb.com.pk/press-release-detail/pakistan-to-host-sri-lanka-and-england-for-t20is-odi-tri-series-and-tests.html",
+        "label": "PCB home season announcement"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "pakistan",
+          "away": "sri-lanka",
+          "venue": "rawalpindi-cricket-stadium",
+          "start": "2026-11-09T10:00"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "pakistan",
+          "away": "sri-lanka",
+          "venue": "gaddafi-stadium",
+          "start": "2026-11-17T10:00"
+        }
+      ]
+    },
+    {
+      "id": "uae-odi-tri-series-2026",
+      "competition": "ODI Tri-Nation Series in the UAE",
+      "competitionSlug": "uae-odi-tri-nation-series",
+      "kind": "international",
+      "season": "2026",
+      "seasonSlug": "uae-odi-tri-nation-series-2026",
+      "source": {
+        "url": "https://acb.af/en-US/post/afghanistan-to-host-bangladesh-and-zimbabwe-for-multi-format-series-in-uae",
+        "label": "Afghanistan Cricket Board announcement"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "match-1",
+          "label": "Match 1",
+          "format": "odi",
+          "home": "bangladesh",
+          "away": "zimbabwe",
+          "venue": "sheikh-zayed-cricket-stadium",
+          "start": "2026-10-17T16:00"
+        },
+        {
+          "key": "match-2",
+          "label": "Match 2",
+          "format": "odi",
+          "home": "afghanistan",
+          "away": "zimbabwe",
+          "venue": "sheikh-zayed-cricket-stadium",
+          "start": "2026-10-19T16:00"
+        },
+        {
+          "key": "match-3",
+          "label": "Match 3",
+          "format": "odi",
+          "home": "afghanistan",
+          "away": "bangladesh",
+          "venue": "sharjah-cricket-stadium",
+          "start": "2026-10-21T16:00"
+        }
+      ]
+    },
+    {
+      "id": "zimbabwe-v-afghanistan-uae-2026-27",
+      "competition": "Afghanistan v Zimbabwe in the UAE",
+      "competitionSlug": "afghanistan-v-zimbabwe",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "afghanistan-v-zimbabwe-2026-27",
+      "source": {
+        "url": "https://acb.af/en-US/post/afghanistan-to-host-bangladesh-and-zimbabwe-for-multi-format-series-in-uae",
+        "label": "Afghanistan Cricket Board announcement"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "t20i-1",
+          "label": "1st T20I",
+          "format": "t20",
+          "home": "afghanistan",
+          "away": "zimbabwe",
+          "venue": "sharjah-cricket-stadium",
+          "start": "2026-10-27T18:30"
+        },
+        {
+          "key": "t20i-2",
+          "label": "2nd T20I",
+          "format": "t20",
+          "home": "afghanistan",
+          "away": "zimbabwe",
+          "venue": "sharjah-cricket-stadium",
+          "start": "2026-10-29T18:30"
+        },
+        {
+          "key": "t20i-3",
+          "label": "3rd T20I",
+          "format": "t20",
+          "home": "afghanistan",
+          "away": "zimbabwe",
+          "venue": "sharjah-cricket-stadium",
+          "start": "2026-11-01T18:30"
+        }
+      ]
+    },
+    {
+      "id": "west-indies-in-bangladesh-2026-27",
+      "competition": "West Indies tour of Bangladesh",
+      "competitionSlug": "west-indies-tour-of-bangladesh",
+      "kind": "international",
+      "season": "2026-27",
+      "seasonSlug": "west-indies-tour-of-bangladesh-2026-27",
+      "source": {
+        "url": "https://www.windiescricket.com/fixtures/",
+        "label": "Cricket West Indies fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "test-1",
+          "label": "1st Test",
+          "format": "test",
+          "home": "bangladesh",
+          "away": "west-indies",
+          "venue": "sher-e-bangla-national-cricket-stadium",
+          "start": "2026-10-28T10:00"
+        },
+        {
+          "key": "test-2",
+          "label": "2nd Test",
+          "format": "test",
+          "home": "bangladesh",
+          "away": "west-indies",
+          "venue": "sylhet-international-cricket-stadium",
+          "start": "2026-11-05T10:00"
+        }
+      ]
+    },
+    {
+      "id": "wbbl-12",
+      "competition": "Women's Big Bash League",
+      "competitionSlug": "wbbl",
+      "kind": "league",
+      "season": "WBBL|12",
+      "seasonSlug": "wbbl-2026",
+      "source": {
+        "url": "https://www.cricket.com.au/matches/series/CA:4687/weber-wbbl-12",
+        "label": "Cricket Australia WBBL|12 fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "match-1",
+          "label": "Match 1",
+          "format": "t20",
+          "home": "melbourne-renegades-women",
+          "away": "sydney-thunder-women",
+          "venue": "junction-oval",
+          "start": "2026-10-29T15:40"
+        },
+        {
+          "key": "match-2",
+          "label": "Match 2",
+          "format": "t20",
+          "home": "melbourne-stars-women",
+          "away": "hobart-hurricanes-women",
+          "venue": "junction-oval",
+          "start": "2026-10-29T19:10"
+        },
+        {
+          "key": "match-3",
+          "label": "Match 3",
+          "format": "t20",
+          "home": "brisbane-heat-women",
+          "away": "sydney-sixers-women",
+          "venue": "allan-border-field",
+          "start": "2026-10-30T18:10"
+        },
+        {
+          "key": "match-4",
+          "label": "Match 4",
+          "format": "t20",
+          "home": "adelaide-strikers-women",
+          "away": "melbourne-stars-women",
+          "venue": "karen-rolton-oval",
+          "start": "2026-10-31T15:10"
+        },
+        {
+          "key": "match-5",
+          "label": "Match 5",
+          "format": "t20",
+          "home": "perth-scorchers-women",
+          "away": "melbourne-renegades-women",
+          "venue": "waca-ground",
+          "start": "2026-10-31T16:10"
+        },
+        {
+          "key": "match-6",
+          "label": "Match 6",
+          "format": "t20",
+          "home": "sydney-thunder-women",
+          "away": "brisbane-heat-women",
+          "venue": "drummoyne-oval",
+          "start": "2026-11-01T15:40"
+        },
+        {
+          "key": "match-7",
+          "label": "Match 7",
+          "format": "t20",
+          "home": "sydney-sixers-women",
+          "away": "hobart-hurricanes-women",
+          "venue": "drummoyne-oval",
+          "start": "2026-11-01T19:10"
+        },
+        {
+          "key": "match-8",
+          "label": "Match 8",
+          "format": "t20",
+          "home": "melbourne-stars-women",
+          "away": "perth-scorchers-women",
+          "venue": "junction-oval",
+          "start": "2026-11-02T19:10"
+        },
+        {
+          "key": "match-9",
+          "label": "Match 9",
+          "format": "t20",
+          "home": "hobart-hurricanes-women",
+          "away": "melbourne-renegades-women",
+          "venue": "bellerive-oval",
+          "start": "2026-11-04T19:10"
+        },
+        {
+          "key": "match-10",
+          "label": "Match 10",
+          "format": "t20",
+          "home": "adelaide-strikers-women",
+          "away": "brisbane-heat-women",
+          "venue": "drummoyne-oval",
+          "start": "2026-11-05T15:40"
+        },
+        {
+          "key": "match-11",
+          "label": "Match 11",
+          "format": "t20",
+          "home": "sydney-thunder-women",
+          "away": "perth-scorchers-women",
+          "venue": "drummoyne-oval",
+          "start": "2026-11-05T19:10"
+        },
+        {
+          "key": "match-12",
+          "label": "Match 12",
+          "format": "t20",
+          "home": "melbourne-stars-women",
+          "away": "sydney-sixers-women",
+          "venue": "junction-oval",
+          "start": "2026-11-06T19:10"
+        },
+        {
+          "key": "match-13",
+          "label": "Match 13",
+          "format": "t20",
+          "home": "melbourne-renegades-women",
+          "away": "adelaide-strikers-women",
+          "venue": "junction-oval",
+          "start": "2026-11-07T15:40"
+        },
+        {
+          "key": "match-14",
+          "label": "Match 14",
+          "format": "t20",
+          "home": "brisbane-heat-women",
+          "away": "hobart-hurricanes-women",
+          "venue": "allan-border-field",
+          "start": "2026-11-07T18:10"
+        },
+        {
+          "key": "match-15",
+          "label": "Match 15",
+          "format": "t20",
+          "home": "sydney-sixers-women",
+          "away": "sydney-thunder-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-11-08T13:40"
+        },
+        {
+          "key": "match-16",
+          "label": "Match 16",
+          "format": "t20",
+          "home": "perth-scorchers-women",
+          "away": "melbourne-stars-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-11-08T17:10"
+        },
+        {
+          "key": "match-17",
+          "label": "Match 17",
+          "format": "t20",
+          "home": "hobart-hurricanes-women",
+          "away": "adelaide-strikers-women",
+          "venue": "bellerive-oval",
+          "start": "2026-11-10T19:10"
+        },
+        {
+          "key": "match-18",
+          "label": "Match 18",
+          "format": "t20",
+          "home": "perth-scorchers-women",
+          "away": "sydney-thunder-women",
+          "venue": "waca-ground",
+          "start": "2026-11-11T16:10"
+        },
+        {
+          "key": "match-19",
+          "label": "Match 19",
+          "format": "t20",
+          "home": "melbourne-stars-women",
+          "away": "brisbane-heat-women",
+          "venue": "junction-oval",
+          "start": "2026-11-12T15:40"
+        },
+        {
+          "key": "match-20",
+          "label": "Match 20",
+          "format": "t20",
+          "home": "melbourne-renegades-women",
+          "away": "sydney-sixers-women",
+          "venue": "junction-oval",
+          "start": "2026-11-12T19:10"
+        },
+        {
+          "key": "match-21",
+          "label": "Match 21",
+          "format": "t20",
+          "home": "hobart-hurricanes-women",
+          "away": "brisbane-heat-women",
+          "venue": "bellerive-oval",
+          "start": "2026-11-14T15:40"
+        },
+        {
+          "key": "match-22",
+          "label": "Match 22",
+          "format": "t20",
+          "home": "perth-scorchers-women",
+          "away": "adelaide-strikers-women",
+          "venue": "waca-ground",
+          "start": "2026-11-14T16:10"
+        },
+        {
+          "key": "match-23",
+          "label": "Match 23",
+          "format": "t20",
+          "home": "sydney-sixers-women",
+          "away": "melbourne-renegades-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-11-15T11:00"
+        },
+        {
+          "key": "match-24",
+          "label": "Match 24",
+          "format": "t20",
+          "home": "sydney-thunder-women",
+          "away": "melbourne-stars-women",
+          "venue": "drummoyne-oval",
+          "start": "2026-11-16T19:10"
+        },
+        {
+          "key": "match-25",
+          "label": "Match 25",
+          "format": "t20",
+          "home": "adelaide-strikers-women",
+          "away": "sydney-sixers-women",
+          "venue": "karen-rolton-oval",
+          "start": "2026-11-17T18:40"
+        },
+        {
+          "key": "match-26",
+          "label": "Match 26",
+          "format": "t20",
+          "home": "hobart-hurricanes-women",
+          "away": "perth-scorchers-women",
+          "venue": "allan-border-field",
+          "start": "2026-11-19T14:40"
+        },
+        {
+          "key": "match-27",
+          "label": "Match 27",
+          "format": "t20",
+          "home": "brisbane-heat-women",
+          "away": "sydney-thunder-women",
+          "venue": "allan-border-field",
+          "start": "2026-11-19T18:10"
+        },
+        {
+          "key": "match-28",
+          "label": "Match 28",
+          "format": "t20",
+          "home": "adelaide-strikers-women",
+          "away": "melbourne-renegades-women",
+          "venue": "adelaide-oval",
+          "start": "2026-11-20T18:40"
+        },
+        {
+          "key": "match-29",
+          "label": "Match 29",
+          "format": "t20",
+          "home": "hobart-hurricanes-women",
+          "away": "sydney-thunder-women",
+          "venue": "bellerive-oval",
+          "start": "2026-11-21T12:00"
+        },
+        {
+          "key": "match-30",
+          "label": "Match 30",
+          "format": "t20",
+          "home": "sydney-sixers-women",
+          "away": "perth-scorchers-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-11-21T15:30"
+        },
+        {
+          "key": "match-31",
+          "label": "Match 31",
+          "format": "t20",
+          "home": "brisbane-heat-women",
+          "away": "adelaide-strikers-women",
+          "venue": "allan-border-field",
+          "start": "2026-11-22T14:40"
+        },
+        {
+          "key": "match-32",
+          "label": "Match 32",
+          "format": "t20",
+          "home": "melbourne-stars-women",
+          "away": "melbourne-renegades-women",
+          "venue": "junction-oval",
+          "start": "2026-11-22T19:10"
+        },
+        {
+          "key": "match-33",
+          "label": "Match 33",
+          "format": "t20",
+          "home": "melbourne-renegades-women",
+          "away": "brisbane-heat-women",
+          "venue": "junction-oval",
+          "start": "2026-11-25T19:10"
+        },
+        {
+          "key": "match-34",
+          "label": "Match 34",
+          "format": "t20",
+          "home": "sydney-thunder-women",
+          "away": "adelaide-strikers-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-11-26T15:40"
+        },
+        {
+          "key": "match-35",
+          "label": "Match 35",
+          "format": "t20",
+          "home": "sydney-sixers-women",
+          "away": "melbourne-stars-women",
+          "venue": "north-sydney-oval",
+          "start": "2026-11-26T19:10"
+        },
+        {
+          "key": "match-36",
+          "label": "Match 36",
+          "format": "t20",
+          "home": "perth-scorchers-women",
+          "away": "hobart-hurricanes-women",
+          "venue": "waca-ground",
+          "start": "2026-11-27T18:10"
+        },
+        {
+          "key": "match-37",
+          "label": "Match 37",
+          "format": "t20",
+          "home": "melbourne-renegades-women",
+          "away": "melbourne-stars-women",
+          "venue": "junction-oval",
+          "start": "2026-11-28T15:40"
+        },
+        {
+          "key": "match-38",
+          "label": "Match 38",
+          "format": "t20",
+          "home": "sydney-thunder-women",
+          "away": "sydney-sixers-women",
+          "venue": "drummoyne-oval",
+          "start": "2026-11-28T19:10"
+        },
+        {
+          "key": "match-39",
+          "label": "Match 39",
+          "format": "t20",
+          "home": "brisbane-heat-women",
+          "away": "perth-scorchers-women",
+          "venue": "karen-rolton-oval",
+          "start": "2026-11-29T11:30"
+        },
+        {
+          "key": "match-40",
+          "label": "Match 40",
+          "format": "t20",
+          "home": "adelaide-strikers-women",
+          "away": "hobart-hurricanes-women",
+          "venue": "karen-rolton-oval",
+          "start": "2026-11-29T15:00"
+        }
+      ]
+    },
+    {
+      "id": "bbl-16",
+      "competition": "Big Bash League",
+      "competitionSlug": "bbl",
+      "kind": "league",
+      "season": "BBL|16",
+      "seasonSlug": "bbl-2026-27",
+      "source": {
+        "url": "https://www.bigbash.com.au/matches",
+        "label": "Big Bash League fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "match-1",
+          "label": "Match 1",
+          "format": "t20",
+          "home": "melbourne-renegades",
+          "away": "perth-scorchers",
+          "venue": "ma-chidambaram-stadium",
+          "start": "2026-12-12T14:40"
+        },
+        {
+          "key": "match-2",
+          "label": "Match 2",
+          "format": "t20",
+          "home": "brisbane-heat",
+          "away": "sydney-sixers",
+          "venue": "the-gabba",
+          "start": "2026-12-15T18:15"
+        },
+        {
+          "key": "match-3",
+          "label": "Match 3",
+          "format": "t20",
+          "home": "sydney-thunder",
+          "away": "adelaide-strikers",
+          "venue": "manuka-oval",
+          "start": "2026-12-16T19:15"
+        },
+        {
+          "key": "match-4",
+          "label": "Match 4",
+          "format": "t20",
+          "home": "hobart-hurricanes",
+          "away": "brisbane-heat",
+          "venue": "bellerive-oval",
+          "start": "2026-12-17T19:15"
+        },
+        {
+          "key": "match-5",
+          "label": "Match 5",
+          "format": "t20",
+          "home": "melbourne-stars",
+          "away": "adelaide-strikers",
+          "venue": "mcg",
+          "start": "2026-12-18T19:15"
+        },
+        {
+          "key": "match-6",
+          "label": "Match 6",
+          "format": "t20",
+          "home": "sydney-thunder",
+          "away": "sydney-sixers",
+          "venue": "sydney-showground-stadium",
+          "start": "2026-12-19T19:15"
+        },
+        {
+          "key": "match-7",
+          "label": "Match 7",
+          "format": "t20",
+          "home": "perth-scorchers",
+          "away": "hobart-hurricanes",
+          "venue": "perth-stadium",
+          "start": "2026-12-20T16:15"
+        },
+        {
+          "key": "match-8",
+          "label": "Match 8",
+          "format": "t20",
+          "home": "melbourne-stars",
+          "away": "brisbane-heat",
+          "venue": "junction-oval",
+          "start": "2026-12-21T19:15"
+        },
+        {
+          "key": "match-9",
+          "label": "Match 9",
+          "format": "t20",
+          "home": "sydney-sixers",
+          "away": "melbourne-renegades",
+          "venue": "scg",
+          "start": "2026-12-22T19:15"
+        },
+        {
+          "key": "match-10",
+          "label": "Match 10",
+          "format": "t20",
+          "home": "adelaide-strikers",
+          "away": "sydney-thunder",
+          "venue": "adelaide-oval",
+          "start": "2026-12-23T18:45"
+        },
+        {
+          "key": "match-11",
+          "label": "Match 11",
+          "format": "t20",
+          "home": "melbourne-renegades",
+          "away": "hobart-hurricanes",
+          "venue": "junction-oval",
+          "start": "2026-12-24T19:15"
+        },
+        {
+          "key": "match-12",
+          "label": "Match 12",
+          "format": "t20",
+          "home": "sydney-sixers",
+          "away": "brisbane-heat",
+          "venue": "scg",
+          "start": "2026-12-26T18:05"
+        },
+        {
+          "key": "match-13",
+          "label": "Match 13",
+          "format": "t20",
+          "home": "perth-scorchers",
+          "away": "melbourne-stars",
+          "venue": "perth-stadium",
+          "start": "2026-12-26T18:15"
+        },
+        {
+          "key": "match-14",
+          "label": "Match 14",
+          "format": "t20",
+          "home": "sydney-thunder",
+          "away": "melbourne-renegades",
+          "venue": "sydney-showground-stadium",
+          "start": "2026-12-27T19:15"
+        },
+        {
+          "key": "match-15",
+          "label": "Match 15",
+          "format": "t20",
+          "home": "brisbane-heat",
+          "away": "adelaide-strikers",
+          "venue": "the-gabba",
+          "start": "2026-12-28T18:15"
+        },
+        {
+          "key": "match-16",
+          "label": "Match 16",
+          "format": "t20",
+          "home": "hobart-hurricanes",
+          "away": "melbourne-stars",
+          "venue": "bellerive-oval",
+          "start": "2026-12-29T19:15"
+        },
+        {
+          "key": "match-17",
+          "label": "Match 17",
+          "format": "t20",
+          "home": "perth-scorchers",
+          "away": "sydney-thunder",
+          "venue": "perth-stadium",
+          "start": "2026-12-30T16:15"
+        },
+        {
+          "key": "match-18",
+          "label": "Match 18",
+          "format": "t20",
+          "home": "adelaide-strikers",
+          "away": "melbourne-stars",
+          "venue": "adelaide-oval",
+          "start": "2026-12-31T18:45"
+        },
+        {
+          "key": "match-19",
+          "label": "Match 19",
+          "format": "t20",
+          "home": "melbourne-renegades",
+          "away": "sydney-sixers",
+          "venue": "mcg",
+          "start": "2027-01-01T16:00"
+        },
+        {
+          "key": "match-20",
+          "label": "Match 20",
+          "format": "t20",
+          "home": "brisbane-heat",
+          "away": "hobart-hurricanes",
+          "venue": "the-gabba",
+          "start": "2027-01-01T18:15"
+        },
+        {
+          "key": "match-21",
+          "label": "Match 21",
+          "format": "t20",
+          "home": "sydney-thunder",
+          "away": "perth-scorchers",
+          "venue": "sydney-showground-stadium",
+          "start": "2027-01-02T19:15"
+        },
+        {
+          "key": "match-22",
+          "label": "Match 22",
+          "format": "t20",
+          "home": "sydney-sixers",
+          "away": "adelaide-strikers",
+          "venue": "manuka-oval",
+          "start": "2027-01-03T19:15"
+        },
+        {
+          "key": "match-23",
+          "label": "Match 23",
+          "format": "t20",
+          "home": "melbourne-stars",
+          "away": "melbourne-renegades",
+          "venue": "mcg",
+          "start": "2027-01-04T18:05"
+        },
+        {
+          "key": "match-24",
+          "label": "Match 24",
+          "format": "t20",
+          "home": "perth-scorchers",
+          "away": "brisbane-heat",
+          "venue": "perth-stadium",
+          "start": "2027-01-04T18:15"
+        },
+        {
+          "key": "match-25",
+          "label": "Match 25",
+          "format": "t20",
+          "home": "hobart-hurricanes",
+          "away": "sydney-thunder",
+          "venue": "bellerive-oval",
+          "start": "2027-01-05T19:15"
+        },
+        {
+          "key": "match-26",
+          "label": "Match 26",
+          "format": "t20",
+          "home": "adelaide-strikers",
+          "away": "melbourne-renegades",
+          "venue": "adelaide-oval",
+          "start": "2027-01-06T18:45"
+        },
+        {
+          "key": "match-27",
+          "label": "Match 27",
+          "format": "t20",
+          "home": "melbourne-stars",
+          "away": "sydney-sixers",
+          "venue": "mcg",
+          "start": "2027-01-07T19:15"
+        },
+        {
+          "key": "match-28",
+          "label": "Match 28",
+          "format": "t20",
+          "home": "brisbane-heat",
+          "away": "perth-scorchers",
+          "venue": "the-gabba",
+          "start": "2027-01-08T18:15"
+        },
+        {
+          "key": "match-29",
+          "label": "Match 29",
+          "format": "t20",
+          "home": "hobart-hurricanes",
+          "away": "adelaide-strikers",
+          "venue": "york-park",
+          "start": "2027-01-09T19:15"
+        },
+        {
+          "key": "match-30",
+          "label": "Match 30",
+          "format": "t20",
+          "home": "sydney-sixers",
+          "away": "perth-scorchers",
+          "venue": "scg",
+          "start": "2027-01-10T14:10"
+        },
+        {
+          "key": "match-31",
+          "label": "Match 31",
+          "format": "t20",
+          "home": "melbourne-renegades",
+          "away": "brisbane-heat",
+          "venue": "junction-oval",
+          "start": "2027-01-10T19:15"
+        },
+        {
+          "key": "match-32",
+          "label": "Match 32",
+          "format": "t20",
+          "home": "sydney-thunder",
+          "away": "melbourne-stars",
+          "venue": "manuka-oval",
+          "start": "2027-01-11T19:15"
+        },
+        {
+          "key": "match-33",
+          "label": "Match 33",
+          "format": "t20",
+          "home": "adelaide-strikers",
+          "away": "hobart-hurricanes",
+          "venue": "adelaide-oval",
+          "start": "2027-01-12T18:45"
+        },
+        {
+          "key": "match-34",
+          "label": "Match 34",
+          "format": "t20",
+          "home": "perth-scorchers",
+          "away": "melbourne-renegades",
+          "venue": "perth-stadium",
+          "start": "2027-01-13T16:15"
+        },
+        {
+          "key": "match-35",
+          "label": "Match 35",
+          "format": "t20",
+          "home": "melbourne-stars",
+          "away": "hobart-hurricanes",
+          "venue": "mcg",
+          "start": "2027-01-14T19:15"
+        },
+        {
+          "key": "match-36",
+          "label": "Match 36",
+          "format": "t20",
+          "home": "sydney-sixers",
+          "away": "sydney-thunder",
+          "venue": "scg",
+          "start": "2027-01-15T19:15"
+        },
+        {
+          "key": "match-37",
+          "label": "Match 37",
+          "format": "t20",
+          "home": "adelaide-strikers",
+          "away": "perth-scorchers",
+          "venue": "adelaide-oval",
+          "start": "2027-01-16T15:30"
+        },
+        {
+          "key": "match-38",
+          "label": "Match 38",
+          "format": "t20",
+          "home": "melbourne-renegades",
+          "away": "melbourne-stars",
+          "venue": "mcg",
+          "start": "2027-01-16T19:15"
+        },
+        {
+          "key": "match-39",
+          "label": "Match 39",
+          "format": "t20",
+          "home": "hobart-hurricanes",
+          "away": "sydney-sixers",
+          "venue": "bellerive-oval",
+          "start": "2027-01-17T13:40"
+        },
+        {
+          "key": "match-40",
+          "label": "Match 40",
+          "format": "t20",
+          "home": "brisbane-heat",
+          "away": "sydney-thunder",
+          "venue": "the-gabba",
+          "start": "2027-01-17T18:15"
+        }
+      ]
+    },
+    {
+      "id": "sa20-2027",
+      "competition": "SA20",
+      "competitionSlug": "sa20",
+      "kind": "league",
+      "season": "SA20 2027",
+      "seasonSlug": "sa20-2027",
+      "source": {
+        "url": "https://www.sa20.co.za/fixtures",
+        "label": "SA20 fixtures"
+      },
+      "attendance": "ticketed",
+      "matches": [
+        {
+          "key": "match-1",
+          "format": "t20",
+          "home": "sunrisers-eastern-cape",
+          "away": "pretoria-capitals",
+          "venue": "st-georges-park",
+          "start": "2027-01-17T15:30"
+        },
+        {
+          "key": "match-2",
+          "format": "t20",
+          "home": "paarl-royals",
+          "away": "joburg-super-kings",
+          "venue": "boland-park",
+          "start": "2027-01-18T17:30"
+        },
+        {
+          "key": "match-3",
+          "format": "t20",
+          "home": "pretoria-capitals",
+          "away": "durbans-super-giants",
+          "venue": "supersport-park",
+          "start": "2027-01-19T17:30"
+        },
+        {
+          "key": "match-4",
+          "format": "t20",
+          "home": "mi-cape-town",
+          "away": "joburg-super-kings",
+          "venue": "newlands",
+          "start": "2027-01-20T17:30"
+        },
+        {
+          "key": "match-5",
+          "format": "t20",
+          "home": "durbans-super-giants",
+          "away": "sunrisers-eastern-cape",
+          "venue": "kingsmead",
+          "start": "2027-01-21T17:30"
+        },
+        {
+          "key": "match-6",
+          "format": "t20",
+          "home": "mi-cape-town",
+          "away": "paarl-royals",
+          "venue": "newlands",
+          "start": "2027-01-22T17:30"
+        },
+        {
+          "key": "match-7",
+          "format": "t20",
+          "home": "durbans-super-giants",
+          "away": "pretoria-capitals",
+          "venue": "kingsmead",
+          "start": "2027-01-23T13:00"
+        },
+        {
+          "key": "match-8",
+          "format": "t20",
+          "home": "joburg-super-kings",
+          "away": "sunrisers-eastern-cape",
+          "venue": "wanderers-stadium",
+          "start": "2027-01-23T17:30"
+        },
+        {
+          "key": "match-9",
+          "format": "t20",
+          "home": "paarl-royals",
+          "away": "mi-cape-town",
+          "venue": "boland-park",
+          "start": "2027-01-24T15:30"
+        },
+        {
+          "key": "match-10",
+          "format": "t20",
+          "home": "pretoria-capitals",
+          "away": "sunrisers-eastern-cape",
+          "venue": "supersport-park",
+          "start": "2027-01-26T17:30"
+        },
+        {
+          "key": "match-11",
+          "format": "t20",
+          "home": "durbans-super-giants",
+          "away": "paarl-royals",
+          "venue": "kingsmead",
+          "start": "2027-01-27T17:30"
+        },
+        {
+          "key": "match-12",
+          "format": "t20",
+          "home": "sunrisers-eastern-cape",
+          "away": "joburg-super-kings",
+          "venue": "st-georges-park",
+          "start": "2027-01-28T17:30"
+        },
+        {
+          "key": "match-13",
+          "format": "t20",
+          "home": "paarl-royals",
+          "away": "pretoria-capitals",
+          "venue": "boland-park",
+          "start": "2027-01-29T17:30"
+        },
+        {
+          "key": "match-14",
+          "format": "t20",
+          "home": "sunrisers-eastern-cape",
+          "away": "mi-cape-town",
+          "venue": "st-georges-park",
+          "start": "2027-01-30T13:00"
+        },
+        {
+          "key": "match-15",
+          "format": "t20",
+          "home": "joburg-super-kings",
+          "away": "durbans-super-giants",
+          "venue": "wanderers-stadium",
+          "start": "2027-01-30T17:30"
+        },
+        {
+          "key": "match-16",
+          "format": "t20",
+          "home": "pretoria-capitals",
+          "away": "paarl-royals",
+          "venue": "supersport-park",
+          "start": "2027-01-31T15:30"
+        },
+        {
+          "key": "match-17",
+          "format": "t20",
+          "home": "mi-cape-town",
+          "away": "durbans-super-giants",
+          "venue": "newlands",
+          "start": "2027-02-02T17:30"
+        },
+        {
+          "key": "match-18",
+          "format": "t20",
+          "home": "joburg-super-kings",
+          "away": "paarl-royals",
+          "venue": "wanderers-stadium",
+          "start": "2027-02-03T17:30"
+        },
+        {
+          "key": "match-19",
+          "format": "t20",
+          "home": "mi-cape-town",
+          "away": "sunrisers-eastern-cape",
+          "venue": "newlands",
+          "start": "2027-02-04T17:30"
+        },
+        {
+          "key": "match-20",
+          "format": "t20",
+          "home": "pretoria-capitals",
+          "away": "joburg-super-kings",
+          "venue": "supersport-park",
+          "start": "2027-02-05T17:30"
+        },
+        {
+          "key": "match-21",
+          "format": "t20",
+          "home": "durbans-super-giants",
+          "away": "mi-cape-town",
+          "venue": "kingsmead",
+          "start": "2027-02-06T13:00"
+        },
+        {
+          "key": "match-22",
+          "format": "t20",
+          "home": "paarl-royals",
+          "away": "sunrisers-eastern-cape",
+          "venue": "boland-park",
+          "start": "2027-02-06T17:30"
+        },
+        {
+          "key": "match-23",
+          "format": "t20",
+          "home": "joburg-super-kings",
+          "away": "pretoria-capitals",
+          "venue": "wanderers-stadium",
+          "start": "2027-02-07T15:30"
+        },
+        {
+          "key": "match-24",
+          "format": "t20",
+          "home": "sunrisers-eastern-cape",
+          "away": "durbans-super-giants",
+          "venue": "st-georges-park",
+          "start": "2027-02-09T17:30"
+        },
+        {
+          "key": "match-25",
+          "format": "t20",
+          "home": "joburg-super-kings",
+          "away": "mi-cape-town",
+          "venue": "wanderers-stadium",
+          "start": "2027-02-10T17:30"
+        },
+        {
+          "key": "match-26",
+          "format": "t20",
+          "home": "paarl-royals",
+          "away": "durbans-super-giants",
+          "venue": "boland-park",
+          "start": "2027-02-11T17:30"
+        },
+        {
+          "key": "match-27",
+          "format": "t20",
+          "home": "pretoria-capitals",
+          "away": "mi-cape-town",
+          "venue": "supersport-park",
+          "start": "2027-02-12T17:30"
+        },
+        {
+          "key": "match-28",
+          "format": "t20",
+          "home": "durbans-super-giants",
+          "away": "joburg-super-kings",
+          "venue": "kingsmead",
+          "start": "2027-02-13T13:00"
+        },
+        {
+          "key": "match-29",
+          "format": "t20",
+          "home": "sunrisers-eastern-cape",
+          "away": "paarl-royals",
+          "venue": "st-georges-park",
+          "start": "2027-02-13T17:30"
+        },
+        {
+          "key": "match-30",
+          "format": "t20",
+          "home": "mi-cape-town",
+          "away": "pretoria-capitals",
+          "venue": "newlands",
+          "start": "2027-02-14T15:30"
+        }
+      ]
+    }
+  ]
+}

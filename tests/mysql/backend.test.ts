@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { buildFixtureMatches } from "@/lib/data/fixtures";
+import { loadFixtures } from "@/lib/data/mysql/fixtures";
 import { matches as seedMatches } from "@/lib/data/seed";
 import {
   consumeMagicLink,
@@ -559,5 +562,90 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
     );
     expect(Number(offers[0]!.total)).toBe(0);
     expect((await loadDirectory(pool)).matches.every((match) => !match.demo)).toBe(true);
+  });
+
+  it("loads a fixture file, updates what changed, and leaves other listings alone", async () => {
+    const fixtures = buildFixtureMatches(
+      JSON.parse(readFileSync("data/fixtures/2026-27.json", "utf8")),
+    );
+    expect(await loadFixtures(pool, fixtures, now)).toEqual({
+      inserted: 209,
+      updated: 0,
+      unchanged: 0,
+      skipped: [],
+    });
+    const listed = (await loadDirectory(pool)).matches.filter((match) =>
+      match.sourceExternalId?.startsWith("fixtures:"),
+    );
+    expect(listed).toHaveLength(209);
+    expect(
+      listed.find(
+        (match) => match.sourceExternalId === "fixtures:west-indies-in-india-2026-27:t20i-1",
+      ),
+    ).toMatchObject({
+      slug: "india-vs-west-indies-1st-t20i-lucknow-2026-10-06",
+      startsAt: "2026-10-06T13:30:00.000Z",
+      competitionName: "West Indies tour of India, 1st T20I",
+      venueName: "Ekana Cricket Stadium",
+      status: "published",
+      sourceType: "admin",
+      demo: false,
+      offers: [],
+    });
+
+    expect(await loadFixtures(pool, fixtures, now)).toMatchObject({
+      inserted: 0,
+      updated: 0,
+      unchanged: 209,
+    });
+
+    // A moved fixture is updated in place and keeps its address.
+    const testId = "fixtures:india-in-new-zealand-2026-27:test-1";
+    const moved = fixtures.map((fixture) =>
+      fixture.sourceExternalId === testId
+        ? { ...fixture, startsAt: "2026-11-19T21:30:00.000Z", status: "postponed" as const }
+        : fixture,
+    );
+    expect(await loadFixtures(pool, moved, now)).toMatchObject({ updated: 1, unchanged: 208 });
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT slug, status, starts_at FROM matches WHERE source_external_id = ?",
+      [testId],
+    );
+    expect(rows[0]).toMatchObject({
+      slug: "new-zealand-vs-india-1st-test-wellington-2026-11-19",
+      status: "postponed",
+    });
+    expect((rows[0]!.starts_at as Date).toISOString()).toBe("2026-11-19T21:30:00.000Z");
+
+    // Organiser listings are not changed, and a fixture that has started is not added.
+    await pool.query("UPDATE matches SET source_type = 'organiser' WHERE source_external_id = ?", [
+      "fixtures:bbl-16:match-1",
+    ]);
+    const started = {
+      ...fixtures[0]!,
+      sourceExternalId: "fixtures:example:started",
+      slugBase: "started-fixture",
+    };
+    const later = await loadFixtures(
+      pool,
+      [
+        ...moved.map((fixture) =>
+          fixture.sourceExternalId === "fixtures:bbl-16:match-1"
+            ? { ...fixture, venueName: "Somewhere else" }
+            : fixture,
+        ),
+        started,
+      ],
+      new Date("2026-10-07T00:00:00.000Z"),
+    );
+    expect(later).toMatchObject({ inserted: 0, updated: 0 });
+    expect(later.skipped).toEqual([
+      "fixtures:bbl-16:match-1: listed by organiser",
+      "fixtures:example:started: already started",
+    ]);
+    const [audit] = await pool.query<RowDataPacket[]>(
+      "SELECT COUNT(*) AS total FROM audit_log WHERE action = 'fixtures.load'",
+    );
+    expect(Number(audit[0]!.total)).toBe(4);
   });
 });
