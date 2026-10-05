@@ -21,11 +21,10 @@ Updated 5 October 2026, after the VPS deployment.
 - Rate limits use `rate_limits` when Supabase is configured, and the in-memory limiter otherwise.
 - Test pass on 5 October 2026. Fixed: an open redirect through the sign-in `next` path, forms that cleared input after a server error (including a review form that fell back to Approve), alert links that changed state on a GET, an invalid `.ics` export, the alert email text and failed-send handling, an unreadable dark-mode hero select, the Next.js 16 scroll warning, and `pnpm ci` in the docs. 18 Playwright and 34 Vitest tests pass.
 - Production runs on the VPS with MySQL since 5 October 2026, at https://cricketmatch.today. The labelled DEMO catalogue is loaded and `admin@cricketmatch.today` is the admin. See [deployment.md](deployment.md).
-- Mail to `admin@` and `hello@cricketmatch.today` is forwarded by Spaceship. On the server, `pnpm db sign-in-link <email>` prints a one-time sign-in link without email.
+- Email is on since 5 October 2026. Resend sends from `hello@cricketmatch.today` with a send-only key, and Spaceship forwards `admin@` and `hello@`. A sign-in email to admin@ and a test to hello@ were both delivered. On the server, `pnpm db sign-in-link <email>` prints a one-time sign-in link without email.
 
 ## Not done
 
-- Sending waits on Resend, which is verifying the domain's DNS records. The server's `.env` has a send-only key; once the domain is verified, set `EMAIL_FROM` and restart. Until then, mail goes to `journalctl -u cricketmatch`.
 - The public catalogue is the DEMO seed. No real fixture is listed yet.
 - No live provider tokens are configured.
 - A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs the request's token hashes to be rotated.
@@ -36,7 +35,6 @@ Updated 5 October 2026, after the VPS deployment.
 ## Next
 
 1. Review and merge PR #1, then PR #2, and deploy `main` with `deploy/vps/deploy.sh`.
-2. Email: once Resend verifies cricketmatch.today, set `EMAIL_FROM` in `/var/www/cricketmatch/.env` and restart. See [deployment.md](deployment.md#email).
-3. Approve real fixtures through `/submit/match` and `/admin`, then run `pnpm db remove-demo`.
-4. Add the `cricketmatch` database to the server's MySQL backups.
-5. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
+2. Approve real fixtures through `/submit/match` and `/admin`, then run `pnpm db remove-demo`.
+3. Add the `cricketmatch` database to the server's MySQL backups.
+4. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
