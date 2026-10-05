@@ -24,7 +24,7 @@ Updated 5 October 2026, after the VPS deployment.
 
 ## Not done
 
-- Email is not set up. Sign-in links and alert mail go to `journalctl -u cricketmatch` until Zoho SMTP is configured, and cricketmatch.today has no MX records yet, so `admin@cricketmatch.today` cannot receive mail.
+- Email is not set up. Sign-in links and alert mail go to `journalctl -u cricketmatch` until Resend is configured. cricketmatch.today has no MX records yet, so `admin@cricketmatch.today` cannot receive mail. The ImprovMX account is on the free plan, which holds one domain, and kidspc.online uses it.
 - The public catalogue is the DEMO seed. No real fixture is listed yet.
 - No live provider tokens are configured.
 - A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs the request's token hashes to be rotated.
@@ -35,7 +35,7 @@ Updated 5 October 2026, after the VPS deployment.
 ## Next
 
 1. Review and merge PR #1, then PR #2, and deploy `main` with `deploy/vps/deploy.sh`.
-2. Email, as on kidspc.online: add ImprovMX MX records and an `admin@` forward, add the domain and a sender to Zoho Mail with its SPF and DKIM records, then set `EMAIL_FROM` and `SMTP_*` in `/var/www/cricketmatch/.env`.
+2. Email, as on kidspc.online: send with Resend and receive with ImprovMX, which needs the Light plan or a second account first. The steps are in [deployment.md](deployment.md#email).
 3. Approve real fixtures through `/submit/match` and `/admin`, then run `pnpm db remove-demo`.
 4. Add the `cricketmatch` database to the server's MySQL backups.
 5. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.

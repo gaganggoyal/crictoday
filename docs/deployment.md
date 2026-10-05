@@ -42,11 +42,14 @@ Until SMTP is configured, mail is written to the service log. To sign in before 
 journalctl -u cricketmatch --since "15 min ago" | grep "Sign in:"
 ```
 
-To send real mail the way kidspc.online does:
+cricketmatch.today handles mail the way kidspc.online does: Resend sends it and ImprovMX receives it. The domain's DNS is at Spaceship.
 
-1. Add cricketmatch.today to Zoho Mail, create a sender such as `hello@cricketmatch.today`, and add the SPF and DKIM records Zoho lists.
-2. To receive mail for `admin@cricketmatch.today`, add the domain to ImprovMX, point its MX records at `mx1.improvmx.com` and `mx2.improvmx.com`, and forward `admin@` to a real inbox.
-3. In `.env`, set `EMAIL_FROM`, `SMTP_HOST=smtp.zoho.com`, `SMTP_PORT=465`, `SMTP_USER` and `SMTP_PASS`, then run `systemctl restart cricketmatch`.
+1. **Sending.** Add cricketmatch.today to Resend in the region kidspc.online uses (`ap-northeast-1`). Add the records Resend lists: a DKIM TXT record at `resend._domainkey`, and an MX record and an SPF TXT record at `send`. Create a sending-only API key for the domain.
+2. **Receiving.** Add the domain to ImprovMX, point its MX records at `mx1.improvmx.com` (priority 10) and `mx2.improvmx.com` (priority 20), and forward `admin@` and `hello@` to a real inbox. ImprovMX's free plan holds one domain and kidspc.online uses it, so this needs the Light plan or above, or a second account.
+3. Add a DMARC record: TXT at `_dmarc`, `v=DMARC1; p=none; rua=mailto:hello@cricketmatch.today`.
+4. In `.env`, set `RESEND_API_KEY` and `EMAIL_FROM`, for example `cricketmatch.today <hello@cricketmatch.today>`, then run `systemctl restart cricketmatch`.
+
+Any SMTP server can send instead. Set `SMTP_HOST`, `SMTP_PORT` (465 is TLS from the start, 587 is STARTTLS), `SMTP_USER` and `SMTP_PASS`. SMTP is used ahead of Resend when both are set. ImprovMX's paid plans include SMTP at `smtp.improvmx.com`.
 
 ### First install
 

@@ -62,7 +62,7 @@ function smtp() {
   smtpTransport ??= nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port,
-    // 465 speaks TLS from the start (Zoho, as on kidspc.online). 587 upgrades with STARTTLS.
+    // 465 speaks TLS from the start. 587 upgrades with STARTTLS.
     secure: process.env.SMTP_SECURE
       ? ["1", "true"].includes(process.env.SMTP_SECURE)
       : port === 465,
