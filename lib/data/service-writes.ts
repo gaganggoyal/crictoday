@@ -1,7 +1,13 @@
 import "server-only";
+
+// Writes go to MySQL when DATABASE_URL is a mysql:// URL, otherwise through the Supabase
+// service-role functions. Both return the same shapes.
 import type { EmailDraft } from "@/lib/domain/workflows";
 import type { Role } from "@/lib/domain/types";
 import { supabaseService } from "@/lib/data/supabase";
+import { dataMode } from "@/lib/data/mode";
+import { mysqlPool } from "@/lib/data/mysql/pool";
+import * as mysql from "@/lib/data/mysql/writes";
 
 type Failure = { ok: false; errors: Record<string, string> };
 
@@ -39,6 +45,7 @@ export async function serviceCreateSubmission(input: {
   payload: Record<string, unknown>;
   submitterId: string | null;
 }) {
+  if (dataMode() === "mysql") return mysql.createSubmission(mysqlPool(), input, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { data, error: rpcError } = await client.rpc("create_submission", {
@@ -58,6 +65,7 @@ export async function serviceReview(input: {
   mergeTarget?: string;
   actorId: string;
 }) {
+  if (dataMode() === "mysql") return mysql.reviewSubmission(mysqlPool(), input, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { error: rpcError } = await client.rpc("review_submission", {
@@ -73,6 +81,7 @@ export async function serviceReview(input: {
 }
 
 export async function serviceAssignRole(input: { account: string; role: Role; actorId: string }) {
+  if (dataMode() === "mysql") return mysql.assignRole(mysqlPool(), input, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { error: rpcError } = await client.rpc("set_user_role_for_account", {
@@ -96,6 +105,7 @@ export async function serviceCreateTicketRequest(input: {
   unsubTokenHash: string;
   userId: string | null;
 }) {
+  if (dataMode() === "mysql") return mysql.createTicketRequest(mysqlPool(), input, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { data, error: rpcError } = await client.rpc("create_ticket_request", {
@@ -119,6 +129,8 @@ export async function serviceOpenTicketRequest(
   tokenHash: string,
   intent: "verify" | "unsubscribe",
 ) {
+  if (dataMode() === "mysql")
+    return mysql.openTicketRequest(mysqlPool(), tokenHash, intent, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { data, error: rpcError } = await client.rpc("open_ticket_request", {
@@ -140,6 +152,7 @@ export async function serviceApproveOffer(input: {
   matchSlug: string;
   actorId: string;
 }) {
+  if (dataMode() === "mysql") return mysql.approveOffer(mysqlPool(), input, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { data, error: rpcError } = await client.rpc("approve_ticket_offer", {
@@ -154,6 +167,7 @@ export async function serviceApproveOffer(input: {
 }
 
 export async function serviceMarkVerified(input: { matchSlug: string; actorId: string }) {
+  if (dataMode() === "mysql") return mysql.markVerified(mysqlPool(), input, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { error: rpcError } = await client.rpc("mark_match_verified", {
@@ -166,6 +180,7 @@ export async function serviceMarkVerified(input: { matchSlug: string; actorId: s
 }
 
 export async function serviceRecordClick(offerId: string, referrer: string | null) {
+  if (dataMode() === "mysql") return mysql.recordClick(mysqlPool(), offerId, referrer, new Date());
   const { client, error } = service();
   if (!client) return error;
   const { error: rpcError } = await client.rpc("record_outbound_click", {

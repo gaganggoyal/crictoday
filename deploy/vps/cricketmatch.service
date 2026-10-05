@@ -1,0 +1,28 @@
+[Unit]
+Description=cricketmatch.today (Next.js on MySQL)
+Documentation=https://github.com/gaganggoyal/crictoday
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cricketmatch
+Group=cricketmatch
+WorkingDirectory=/var/www/cricketmatch
+EnvironmentFile=/var/www/cricketmatch/.env
+Environment=NODE_ENV=production
+# Caddy runs in Docker and reaches the host on the bridge. ufw admits 3300 only from 172.16.0.0/12.
+ExecStart=/usr/bin/node node_modules/next/dist/bin/next start --hostname 0.0.0.0 --port 3300
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cricketmatch
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

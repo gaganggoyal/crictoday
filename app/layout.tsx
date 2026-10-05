@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AppThemeProvider } from "@/components/theme/provider";
 import { getSession, isStaff } from "@/lib/auth/session";
-import { dataMode } from "@/lib/data/mode";
+import { showDemoBanner } from "@/lib/data/catalog";
 import { siteUrl } from "@/lib/utils";
 import "./globals.css";
 
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const session = await getSession();
-  const demo = dataMode() === "demo";
+  const demo = await showDemoBanner();
 
   return (
     <html

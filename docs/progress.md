@@ -1,6 +1,6 @@
 # Progress
 
-Updated 5 October 2026.
+Updated 5 October 2026, after the VPS deployment.
 
 ## Done
 
@@ -20,21 +20,22 @@ Updated 5 October 2026.
 - Supabase Auth magic links replace the demo cookie when Supabase is configured. Demo sign-in stays on the local store, and `/login/verify` sets that cookie on a same-host redirect.
 - Rate limits use `rate_limits` when Supabase is configured, and the in-memory limiter otherwise.
 - Test pass on 5 October 2026. Fixed: an open redirect through the sign-in `next` path, forms that cleared input after a server error (including a review form that fell back to Approve), alert links that changed state on a GET, an invalid `.ics` export, the alert email text and failed-send handling, an unreadable dark-mode hero select, the Next.js 16 scroll warning, and `pnpm ci` in the docs. 18 Playwright and 34 Vitest tests pass.
+- Production runs on the VPS with MySQL since 5 October 2026, at https://cricketmatch.today. The labelled DEMO catalogue is loaded and `admin@cricketmatch.today` is the admin. See [deployment.md](deployment.md).
 
 ## Not done
 
-- Docker and the Supabase CLI were not started. RLS and the service-role functions are verified with PGlite.
-- No live provider tokens are configured, so local `pnpm dev` still uses the labelled demo inventory.
-- The first admin is created in the SQL editor. The admin form can change roles only after that person exists.
-- Supabase Auth, Resend, and the redirect allow list are configuration, not code. They stay idle until the env vars and dashboard settings are filled in.
-- A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs `create_ticket_request` to rotate the token hashes.
+- Email is not set up. Sign-in links and alert mail go to `journalctl -u cricketmatch` until Zoho SMTP is configured, and cricketmatch.today has no MX records yet, so `admin@cricketmatch.today` cannot receive mail.
+- The public catalogue is the DEMO seed. No real fixture is listed yet.
+- No live provider tokens are configured.
+- A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs the request's token hashes to be rotated.
 - On a phone, `/matches` shows ten filter fields before the first result.
-- supabase-js warns that Node 20 is deprecated. Use Node 22 for builds and the host.
+- The server runs Node 20, which supabase-js now warns about. Node 22 is the safer host version.
+- The Supabase path is kept but untested against a hosted project; RLS and its functions are verified with PGlite.
 
 ## Next
 
-1. Apply both SQL migrations on the hosted project and create the first admin.
-2. Set the Supabase Auth site URL and allow `https://cricketmatch.today/auth/callback`.
-3. Add `SUPABASE_SECRET_KEY`, `ENCRYPTION_KEY`, `CRON_SECRET`, and `RESEND_API_KEY` on the host.
-4. Licence SportMonks before turning on the cron. Leave Ticketmaster offers pending.
-5. Confirm a second app instance shares `rate_limits` before taking public writes.
+1. Review and merge PR #1, then PR #2, and deploy `main` with `deploy/vps/deploy.sh`.
+2. Email, as on kidspc.online: add ImprovMX MX records and an `admin@` forward, add the domain and a sender to Zoho Mail with its SPF and DKIM records, then set `EMAIL_FROM` and `SMTP_*` in `/var/www/cricketmatch/.env`.
+3. Approve real fixtures through `/submit/match` and `/admin`, then run `pnpm db remove-demo`.
+4. Add the `cricketmatch` database to the server's MySQL backups.
+5. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.

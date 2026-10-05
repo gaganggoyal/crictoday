@@ -1,4 +1,4 @@
-import { consumeDemoSignIn } from "@/lib/auth/demo-signin";
+import { consumeSignInLink } from "@/lib/auth/sign-in-link";
 import { sessionCookie } from "@/lib/auth/session";
 import { redirectOnSameHost } from "@/lib/http/redirect";
 import { safeNextPath } from "@/lib/utils";
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const token = url.searchParams.get("token");
   const next = safeNextPath(url.searchParams.get("next"));
   if (!token) return redirectOnSameHost("/login?error=link");
-  const result = consumeDemoSignIn(token);
+  const result = await consumeSignInLink(token);
   if (!result.ok) return redirectOnSameHost("/login?error=link");
   const response = redirectOnSameHost(next);
   const cookie = sessionCookie({

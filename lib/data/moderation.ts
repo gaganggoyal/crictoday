@@ -3,6 +3,8 @@ import { getSession, isStaff, type Session } from "@/lib/auth/session";
 import { supabaseServer } from "@/lib/auth/supabase-server";
 import { getDirectory } from "@/lib/data/catalog";
 import { dataMode } from "@/lib/data/mode";
+import { mysqlPool } from "@/lib/data/mysql/pool";
+import { loadModeration } from "@/lib/data/mysql/reads";
 import { readStore } from "@/lib/data/store";
 import type {
   AuditRecord,
@@ -73,6 +75,10 @@ function mapSubmission(row: {
 export async function moderationSnapshot(): Promise<ModerationSnapshot> {
   const session = await getSession();
   if (!session || !isStaff(session.role)) return empty(session);
+  if (dataMode() === "mysql") {
+    const [queue, directory] = await Promise.all([loadModeration(mysqlPool()), getDirectory()]);
+    return { session, ...queue, matches: directory.matches };
+  }
   if (dataMode() !== "supabase") {
     const store = readStore();
     const matches = mergeMatches(store);

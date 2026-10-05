@@ -1,12 +1,22 @@
 import "server-only";
 import { dataMode } from "@/lib/data/mode";
+import { rateLimitHit } from "@/lib/data/mysql/auth";
+import { mysqlPool } from "@/lib/data/mysql/pool";
 import { supabaseService } from "@/lib/data/supabase";
 import { hashLimitKey, limiter } from "@/lib/security/rate-limit";
 
 export type LimitResult = { ok: boolean; retryAfterMs: number; unavailable?: boolean };
 
 export async function limitHit(key: string, limit: number, windowMs: number): Promise<LimitResult> {
-  if (dataMode() !== "supabase") return limiter.hit(key, limit, windowMs);
+  const mode = dataMode();
+  if (mode === "mysql") {
+    try {
+      return await rateLimitHit(mysqlPool(), hashLimitKey(key), limit, windowMs, new Date());
+    } catch {
+      return { ok: false, retryAfterMs: windowMs, unavailable: true };
+    }
+  }
+  if (mode !== "supabase") return limiter.hit(key, limit, windowMs);
   const client = supabaseService();
   if (!client) return { ok: false, retryAfterMs: windowMs, unavailable: true };
   const { data, error } = await client.rpc("rate_limit_hit", {
