@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { submitCorrectionAction } from "@/app/actions";
-import { Error, Honeypot } from "@/components/forms/request-form";
+import { Error, Honeypot, submitKeepingValues } from "@/components/forms/request-form";
 
 export function CorrectionForm({ matchSlug }: { matchSlug: string }) {
   const [state, action, pending] = useActionState(submitCorrectionAction, null);
@@ -15,7 +15,7 @@ export function CorrectionForm({ matchSlug }: { matchSlug: string }) {
   }
   const errors = state && !state.ok ? state.errors : {};
   return (
-    <form action={action} className="grid gap-3">
+    <form action={action} onSubmit={submitKeepingValues(action)} className="grid gap-3">
       <Honeypot />
       <input type="hidden" name="matchSlug" value={matchSlug} />
       <label className="grid gap-1.5 text-sm font-medium">

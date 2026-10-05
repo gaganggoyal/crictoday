@@ -228,7 +228,15 @@ test("an academy owner can submit a listing and report a correction", async ({ p
 
   await signIn(page, "moderator@cricketmatch.today");
   await page.goto("/admin/corrections");
-  await expect(page.getByText("The gate opens 90 minutes before the start").first()).toBeVisible();
+  await page.getByText("The gate opens 90 minutes before the start").first().click();
+  await page.getByLabel("Decision").selectOption("reject");
+  await page.getByRole("button", { name: "Save decision" }).click();
+  await expect(page.getByText("A reason is required.")).toBeVisible();
+  await expect(page.getByLabel("Decision")).toHaveValue("reject");
+  await page.getByLabel("Reason").fill("Gate times come from the venue, not the organiser.");
+  await page.getByRole("button", { name: "Save decision" }).click();
+  await expect(page.getByText("Decision saved.")).toBeVisible();
+  await expect(page.getByText("correction · rejected")).toBeVisible();
 });
 
 test("theme, share, sign-out, and a phone layout hold up", async ({ page }) => {

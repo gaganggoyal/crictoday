@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requestTicketAction } from "@/app/actions";
@@ -60,10 +60,7 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
     <form
       action={action}
       className="grid gap-3"
-      onSubmit={async (event) => {
-        const valid = await form.trigger();
-        if (!valid) event.preventDefault();
-      }}
+      onSubmit={submitKeepingValues(action, () => form.trigger())}
     >
       <input type="hidden" name="matchSlug" value={matchSlug} />
       <Honeypot />
@@ -114,6 +111,29 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
       </button>
     </form>
   );
+}
+
+/**
+ * onSubmit for a form whose `action` comes from useActionState. React 19 resets every
+ * uncontrolled field after a form action runs, so a server-side validation error would
+ * also wipe what the visitor typed. Dispatching from onSubmit skips that reset, and the
+ * `action` prop still submits the form before hydration. `validate` can block the request.
+ */
+export function submitKeepingValues(
+  dispatch: (formData: FormData) => void,
+  validate?: () => Promise<boolean>,
+) {
+  return (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    if (!validate) {
+      startTransition(() => dispatch(formData));
+      return;
+    }
+    void validate().then((valid) => {
+      if (valid) startTransition(() => dispatch(formData));
+    });
+  };
 }
 
 export function Honeypot() {

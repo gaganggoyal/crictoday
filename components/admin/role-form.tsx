@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { setUserRoleAction } from "@/app/actions";
-import { Error } from "@/components/forms/request-form";
+import { Error, submitKeepingValues } from "@/components/forms/request-form";
 
 const roles = [
   ["fan", "Fan"],
@@ -18,6 +18,7 @@ export function RoleForm() {
   return (
     <form
       action={action}
+      onSubmit={submitKeepingValues(action)}
       className="mt-8 grid gap-3 rounded-2xl border border-line bg-surface p-4 sm:grid-cols-[1fr_180px_auto]"
     >
       <label className="grid gap-1 text-sm font-medium">

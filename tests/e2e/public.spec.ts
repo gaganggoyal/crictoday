@@ -66,3 +66,35 @@ test("the home and match pages fit a 375px screen", async ({ page }) => {
     expect(overflow).toBe(false);
   }
 });
+
+test("forms keep what was typed when the server rejects it", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("fan@localhost");
+  await page.getByRole("button", { name: "Email me a sign-in link" }).click();
+  await expect(page.getByText("Enter a valid email address.")).toBeVisible();
+  await expect(page.getByLabel("Email")).toHaveValue("fan@localhost");
+
+  await page.goto("/match/india-vs-australia-1st-test-ahmedabad-2026-10-16");
+  const details = "The gate opens 90 minutes before the start, not two hours.";
+  await page.getByLabel("What should change?").fill(details);
+  await page.getByLabel("Email, optional").fill("fan@localhost");
+  await page.getByRole("button", { name: "Report incorrect details" }).click();
+  await expect(page.getByText("Enter a valid email.")).toBeVisible();
+  await expect(page.getByLabel("What should change?")).toHaveValue(details);
+});
+
+test("a ticket alert is checked in the browser before it is sent", async ({ page }) => {
+  await page.goto("/match/india-vs-australia-2nd-test-delhi-2026-10-24");
+  let posted = false;
+  page.on("request", (request) => {
+    if (request.method() === "POST") posted = true;
+  });
+  const email = page.getByRole("textbox", { name: "Email", exact: true });
+  await email.fill("fan@example.com");
+  await page.getByLabel("Your country").fill("India");
+  await page.getByRole("button", { name: "Request ticket alert" }).click();
+  await expect(page.getByText("Consent is required.")).toBeVisible();
+  await expect(email).toHaveValue("fan@example.com");
+  await expect(page.getByLabel("Your country")).toHaveValue("India");
+  expect(posted).toBe(false);
+});

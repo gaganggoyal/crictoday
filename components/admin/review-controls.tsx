@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { approveOfferAction, markVerifiedAction, reviewSubmissionAction } from "@/app/actions";
-import { Error } from "@/components/forms/request-form";
+import { Error, submitKeepingValues } from "@/components/forms/request-form";
 
 export function ReviewControls({
   id,
@@ -14,7 +14,11 @@ export function ReviewControls({
   const [state, action, pending] = useActionState(reviewSubmissionAction, null);
   const errors = state && !state.ok ? state.errors : {};
   return (
-    <form action={action} className="grid gap-3 rounded-2xl border border-line bg-surface p-4">
+    <form
+      action={action}
+      onSubmit={submitKeepingValues(action)}
+      className="grid gap-3 rounded-2xl border border-line bg-surface p-4"
+    >
       <input type="hidden" name="id" value={id} />
       <label className="grid gap-1 text-sm font-medium">
         Decision
