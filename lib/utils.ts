@@ -15,8 +15,20 @@ export function firstParam(value: string | string[] | undefined) {
   return value;
 }
 
+const NEXT_PATH_ORIGIN = "http://next-path.invalid";
+
+/** A same-origin path to send someone to after sign-in, or /dashboard. */
 export function safeNextPath(value: string | null | undefined) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\"))
+  // Browsers strip tabs and newlines from a Location header, so "/\t/evil.com" becomes
+  // "//evil.com". Control characters also make the redirect response itself throw.
+  if (!value || !value.startsWith("/") || /[\\\u0000-\u001f\u007f]/.test(value)) {
     return "/dashboard";
-  return value;
+  }
+  try {
+    const url = new URL(value, NEXT_PATH_ORIGIN);
+    if (url.origin !== NEXT_PATH_ORIGIN) return "/dashboard";
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/dashboard";
+  }
 }

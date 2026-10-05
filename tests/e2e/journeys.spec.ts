@@ -268,3 +268,16 @@ test("theme, share, sign-out, and a phone layout hold up", async ({ page }) => {
   );
   expect(overflow).toBe(false);
 });
+
+test("sign-in never redirects off the site", async ({ page }) => {
+  await page.route("**://example.com/**", (route) => route.fulfill({ body: "external" }));
+  for (const next of ["/\t/example.com", "/\r\n/example.com"]) {
+    await page.context().clearCookies();
+    await page.goto(`/login?next=${encodeURIComponent(next)}`);
+    await page.getByLabel("Email").fill(`redirect-${Date.now()}@example.com`);
+    await page.getByRole("button", { name: "Email me a sign-in link" }).click();
+    await page.getByRole("link", { name: "Demo inbox: open the sign-in link" }).click();
+    await expect(page).toHaveURL("/dashboard");
+    await expect(page.getByRole("heading", { name: "Your account" })).toBeVisible();
+  }
+});
