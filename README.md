@@ -18,7 +18,7 @@ Open http://127.0.0.1:3000. The demo banner is intentional. Fixtures, prices, an
 - `organiser@cricketmatch.today`
 - `academy@cricketmatch.today`
 
-The sign-in page shows the magic link when demo roles are allowed. Nothing is emailed unless `RESEND_API_KEY` and `EMAIL_FROM` are set. With Supabase configured, sign-in uses Supabase magic links instead of the demo cookie.
+Production runs on MySQL: see [docs/deployment.md](docs/deployment.md). The sign-in page shows the magic link when demo roles are allowed. Nothing is emailed unless `RESEND_API_KEY` and `EMAIL_FROM` are set. With Supabase configured, sign-in uses Supabase magic links instead of the demo cookie.
 
 ## Checks
 

@@ -1,0 +1,10 @@
+# Site blocks for /root/cricketverse_deploy/deployment/vps/Caddyfile.
+# 172.18.0.1 is the host on the cricketverse_deploy Docker network.
+www.cricketmatch.today {
+	redir https://cricketmatch.today{uri} permanent
+}
+cricketmatch.today {
+	encode gzip
+	reverse_proxy 172.18.0.1:3300
+	header -Server
+}
