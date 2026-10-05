@@ -129,6 +129,15 @@ describe("ticket request workflow", () => {
     expect(approved.result.notified).toBe(1);
     expect(approved.emails[0]?.to).toBe("cipher-text");
     expect(approved.emails[0]?.to.includes("@")).toBe(false);
+    // Same body as approve_ticket_offer in the Supabase migration.
+    expect(approved.emails[0]?.text.split("\n")).toEqual([
+      "India vs Australia",
+      "Arun Jaitley Stadium, Delhi",
+      "Seller: Board",
+      "Domain: tickets.example.com",
+      "Link: https://tickets.example.com/delhi",
+      "This alert does not reserve a ticket.",
+    ]);
     const visible = mergeMatches(approved.store).find((match) => match.slug === base!.slug);
     expect(visible?.offers[0]?.approved).toBe(true);
     expect(visible?.offers[0]?.status).toBe("active");

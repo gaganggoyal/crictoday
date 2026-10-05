@@ -98,12 +98,27 @@ async function gate(scope: string, limit: number, windowMs: number, tooMany: str
   return null;
 }
 
-async function deliver(emails: EmailDraft[]) {
+// The request is marked notified when its alert is drafted, so this is its only email.
+const ALERT_CLOSED =
+  "You asked for one alert for this match, so this request is now closed. We will not email you about it again.";
+
+/** Send approved-offer alerts. One failed send does not stop the rest. Returns the failure count. */
+async function deliverAlerts(emails: EmailDraft[]) {
   const service = emailService();
+  let failed = 0;
   for (const email of emails) {
-    const to = email.to.includes("@") ? email.to : decryptString(email.to);
-    await service.send({ ...email, to });
+    try {
+      const to = email.to.includes("@") ? email.to : decryptString(email.to);
+      await service.send({ ...email, to, text: `${email.text}\n${ALERT_CLOSED}` });
+    } catch (error) {
+      failed += 1;
+      console.error(
+        "[email] ticket alert not sent:",
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
+  return failed;
 }
 
 function readForm(formData: FormData) {
@@ -352,7 +367,9 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
     });
     if (!result.ok) return result;
     if (!result.already) {
-      await sendAlertConfirmation(parsed.data.email, verify, unsub);
+      if (!(await sendAlertConfirmation(parsed.data.email, verify, unsub))) {
+        return confirmationNotSent();
+      }
       await track("ticket_request_started", { match: parsed.data.matchSlug });
     }
     return { ok: true as const, already: result.already };
@@ -372,7 +389,9 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   );
   if (!result.ok) return failure(result.errors);
   if (!result.result.already) {
-    await sendAlertConfirmation(parsed.data.email, verify, unsub);
+    if (!(await sendAlertConfirmation(parsed.data.email, verify, unsub))) {
+      return confirmationNotSent();
+    }
     await track("ticket_request_started", { match: parsed.data.matchSlug });
   }
   if (demoRolesAllowed() && !result.result.already) {
@@ -381,13 +400,29 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
   return { ok: true as const, already: result.result.already };
 }
 
+/** Returns false when the email provider rejects the message. The request is already saved. */
 async function sendAlertConfirmation(email: string, verify: string, unsub: string) {
   const verifyLink = `${siteUrl()}/requests/${verify}`;
   const unsubLink = `${siteUrl()}/requests/${unsub}?intent=unsubscribe`;
-  await emailService().send({
-    to: email,
-    subject: "Confirm your cricket ticket alert",
-    text: `Confirm this alert: ${verifyLink}\nA request does not reserve a ticket.\nUnsubscribe: ${unsubLink}`,
+  try {
+    await emailService().send({
+      to: email,
+      subject: "Confirm your cricket ticket alert",
+      text: `Confirm this alert: ${verifyLink}\nA request does not reserve a ticket.\nUnsubscribe: ${unsubLink}`,
+    });
+    return true;
+  } catch (error) {
+    console.error(
+      "[email] alert confirmation not sent:",
+      error instanceof Error ? error.message : error,
+    );
+    return false;
+  }
+}
+
+function confirmationNotSent() {
+  return failure({
+    form: "We saved your request, but the confirmation email did not send, so the alert is not active yet.",
   });
 }
 
@@ -468,19 +503,19 @@ export async function approveOfferAction(_state: unknown, formData: FormData) {
   if (dataMode() === "supabase") {
     const result = await serviceApproveOffer({ offerId, matchSlug, actorId: session.userId });
     if (!result.ok) return result;
-    await deliver(result.emails);
+    const failed = await deliverAlerts(result.emails);
     revalidatePath(`/match/${matchSlug}`);
     revalidatePath("/admin/ticket-links");
-    return { ok: true as const, notified: result.notified };
+    return { ok: true as const, notified: result.notified, failed };
   }
   const result = commit(
     approveOffer(readStore(), { matchSlug, offerId, actorEmail: session.email }, new Date()),
   );
   if (!result.ok) return failure(result.errors);
-  await deliver(result.emails);
+  const failed = await deliverAlerts(result.emails);
   revalidatePath(`/match/${matchSlug}`);
   revalidatePath("/admin/ticket-links");
-  return { ok: true as const, notified: result.result.notified };
+  return { ok: true as const, notified: result.result.notified, failed };
 }
 
 export async function markVerifiedAction(_state: unknown, formData: FormData) {

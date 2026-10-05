@@ -20,8 +20,9 @@ export default function PrivacyPage() {
         approved offer and the time. It is not a browsing profile.
       </p>
       <p>
-        Verification and alert email includes an unsubscribe link. Alerts stop when you unsubscribe,
-        when the match starts, or when the match is cancelled.
+        The confirmation email includes a link to stop the alert. An alert sends one email when an
+        approved offer is listed, then the request closes. Alerts also stop when you stop them, when
+        the match starts, or when the match is cancelled.
       </p>
       <p>
         Analytics and error reporting run only when their keys are configured. They are off by

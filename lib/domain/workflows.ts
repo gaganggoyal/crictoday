@@ -721,7 +721,6 @@ export function approveOffer(
         `Domain: ${updatedOffer.sellerDomain}`,
         `Link: ${updatedOffer.url}`,
         "This alert does not reserve a ticket.",
-        `Unsubscribe token hash is handled by the stored link.`,
       ].join("\n"),
     });
     return { ...request, status: "notified" as const };
