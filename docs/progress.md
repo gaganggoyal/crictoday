@@ -33,7 +33,7 @@ Updated 6 October 2026, after adding the about, contact and policy pages and the
 - On a phone, `/matches` shows its heading, the search box and folded filters, then the results.
 - Nightly backups of the database and the uploaded pictures, kept for 14 nights in `/var/backups/cricketmatch`. See [deployment.md](deployment.md#backups).
 - The app runs on Node 24 LTS in `/opt/node24`, beside the system's Node 20, which reached its end of life in April 2026 and stays for the server's other apps.
-- About, contact and policy pages since 6 October 2026: `/about` with the founders, Gagan and Vansh; `/contact` with the Grievance Officer the IT Rules, 2021 ask for; and a full privacy policy and terms of use at `/legal/privacy` and `/legal/terms`, written from what the site stores. The texts live in the pages; names and the contact address are in `lib/company.ts`. `/privacy`, `/terms`, `/about-us` and `/contact-us` redirect to them.
+- About, contact and policy pages since 6 October 2026: `/about` with the founders, Gagan and Vansh; `/contact` with how to raise a grievance with the grievance team, as the IT Rules, 2021 ask; and a full privacy policy and terms of use at `/legal/privacy` and `/legal/terms`, written from what the site stores. The texts live in the pages; names and the contact address are in `lib/company.ts`. `/privacy`, `/terms`, `/about-us` and `/contact-us` redirect to them.
 - Search and sharing since 6 October 2026, after an outside audit:
   - every match has its own title and description, such as "India vs West Indies 1st T20I tickets – Lucknow, 6 Oct 2026";
   - countries, states, towns, leagues, teams and grounds describe their own upcoming matches;

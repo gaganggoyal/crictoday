@@ -2,13 +2,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Flag, Handshake, Mail, MapPin, ShieldCheck, Ticket } from "lucide-react";
 import { JsonLd } from "@/components/seo/json-ld";
-import { CONTACT_EMAIL, GRIEVANCE_OFFICER } from "@/lib/company";
+import { CONTACT_EMAIL } from "@/lib/company";
 import { organizationJsonLd, pageMetadata } from "@/lib/seo";
 import { siteUrl } from "@/lib/utils";
 
 export const metadata = pageMetadata(
   "Contact us",
-  "Write to cricketmatch.today about listing your club, a mistake on a match, a photo to take down, your data, or a partnership. Grievance Officer details included.",
+  "Write to cricketmatch.today about listing your club, a mistake on a match, a photo to take down, your data, or a partnership, and how to raise a grievance.",
   "/contact",
 );
 
@@ -103,25 +103,21 @@ export default function ContactPage() {
       </section>
 
       <section
-        id="grievance-officer"
-        aria-labelledby="grievance-officer-title"
+        id="grievances"
+        aria-labelledby="grievances-title"
         className="mt-16 scroll-mt-24 rounded-[1.25rem] border border-line bg-surface p-6 sm:p-8"
       >
-        <h2 id="grievance-officer-title" className="font-display text-3xl font-extrabold">
-          Grievance Officer
+        <h2 id="grievances-title" className="font-display text-3xl font-extrabold">
+          Grievance team
         </h2>
         <p className="mt-2 max-w-2xl text-muted">
-          Named under the Information Technology Act, 2000 and its rules, to handle complaints about
-          content on cricketmatch.today and about your personal data.
+          Our grievance team handles complaints about content on cricketmatch.today and about your
+          personal data, as the Information Technology Act, 2000 and its rules require.
         </p>
-        <dl className="mt-6 grid gap-4 sm:grid-cols-3">
+        <dl className="mt-6 grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-sm text-muted">Name</dt>
-            <dd className="font-semibold">{GRIEVANCE_OFFICER.name}</dd>
-          </div>
-          <div>
-            <dt className="text-sm text-muted">Role</dt>
-            <dd className="font-semibold">{GRIEVANCE_OFFICER.title}, cricketmatch.today</dd>
+            <dt className="text-sm text-muted">Who</dt>
+            <dd className="font-semibold">Grievance team, cricketmatch.today</dd>
           </div>
           <div className="min-w-0">
             <dt className="text-sm text-muted">Email</dt>

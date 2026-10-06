@@ -14,9 +14,9 @@ test("the about, contact and policy pages are linked from the footer", async ({ 
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
   }
   await page.goto("/");
-  await page.getByRole("contentinfo").getByRole("link", { name: "Grievance Officer" }).click();
-  await expect(page).toHaveURL(/\/contact#grievance-officer$/);
-  await expect(page.getByRole("heading", { name: "Grievance Officer" })).toBeVisible();
+  await page.getByRole("contentinfo").getByRole("link", { name: "Grievance team" }).click();
+  await expect(page).toHaveURL(/\/contact#grievances$/);
+  await expect(page.getByRole("heading", { name: "Grievance team" })).toBeVisible();
 });
 
 test("the about page introduces the founders", async ({ page }) => {

@@ -2,9 +2,6 @@
 
 export const CONTACT_EMAIL = "hello@cricketmatch.today";
 
-/** The person India's IT Rules, 2021 ask a site with user posts to name for complaints. */
-export const GRIEVANCE_OFFICER = { name: "Gagan", title: "Founder" };
-
 /** When the privacy policy and the terms last changed, as YYYY-MM-DD. */
 export const POLICIES_UPDATED = "2026-10-06";
 

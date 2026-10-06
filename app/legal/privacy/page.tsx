@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DocPage, Facts, type DocSection } from "@/components/layout/doc-page";
-import { CONTACT_EMAIL, GRIEVANCE_OFFICER, POLICIES_UPDATED } from "@/lib/company";
+import { CONTACT_EMAIL, POLICIES_UPDATED } from "@/lib/company";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -416,9 +416,9 @@ const SECTIONS: DocSection[] = [
     body: (
       <>
         <p>
-          For questions, requests or complaints about your data, email {mail}. Our Grievance Officer
-          is {GRIEVANCE_OFFICER.name}, {GRIEVANCE_OFFICER.title}, at the same address. See the{" "}
-          <Link href="/contact#grievance-officer">Grievance Officer</Link> details.
+          For questions, requests or complaints about your data, email {mail}. Our grievance team
+          answers at the same address, and the Contact page explains{" "}
+          <Link href="/contact#grievances">how to raise a grievance</Link>.
         </p>
         <p>
           We acknowledge complaints within 24 hours and resolve them within 15 days. If our answer

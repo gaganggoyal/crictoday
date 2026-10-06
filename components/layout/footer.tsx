@@ -34,7 +34,7 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
           links={[
             ["/about", "About us"],
             ["/contact", "Contact us"],
-            ["/contact#grievance-officer", "Grievance Officer"],
+            ["/contact#grievances", "Grievance team"],
           ]}
         />
         <FooterColumn
