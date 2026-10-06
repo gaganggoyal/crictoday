@@ -18,6 +18,9 @@ type SeedAcademy = Omit<
   | "whatsapp"
   | "links"
   | "offerings"
+  | "logo"
+  | "cover"
+  | "photos"
   | "reviewNotes"
 > &
   Partial<Pick<StoredAcademy, "kind" | "whatsapp" | "links" | "offerings">>;
@@ -1402,6 +1405,9 @@ export const academies: StoredAcademy[] = demoAcademies.map((academy) => {
     whatsapp: null,
     links: {},
     offerings: [],
+    logo: null,
+    cover: null,
+    photos: [],
     reviewNotes: null,
     ...academy,
   };

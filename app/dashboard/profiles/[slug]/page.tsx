@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MediaEditor } from "@/components/profile/media-editor";
 import { OfferingsEditor } from "@/components/profile/offerings-editor";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { ProfileLogo } from "@/components/profile/profile-picture";
 import { getSession } from "@/lib/auth/session";
 import { PROFILE_COUNTRIES, profileDefaults } from "@/lib/data/profile-form";
 import { ownerProfile } from "@/lib/data/profiles";
@@ -52,10 +54,15 @@ export default async function ManageProfilePage({
         <p className="text-sm">
           <Link href="/dashboard">Your account</Link>
         </p>
-        <p className="mt-3 text-xs font-semibold tracking-[0.14em] text-link uppercase">
-          {PROFILE_KIND_LABEL[profile.kind]}
-        </p>
-        <h1 className="font-display text-4xl font-extrabold">{profile.name}</h1>
+        <div className="mt-3 flex items-center gap-4">
+          <ProfileLogo name={profile.name} logo={profile.logo} size={64} />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold tracking-[0.14em] text-link uppercase">
+              {PROFILE_KIND_LABEL[profile.kind]}
+            </p>
+            <h1 className="font-display text-4xl font-extrabold">{profile.name}</h1>
+          </div>
+        </div>
         <div className="mt-4 grid gap-2">
           {firstParam(query.created) ? (
             <Notice>Your profile is saved. Add your offers and matches while it waits.</Notice>
@@ -94,6 +101,7 @@ export default async function ManageProfilePage({
           {[
             ["#matches", "Matches"],
             ["#offers", "Offers"],
+            ["#photos", "Logo and photos"],
             ["#details", "Details"],
           ].map(([href, label]) => (
             <a
@@ -113,20 +121,28 @@ export default async function ManageProfilePage({
             Matches
           </h2>
           {profile.verificationStatus === "rejected" ? null : (
-            <Link
-              href={`/dashboard/profiles/${profile.slug}/matches/new`}
-              className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white"
-            >
-              Post a match
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/dashboard/profiles/${profile.slug}/matches/new`}
+                className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+              >
+                Post a match
+              </Link>
+              <Link
+                href={`/dashboard/profiles/${profile.slug}/matches/import`}
+                className="inline-flex min-h-11 items-center rounded-full border border-line bg-surface px-5 font-medium"
+              >
+                Add from a spreadsheet
+              </Link>
+            </div>
           )}
         </div>
         {upcoming.length ? (
           <MatchList owner={profile.slug} matches={upcoming} />
         ) : (
           <p className="mt-4 text-muted">
-            No upcoming matches yet. Post a friendly, a league game or your whole tournament
-            schedule.
+            No upcoming matches yet. Post a friendly or a league game, or add your whole season from
+            a spreadsheet.
           </p>
         )}
         {past.length ? (
@@ -144,6 +160,25 @@ export default async function ManageProfilePage({
           Offers
         </h2>
         <OfferingsEditor profile={profile.slug} offerings={profile.offerings} />
+      </section>
+
+      <section id="photos" aria-labelledby="photos-heading" className="scroll-mt-32">
+        <h2 id="photos-heading" className="font-display text-3xl font-extrabold">
+          Logo and photos
+        </h2>
+        <p className="mt-2 mb-5 max-w-2xl text-muted">
+          {live
+            ? "Pictures show on your page and your card as soon as you add them."
+            : "Pictures go public with your profile once it passes its check."}{" "}
+          Use your own photos, or ones you have permission to use.
+        </p>
+        <MediaEditor
+          profile={profile.slug}
+          name={profile.name}
+          logo={profile.logo}
+          cover={profile.cover}
+          photos={profile.photos}
+        />
       </section>
 
       <section id="details" aria-labelledby="details-heading" className="max-w-3xl scroll-mt-32">

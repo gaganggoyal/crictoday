@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProfileLogo } from "@/components/profile/profile-picture";
 import { getSession } from "@/lib/auth/session";
 import { accountSnapshot } from "@/lib/data/account";
 import { ownerProfiles, profilesEnabled } from "@/lib/data/profiles";
@@ -110,11 +111,14 @@ function ProfileStatus({ profile, editable }: { profile: StoredAcademy; editable
           {STATUS[profile.verificationStatus]}
         </span>
       </p>
-      <div>
-        <p className="font-display text-2xl font-extrabold">{profile.name}</p>
-        <p className="text-sm text-muted">
-          {profile.cityName}, {profile.stateName ?? profile.countryName}
-        </p>
+      <div className="flex items-center gap-3">
+        <ProfileLogo name={profile.name} logo={profile.logo} size={48} />
+        <div className="min-w-0">
+          <p className="font-display text-2xl font-extrabold">{profile.name}</p>
+          <p className="text-sm text-muted">
+            {profile.cityName}, {profile.stateName ?? profile.countryName}
+          </p>
+        </div>
       </div>
       {profile.verificationStatus === "rejected" && profile.reviewNotes ? (
         <p className="text-sm">{profile.reviewNotes}</p>

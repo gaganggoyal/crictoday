@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MoreFilters } from "@/components/match/more-filters";
 import { filtersToQuery, type MatchFilters } from "@/lib/domain/filters";
 import { FORMAT_LABEL, KIND_LABEL } from "@/lib/domain/labels";
 
@@ -24,70 +25,85 @@ export function MatchFiltersForm({
         </Link>
       </div>
       <Field label="Search" name="q" defaultValue={filters.q} placeholder="Team, ground, league" />
-      <Select
-        label="Country"
-        name="country"
-        defaultValue={filters.country}
-        options={countries.map((country) => [country.slug, country.name])}
-      />
-      <Select
-        label="City"
-        name="city"
-        defaultValue={filters.city}
-        options={cities.map((city) => [city.slug, city.name])}
-      />
-      <Field label="From" name="from" type="date" defaultValue={filters.from} />
-      <Field label="To" name="to" type="date" defaultValue={filters.to} />
-      <Select
-        label="Competition"
-        name="kind"
-        defaultValue={filters.kind}
-        options={Object.entries(KIND_LABEL)}
-      />
-      <Select
-        label="Format"
-        name="format"
-        defaultValue={filters.format}
-        options={Object.entries(FORMAT_LABEL)}
-      />
-      <Select
-        label="Ticket state"
-        name="tickets"
-        defaultValue={filters.tickets}
-        options={[
-          ["official", "Tickets available"],
-          ["partner", "Authorised partner"],
-          ["alert", "Sale not open"],
-          ["free", "Free entry"],
-          ["sold_out", "Sold out"],
-          ["private", "Private"],
-          ["postponed", "Postponed"],
-          ["cancelled", "Cancelled"],
-        ]}
-      />
-      <Select
-        label="Sort"
-        name="sort"
-        defaultValue={filters.sort}
-        options={[
-          ["featured", "Featured"],
-          ["soonest", "Soonest"],
-          ["verified", "Recently verified"],
-          ["tickets", "Ticket availability"],
-        ]}
-        includeBlank={false}
-      />
+      <MoreFilters active={activeFilters(filters)}>
+        <Select
+          label="Country"
+          name="country"
+          defaultValue={filters.country}
+          options={countries.map((country) => [country.slug, country.name])}
+        />
+        <Select
+          label="City"
+          name="city"
+          defaultValue={filters.city}
+          options={cities.map((city) => [city.slug, city.name])}
+        />
+        <Field label="From" name="from" type="date" defaultValue={filters.from} />
+        <Field label="To" name="to" type="date" defaultValue={filters.to} />
+        <Select
+          label="Competition"
+          name="kind"
+          defaultValue={filters.kind}
+          options={Object.entries(KIND_LABEL)}
+        />
+        <Select
+          label="Format"
+          name="format"
+          defaultValue={filters.format}
+          options={Object.entries(FORMAT_LABEL)}
+        />
+        <Select
+          label="Ticket state"
+          name="tickets"
+          defaultValue={filters.tickets}
+          options={[
+            ["official", "Tickets available"],
+            ["partner", "Authorised partner"],
+            ["alert", "Sale not open"],
+            ["free", "Free entry"],
+            ["sold_out", "Sold out"],
+            ["private", "Private"],
+            ["postponed", "Postponed"],
+            ["cancelled", "Cancelled"],
+          ]}
+        />
+        <Select
+          label="Sort"
+          name="sort"
+          defaultValue={filters.sort}
+          options={[
+            ["featured", "Featured"],
+            ["soonest", "Soonest"],
+            ["verified", "Recently verified"],
+            ["tickets", "Ticket availability"],
+          ]}
+          includeBlank={false}
+        />
+      </MoreFilters>
       <button
         className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white"
         type="submit"
       >
         Apply filters
       </button>
-      <p className="text-xs text-muted">
+      <p className="hidden text-xs text-muted lg:block">
         Filter links stay in the address bar, so a result can be shared or crawled.
       </p>
     </form>
   );
+}
+
+/** Filters set besides the search box, for the count on the folded filters. */
+function activeFilters(filters: MatchFilters) {
+  const set = [
+    filters.country,
+    filters.city,
+    filters.from,
+    filters.to,
+    filters.kind,
+    filters.format,
+  ];
+  return [...set, filters.tickets].filter(Boolean).length + (filters.sort !== "featured" ? 1 : 0);
 }
 
 export function filterHref(filters: MatchFilters, overrides: Partial<MatchFilters> = {}) {

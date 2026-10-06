@@ -5,8 +5,12 @@ set -euo pipefail
 
 APP=/var/www/cricketmatch
 REF="${1:-main}"
+# The app's own Node from install-node.sh, else the system's.
+NODE_BIN=/opt/node24/bin
+[ -x "$NODE_BIN/node" ] || NODE_BIN=$(dirname "$(command -v node)")
 as_app() {
-  runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch COREPACK_ENABLE_DOWNLOAD_PROMPT=0 "$@"
+  runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch PATH="$NODE_BIN:$PATH" \
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0 "$@"
 }
 
 cd "$APP"

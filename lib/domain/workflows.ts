@@ -79,7 +79,7 @@ export function mergeMatches(store: StoreShape): StoredMatch[] {
 
 export function mergeAcademies(store: StoreShape): StoredAcademy[] {
   const map = new Map(academies.map((academy) => [academy.slug, structuredClone(academy)]));
-  // Academies saved before profiles had kinds and offerings get the defaults.
+  // Academies saved before profiles had kinds, offerings and pictures get the defaults.
   for (const academy of store.extraAcademies) {
     const saved: Partial<StoredAcademy> = structuredClone(academy);
     const defaults = {
@@ -89,6 +89,9 @@ export function mergeAcademies(store: StoreShape): StoredAcademy[] {
       whatsapp: null,
       links: {},
       offerings: [],
+      logo: null,
+      cover: null,
+      photos: [],
       reviewNotes: null,
     };
     map.set(academy.slug, { ...defaults, ...saved } as StoredAcademy);
@@ -340,6 +343,26 @@ export function createTicketRequest(
         request.status === "active" ||
         request.status === "notified"),
   );
+  if (existing?.status === "pending_verification") {
+    // The first confirmation may never have arrived: new links replace the old ones.
+    const renewed = {
+      ...existing,
+      quantity: input.quantity,
+      countryCode: input.countryCode,
+      notes: input.notes || null,
+      verifyTokenHash: input.verifyTokenHash,
+      unsubTokenHash: input.unsubTokenHash,
+    };
+    return {
+      ok: true,
+      store: {
+        ...store,
+        requests: store.requests.map((request) => (request.id === existing.id ? renewed : request)),
+      },
+      emails: [],
+      result: { id: existing.id, already: false },
+    };
+  }
   if (existing) {
     return { ok: true, store, emails: [], result: { id: existing.id, already: true } };
   }
@@ -633,6 +656,9 @@ export function reviewSubmission(
       ageGroups: payload.ageGroups,
       facilities: payload.facilities,
       offerings: [],
+      logo: null,
+      cover: null,
+      photos: [],
       verificationStatus: "verified",
       verificationLabel: "Contact verified",
       reviewNotes: null,

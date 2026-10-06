@@ -153,7 +153,13 @@ describe.skipIf(!serverUrl)("club and academy profiles on MySQL", () => {
     await saveOffering(
       pool,
       owner,
-      { profile: slug, id, category: "tournament", title: "Diwali Cup entry", price: "₹4,000 a team" },
+      {
+        profile: slug,
+        id,
+        category: "tournament",
+        title: "Diwali Cup entry",
+        price: "₹4,000 a team",
+      },
       now,
     );
     await saveOffering(
@@ -207,7 +213,11 @@ describe.skipIf(!serverUrl)("club and academy profiles on MySQL", () => {
     expect(resubmitted).toMatchObject({ ok: true, status: "pending" });
     expect(resubmitted.ok && resubmitted.emails).toHaveLength(1);
 
-    const approved = await reviewProfile(pool, { actorId: moderator, slug, action: "approve" }, now);
+    const approved = await reviewProfile(
+      pool,
+      { actorId: moderator, slug, action: "approve" },
+      now,
+    );
     expect(approved.ok && approved.emails[0]?.subject).toBe(
       "Dadar Union Cricket Committee is live on cricketmatch.today",
     );
@@ -269,7 +279,12 @@ describe.skipIf(!serverUrl)("club and academy profiles on MySQL", () => {
       }),
       later(1),
     );
-    expect(edited).toEqual({ ok: true, slug: postedSlug, status: "postponed" });
+    expect(edited).toEqual({
+      ok: true,
+      slug: postedSlug,
+      status: "postponed",
+      startsAt: "2026-11-15T04:30:00.000Z",
+    });
     const owned = await loadOwnerProfile(pool, owner, slug);
     expect(owned?.matches.find((item) => item.slug === postedSlug)).toMatchObject({
       status: "postponed",
@@ -281,7 +296,13 @@ describe.skipIf(!serverUrl)("club and academy profiles on MySQL", () => {
   });
 
   it("keeps a renamed profile's matches pointing at it, and hides both when taken down", async () => {
-    await updateProfile(pool, owner, slug, { ...committee, name: "Dadar Union Cricket Club", kind: "club" }, now);
+    await updateProfile(
+      pool,
+      owner,
+      slug,
+      { ...committee, name: "Dadar Union Cricket Club", kind: "club" },
+      now,
+    );
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT DISTINCT source_label, source_url FROM matches WHERE academy_slug = ?",
       [slug],
@@ -306,7 +327,9 @@ describe.skipIf(!serverUrl)("club and academy profiles on MySQL", () => {
     for (let index = 1; index < 5; index += 1) {
       await createProfile(pool, owner, { ...committee, name: `Dadar Club ${index}` }, now);
     }
-    expect(await createProfile(pool, owner, { ...committee, name: "One too many" }, now)).toMatchObject({
+    expect(
+      await createProfile(pool, owner, { ...committee, name: "One too many" }, now),
+    ).toMatchObject({
       ok: false,
     });
   });

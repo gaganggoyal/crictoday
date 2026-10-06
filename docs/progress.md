@@ -1,6 +1,6 @@
 # Progress
 
-Updated 6 October 2026, after adding club profiles and the India menu.
+Updated 6 October 2026, after adding profile pictures, spreadsheet schedules and nightly backups.
 
 ## Done
 
@@ -27,6 +27,12 @@ Updated 6 October 2026, after adding club profiles and the India menu.
 - Official ticket links since 6 October 2026, for 145 of the 209 matches. They come from Cricket Australia's fixture data, Cricket South Africa's Ticketpro shop, New Zealand Cricket's ticket site, the state associations' District and ticketgenie pages, and the PCB's ticket site; sold-out matches say so. The fixture file lists them, and a link can wait for its sale to open. The hourly sync loads `data/fixtures`, so the file goes live within the hour of a deploy, and it emails the ticket alerts that new links answer.
 - Browse by place since 6 October 2026. A shop-style menu opens Countries, then India's 28 states and 8 union territories, then their towns, from `lib/data/india.ts`; phones get a drill-down drawer. Every state has a page, and every listed Indian town has one even before anything is listed there. Matches and profiles store their state.
 - Club and academy profiles since 6 October 2026. Academies, clubs, committees and leagues, and grounds and turfs sign in with their email and create a profile: about, place, contact with WhatsApp and social links, age groups, facilities, and offers such as coaching, camps, trials, nets, ground hire, tournament entry and membership. They post matches from a short form with "post and add another" for tournament schedules, and can edit, postpone or cancel them. A moderator checks each profile once at `/admin/profiles`; until then it and its matches stay hidden. Approved profiles publish matches at once with the profile as their source. Moderators are emailed about new profiles, and owners when a profile goes live or is sent back.
+- Profile pictures since 6 October 2026. Owners add a logo, a cover photo and up to 12 photos with captions, in order. The browser shrinks phone photos before sending; the server checks the file, turns it upright, strips camera and GPS data, and stores two WebP sizes. Cards, profile pages, match pages ("Posted by" with the logo), structured data and WhatsApp or social link previews use them. Moderators see new pictures on live profiles at `/admin/profiles` and can take any down.
+- Spreadsheet schedules since 6 October 2026. Owners upload an .xlsx or CSV file, or paste rows from Excel or Google Sheets, and see every row checked before saving: dates day first or as Excel stores them, times like 9.30 am, a "Team vs Team" column, an Opponent column for a club's own fixtures, and the profile's ground and town where cells are empty. Adding the sheet again updates changed matches and skips the rest. Up to 200 matches at a time.
+- A ticket alert whose confirmation email failed, or was lost, can be requested again: while it waits for confirmation, a new request replaces its links and sends the email again. Confirmed alerts still answer that they exist.
+- On a phone, `/matches` shows its heading, the search box and folded filters, then the results.
+- Nightly backups of the database and the uploaded pictures, kept for 14 nights in `/var/backups/cricketmatch`. See [deployment.md](deployment.md#backups).
+- The app runs on Node 24 LTS in `/opt/node24`, beside the system's Node 20, which reached its end of life in April 2026 and stays for the server's other apps.
 
 ## Not done
 
@@ -35,16 +41,13 @@ Updated 6 October 2026, after adding club profiles and the India menu.
 - Sold-out states and new ticket links need someone to recheck the boards' pages; nothing fetches them automatically.
 - No clubs or academies are listed yet; the first will come through the new profiles.
 - Profiles are created and edited only with the MySQL database. The demo store and the Supabase path show their academies read-only.
-- Profiles have no logo or photos, and a schedule is posted one match at a time, not from a spreadsheet.
 - No live provider tokens are configured.
-- A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs the request's token hashes to be rotated.
-- On a phone, `/matches` shows ten filter fields before the first result.
-- The server runs Node 20, which supabase-js now warns about. Node 22 is the safer host version.
 - The Supabase path is kept but untested against a hosted project; RLS and its functions are verified with PGlite.
+- Backups stay on the server's own disk. Nothing copies them elsewhere yet, so they do not cover losing the server.
 
 ## Next
 
 1. Recheck `data/fixtures` at least weekly: listings older than seven days are marked unverified. Add the waiting matches, ticket links as sales open, and sold-out states, then deploy.
 2. Invite the first academies, clubs and committees to `/get-listed`, and check new profiles at `/admin/profiles`.
-3. Add the `cricketmatch` database to the server's scheduled MySQL backups.
+3. Copy `/var/backups/cricketmatch` off the server, for example to object storage, once there is an account to hold it.
 4. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.

@@ -7,12 +7,14 @@ cricketmatch.today runs on the shared VPS (`161.97.97.34`) with MySQL. The Supab
 | Piece    | Where                                                                                                                                                      |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Code     | `/var/www/cricketmatch`, a clone of `main`, owned by the `cricketmatch` user                                                                               |
-| Process  | `cricketmatch.service` runs `next start` on port 3300                                                                                                      |
+| Process  | `cricketmatch.service` runs `next start` on port 3300, on Node 24 LTS in `/opt/node24`. The system's `/usr/bin/node` is left for the other apps.           |
 | HTTPS    | The Caddy container from `/root/cricketverse_deploy` proxies to `172.18.0.1:3300`                                                                          |
 | Firewall | ufw admits 3300 only from the Docker bridge range `172.16.0.0/12`                                                                                          |
 | Data     | The `cricketmatch` database on the server's MySQL 8, with its own `cricketmatch` user. It shares the server with indiaoffers, not its tables.              |
 | Settings | `/var/www/cricketmatch/.env`, mode 600                                                                                                                     |
 | Sync     | `cricketmatch-sync.timer` calls `/api/cron/sync` every hour. It loads `data/fixtures`, emails the ticket alerts new links answer, and expires past offers. |
+| Pictures | Profile logos and photos, as WebP files in `UPLOAD_DIR` (`/var/lib/cricketmatch/uploads`), served by the app at `/media/profiles/`                         |
+| Backups  | `cricketmatch-backup.timer` dumps the database and copies the pictures to `/var/backups/cricketmatch` every night, keeping 14 of each                      |
 
 The unit files, the Caddy block and the scripts are in `deploy/vps/`.
 
@@ -26,7 +28,7 @@ It checks out `origin/main` (or the branch or commit you pass as the first argum
 
 ### Database commands
 
-Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch corepack pnpm db migrate`.
+Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch PATH=/opt/node24/bin:$PATH corepack pnpm db migrate`.
 
 - `pnpm db migrate` applies `db/mysql/*.sql` files that have not run.
 - `pnpm db load-fixtures data/fixtures/2026-27.json` adds the real fixtures and official ticket links in that file and updates the ones it loaded before. Add `--dry-run` to check the file first. The hourly sync does the same for every file in `data/fixtures`, so a deploy is enough; run this to apply a file at once. [data/fixtures/README.md](../data/fixtures/README.md) explains the format and the sourcing rules.
@@ -34,11 +36,43 @@ Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cr
 - `pnpm db set-role <email> <role>` creates the account if needed and sets its role. `admin@cricketmatch.today` is the first admin.
 - `pnpm db sign-in-link <email>` prints a one-time sign-in link, valid for 30 minutes. Use it when email cannot reach that address.
 
-Back up the database with the server's other MySQL backups: `mysqldump --single-transaction cricketmatch`.
-
 ### Club and academy profiles
 
 People create profiles from `/get-listed` after signing in. Each new profile waits at `/admin/profiles`, and every moderator and admin account is emailed about it. Approving makes the profile and its waiting matches public and emails the owner; sending it back needs a note, which the owner sees and is emailed. A moderator can take a live profile down the same way, which hides its matches too. Ticket links that owners add to their matches still wait at `/admin/ticket-links`.
+
+Owners add a logo, a cover photo and up to 12 photos. The browser shrinks each picture before sending it; the server checks it is a JPEG, PNG, WebP, GIF, AVIF or TIFF, turns it upright, drops its camera and GPS data, and writes two WebP sizes to `UPLOAD_DIR/profiles`. Link previews use a JPEG copy, made the first time a chat app asks for it. A live profile's new pictures show at once; moderators see the last two weeks' at `/admin/profiles` and can take any down, which deletes its files. Pictures on a profile that waits for its check show only to its owner and moderators.
+
+Owners can also add a season from a spreadsheet at `/dashboard/profiles/<slug>/matches/import`: an .xlsx or CSV file, or rows pasted from Excel or Google Sheets. The browser reads the file, so the server never opens a workbook; it gets the cells as text, checks every row as if posted from the match form, and shows what each row would do before anything is saved. Adding the same sheet again updates changed matches and skips the rest. The template is `public/templates/match-schedule.csv`.
+
+### Backups
+
+`cricketmatch-backup.timer` runs `deploy/vps/backup.sh` as the app user at about 03:40 server time. It writes `cricketmatch-<time>.sql.gz` with `mysqldump --single-transaction`, using the app's own database login from `.env`, and copies `UPLOAD_DIR` to `uploads-<time>/`. Pictures never change once written, so each night's copy hard-links the files the last one has and costs only the new ones. The newest 14 of each are kept in `/var/backups/cricketmatch` (mode 700). The copies are on the same disk, so they cover mistakes, not a lost server: copy them off the server too.
+
+To run one now and see the result:
+
+```bash
+systemctl start cricketmatch-backup.service && journalctl -u cricketmatch-backup.service -n 5 --no-pager
+```
+
+To restore, stop the app, load the dump, and copy the pictures back:
+
+```bash
+systemctl stop cricketmatch
+gunzip -c /var/backups/cricketmatch/cricketmatch-<time>.sql.gz | mysql cricketmatch
+rsync -a --delete /var/backups/cricketmatch/uploads-<time>/ /var/lib/cricketmatch/uploads/
+chown -R cricketmatch:cricketmatch /var/lib/cricketmatch/uploads
+systemctl start cricketmatch
+```
+
+### Node
+
+`deploy/vps/install-node.sh` installs the newest Node 24 LTS into `/opt/node-v24.x.y-linux-x64` and points `/opt/node24` at it. It checks the download against Node's checksum file, and that file's signature against the release team's keys from GitHub. `deploy.sh` and `cricketmatch.service` use `/opt/node24`; the other apps keep the system's Node. To take a Node security release, run the script again, then deploy. Node 24 is supported until April 2028.
+
+After changing a unit file in `deploy/vps/`, install it and reload systemd:
+
+```bash
+install -m 644 deploy/vps/cricketmatch.service /etc/systemd/system/ && systemctl daemon-reload
+```
 
 ### Email
 
@@ -61,7 +95,7 @@ Any SMTP server can send instead. Set `SMTP_HOST`, `SMTP_PORT` (465 is TLS from 
 
 ### First install
 
-`deploy/vps/` documents the steps that were run once: create the `cricketmatch` system user (home `/var/lib/cricketmatch`, so pnpm caches stay out of the checkout) and MySQL user, clone into `/var/www/cricketmatch`, write `.env`, `pnpm install`, `pnpm build`, `pnpm db migrate`, install and enable `cricketmatch.service` and `cricketmatch-sync.timer`, open 3300 to the Docker bridge in ufw, append `deploy/vps/Caddyfile` to the cricketverse Caddyfile, and `caddy reload` in the container.
+`deploy/vps/` documents the steps that were run once: create the `cricketmatch` system user (home `/var/lib/cricketmatch`, so pnpm caches stay out of the checkout) and MySQL user, run `install-node.sh`, clone into `/var/www/cricketmatch`, write `.env` (with `UPLOAD_DIR=/var/lib/cricketmatch/uploads`), `pnpm install`, `pnpm build`, `pnpm db migrate`, install and enable `cricketmatch.service`, `cricketmatch-sync.timer` and `cricketmatch-backup.timer`, open 3300 to the Docker bridge in ufw, append `deploy/vps/Caddyfile` to the cricketverse Caddyfile, and `caddy reload` in the container.
 
 ## 2. Alternative: Supabase and Vercel
 

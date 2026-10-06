@@ -29,7 +29,12 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Node-only drivers: load them with require at runtime instead of bundling them.
-  serverExternalPackages: ["mysql2", "nodemailer"],
+  serverExternalPackages: ["mysql2", "nodemailer", "sharp"],
+  experimental: {
+    // Profile pictures are sent through server actions. Browsers shrink them first; this leaves
+    // room for an 8 MB original when they cannot.
+    serverActions: { bodySizeLimit: "9mb" },
+  },
   async headers() {
     const headers = [...securityHeaders];
     if (process.env.NODE_ENV === "production") {

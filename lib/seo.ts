@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { imageSrc, socialImageSrc } from "@/lib/domain/media";
 import type { StoredAcademy, StoredMatch } from "@/lib/domain/types";
 import { siteUrl } from "@/lib/utils";
 
@@ -63,6 +64,9 @@ export function profileJsonLd(profile: StoredAcademy, path: string) {
     profile.links.facebook,
     profile.links.youtube,
   ].filter(Boolean);
+  const images = [profile.cover, ...profile.photos]
+    .filter((image) => image !== null)
+    .map((image) => `${siteUrl()}${imageSrc(image)}`);
   return {
     "@context": "https://schema.org",
     "@type": profile.kind === "ground" ? "SportsActivityLocation" : "SportsOrganization",
@@ -73,6 +77,8 @@ export function profileJsonLd(profile: StoredAcademy, path: string) {
     ...(profile.contactEmail ? { email: profile.contactEmail } : {}),
     ...(profile.phone ? { telephone: profile.phone } : {}),
     ...(sameAs.length ? { sameAs } : {}),
+    ...(profile.logo ? { logo: `${siteUrl()}${imageSrc(profile.logo)}` } : {}),
+    ...(images.length ? { image: images } : {}),
     address: {
       "@type": "PostalAddress",
       streetAddress: profile.address,
@@ -80,5 +86,31 @@ export function profileJsonLd(profile: StoredAcademy, path: string) {
       ...(profile.stateName ? { addressRegion: profile.stateName } : {}),
       addressCountry: profile.countryName,
     },
+  };
+}
+
+/**
+ * A profile page's metadata, with its cover photo (or else its logo) as the link preview that
+ * WhatsApp, Facebook and X show. The preview is a JPEG copy, which every chat app reads.
+ */
+export function profileMetadata(profile: StoredAcademy, title: string, path: string): Metadata {
+  const metadata = pageMetadata(title, profile.description, path);
+  const picture = profile.cover ?? profile.logo;
+  if (!picture) return metadata;
+  const scale = Math.min(1, 1200 / Math.max(picture.width, picture.height));
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      images: [
+        {
+          url: `${siteUrl()}${socialImageSrc(picture)}`,
+          width: Math.round(picture.width * scale),
+          height: Math.round(picture.height * scale),
+          alt: profile.cover ? profile.name : `${profile.name} logo`,
+        },
+      ],
+    },
+    twitter: { card: profile.cover ? "summary_large_image" : "summary" },
   };
 }

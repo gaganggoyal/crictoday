@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import { ProfileCover, ProfileLogo } from "@/components/profile/profile-picture";
 import { PROFILE_KIND_LABEL, profilePath } from "@/lib/domain/profiles";
 import type { StoredAcademy } from "@/lib/domain/types";
 
@@ -8,31 +9,47 @@ export function ProfileCard({ profile }: { profile: StoredAcademy }) {
   return (
     <Link
       href={profilePath(profile)}
-      className="flex h-full flex-col rounded-[1.25rem] border border-line bg-surface p-5 no-underline"
+      className="group flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-line bg-surface no-underline"
     >
-      <p className="text-xs font-semibold tracking-[0.14em] text-link uppercase">
-        {PROFILE_KIND_LABEL[profile.kind]}
-        {profile.verificationLabel ? ` · ${profile.verificationLabel}` : ""}
-      </p>
-      <h3 className="mt-2 font-display text-2xl leading-tight font-extrabold">{profile.name}</h3>
-      <p className="mt-2 flex items-start gap-1.5 text-sm text-muted">
-        <MapPin aria-hidden="true" size={16} className="mt-0.5 shrink-0" />
-        {place}
-      </p>
-      {profile.offerings.length ? (
-        <ul className="mt-4 flex flex-wrap gap-2 text-xs" aria-label="Offers">
-          {profile.offerings.slice(0, 3).map((offering) => (
-            <li key={offering.id} className="rounded-full border border-line px-2.5 py-1">
-              {offering.title}
-            </li>
-          ))}
-          {profile.offerings.length > 3 ? (
-            <li className="px-1 py-1 text-muted">+{profile.offerings.length - 3} more</li>
-          ) : null}
-        </ul>
-      ) : profile.ageGroups.length ? (
-        <p className="mt-3 text-sm">{profile.ageGroups.join(" · ")}</p>
-      ) : null}
+      <ProfileCover cover={profile.cover} size="small" className="aspect-[16/7]" />
+      <div className="flex flex-1 flex-col px-5 pb-5">
+        <ProfileLogo
+          name={profile.name}
+          logo={profile.logo}
+          size={64}
+          className="-mt-8 shadow-sm ring-4 ring-surface"
+        />
+        <p className="mt-3 text-xs font-semibold tracking-[0.14em] text-link uppercase">
+          {PROFILE_KIND_LABEL[profile.kind]}
+          {profile.verificationLabel ? ` · ${profile.verificationLabel}` : ""}
+        </p>
+        <h3 className="mt-1 font-display text-2xl leading-tight font-extrabold group-hover:underline">
+          {profile.name}
+        </h3>
+        <p className="mt-2 flex items-start gap-1.5 text-sm text-muted">
+          <MapPin aria-hidden="true" size={16} className="mt-0.5 shrink-0" />
+          {place}
+        </p>
+        {profile.offerings.length ? (
+          <ul className="mt-4 flex flex-wrap gap-2 text-xs" aria-label="Offers">
+            {profile.offerings.slice(0, 3).map((offering) => (
+              <li key={offering.id} className="rounded-full border border-line px-2.5 py-1">
+                {offering.title}
+              </li>
+            ))}
+            {profile.offerings.length > 3 ? (
+              <li className="px-1 py-1 text-muted">+{profile.offerings.length - 3} more</li>
+            ) : null}
+          </ul>
+        ) : profile.ageGroups.length ? (
+          <p className="mt-3 text-sm">{profile.ageGroups.join(" · ")}</p>
+        ) : null}
+        {profile.photos.length ? (
+          <p className="mt-auto pt-4 text-xs text-muted">
+            {profile.photos.length} {profile.photos.length === 1 ? "photo" : "photos"}
+          </p>
+        ) : null}
+      </div>
     </Link>
   );
 }
