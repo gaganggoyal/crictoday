@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { findDuplicateCandidates } from "@/lib/domain/duplicates";
-import { filterMatches, isFiltered, parseFilters, pickHero, playsOn } from "@/lib/domain/filters";
+import {
+  filterMatches,
+  isFiltered,
+  parseFilters,
+  pickHero,
+  playsOn,
+  relatedMatches,
+} from "@/lib/domain/filters";
 import {
   planImport,
   normalizeSportMonksFixture,
@@ -322,5 +329,44 @@ describe("day shortcuts", () => {
     expect(isFiltered(parseFilters({ page: "2" }))).toBe(false);
     expect(isFiltered(parseFilters({ when: "weekend" }))).toBe(true);
     expect(isFiltered(parseFilters({ when: "someday" }))).toBe(false);
+  });
+});
+
+describe("related matches", () => {
+  it("lists only matches still to come, soonest first and postponed last", () => {
+    const base: StoredMatch = {
+      ...matches[0]!,
+      slug: "base",
+      citySlug: "lucknow",
+      competitionSlug: "tour",
+      format: "t20",
+      status: "published",
+      attendanceType: "ticketed",
+      startsAt: "2026-10-06T13:30:00.000Z",
+      endsAt: null,
+      offers: [],
+    };
+    const at = (slug: string, startsAt: string, patch: Partial<StoredMatch> = {}) => ({
+      ...base,
+      slug,
+      startsAt,
+      ...patch,
+    });
+    const list = [
+      base,
+      at("played", "2026-10-06T10:00:00.000Z"),
+      at("called-off", "2026-10-08T13:30:00.000Z", { status: "cancelled" }),
+      at("later", "2026-10-11T13:30:00.000Z"),
+      at("next", "2026-10-09T13:30:00.000Z"),
+      at("on-now", "2026-10-07T11:00:00.000Z"),
+      at("no-date", "2026-10-05T13:30:00.000Z", { status: "postponed" }),
+      at("same-town", "2026-10-10T13:30:00.000Z", { competitionSlug: "league" }),
+      at("elsewhere", "2026-10-08T13:30:00.000Z", { citySlug: "pune", competitionSlug: "league" }),
+    ];
+    const time = new Date("2026-10-07T12:00:00.000Z");
+    const slugs = (limit?: number) =>
+      relatedMatches(base, list, time, limit).map((match) => match.slug);
+    expect(slugs(10)).toEqual(["on-now", "next", "same-town", "later", "no-date"]);
+    expect(slugs()).toEqual(["on-now", "next", "same-town"]);
   });
 });

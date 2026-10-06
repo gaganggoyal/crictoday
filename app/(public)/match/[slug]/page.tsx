@@ -9,6 +9,7 @@ import { ShareButton, VisitorTime } from "@/components/match/visitor-time";
 import { TicketPanel } from "@/components/ticket/ticket-panel";
 import { currentTime } from "@/lib/clock";
 import { getDirectory, getMatch } from "@/lib/data/catalog";
+import { relatedMatches } from "@/lib/domain/filters";
 import { FORMAT_LABEL, STATUS_LABEL } from "@/lib/domain/labels";
 import { profilePath } from "@/lib/domain/profiles";
 import { ATTENDANCE_COPY, isStale, resolveAttendance } from "@/lib/domain/ticket-state";
@@ -44,13 +45,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
   if (!match) notFound();
   const now = currentTime();
   const directory = await getDirectory();
-  const related = directory.matches
-    .filter(
-      (item) =>
-        item.slug !== match.slug &&
-        (item.citySlug === match.citySlug || item.competitionSlug === match.competitionSlug),
-    )
-    .slice(0, 3);
+  const related = relatedMatches(match, directory.matches, now);
   // A club or academy that posted the match is its source, with its logo.
   const organiser = match.academySlug
     ? (directory.academies.find((academy) => academy.slug === match.academySlug) ?? null)

@@ -214,6 +214,28 @@ function compareMatches(a: StoredMatch, b: StoredMatch, sort: MatchSort, now: Da
   return +new Date(a.startsAt) - +new Date(b.startsAt) || a.slug.localeCompare(b.slug);
 }
 
+/**
+ * Other matches in the same town or competition that are still to come: neither finished nor
+ * cancelled. Soonest first, then postponed ones, which have no date yet.
+ */
+export function relatedMatches(match: StoredMatch, matches: StoredMatch[], now: Date, limit = 3) {
+  return matches
+    .filter((item) => {
+      if (item.slug === match.slug) return false;
+      if (item.citySlug !== match.citySlug && item.competitionSlug !== match.competitionSlug) {
+        return false;
+      }
+      const state = resolveAttendance(item, item.offers, now);
+      return state !== "FINISHED" && state !== "CANCELLED";
+    })
+    .sort(
+      (a, b) =>
+        Number(a.status === "postponed") - Number(b.status === "postponed") ||
+        Date.parse(a.startsAt) - Date.parse(b.startsAt),
+    )
+    .slice(0, limit);
+}
+
 export function pickHero(matches: StoredMatch[], now: Date) {
   return matches
     .filter(
