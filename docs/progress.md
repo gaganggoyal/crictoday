@@ -46,6 +46,7 @@ Updated 6 October 2026, after adding CI and rewriting the README for people revi
 - CI since 6 October 2026. GitHub Actions runs lint, typecheck, formatting, every Vitest suite (the MySQL ones against MySQL 8.0, as in production), the production build and the Playwright tests on every push and pull request. `pnpm typecheck` generates Next's route types first, so it also passes on a fresh clone.
 - The README is written for people reviewing the code: what the site does, screenshots, the engineering choices, the stack and how to run it.
 - On a phone, a match page shows its tickets straight after the details, before the correction form. The source line and the last-checked time read normally on match and profile pages.
+- A match that has started says "Under way" instead of offering a ticket alert, and "Finished" two hours after it should be over (a Test runs for five days). Cards, filters, titles, descriptions, structured data and link previews follow, and a finished match drops its calendar button. Pages judge time through `lib/clock.ts`; in demo mode `DEMO_NOW` pins it, and the end-to-end tests run at 5 October 2026 so the dated demo keeps its states.
 
 ## Not done
 

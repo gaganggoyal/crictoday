@@ -17,7 +17,9 @@ export type AttendanceState =
   | "SOLD_OUT"
   | "PRIVATE_EVENT"
   | "CANCELLED"
-  | "POSTPONED";
+  | "POSTPONED"
+  | "IN_PLAY"
+  | "FINISHED";
 
 export type StoredOffer = {
   id: string;

@@ -2,8 +2,10 @@ import {
   BadgeCheck,
   Ban,
   Bell,
+  CalendarCheck,
   CalendarClock,
   CircleOff,
+  CirclePlay,
   DoorOpen,
   Lock,
   Ticket,
@@ -21,6 +23,8 @@ const icons = {
   PRIVATE_EVENT: Lock,
   CANCELLED: CircleOff,
   POSTPONED: CalendarClock,
+  IN_PLAY: CirclePlay,
+  FINISHED: CalendarCheck,
 } satisfies Record<AttendanceState, typeof Ticket>;
 
 export function TicketBadge({ state, className }: { state: AttendanceState; className?: string }) {
@@ -39,6 +43,8 @@ export function TicketBadge({ state, className }: { state: AttendanceState; clas
         state === "PRIVATE_EVENT" && "border-line bg-background text-foreground",
         state === "CANCELLED" && "border-[#8C2F1B] bg-[#8C2F1B] text-white no-underline",
         state === "POSTPONED" && "border-[#8A5A12] bg-[#8A5A12] text-white",
+        state === "IN_PLAY" && "border-[#B8501E] bg-[#B8501E]/10 text-foreground",
+        state === "FINISHED" && "border-line bg-background text-muted",
         className,
       )}
     >

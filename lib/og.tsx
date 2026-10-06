@@ -25,6 +25,8 @@ const BADGE: Record<AttendanceState, string> = {
   PRIVATE_EVENT: "Private match",
   CANCELLED: "Cancelled",
   POSTPONED: "Postponed",
+  IN_PLAY: "Under way",
+  FINISHED: "Finished",
 };
 
 function clip(text: string, max: number) {
@@ -175,8 +177,8 @@ export function siteImage() {
 }
 
 /** A match's preview: teams, label, ground, local start and ticket state. */
-export function matchImage(match: StoredMatch) {
-  const state = resolveAttendance(match, match.offers);
+export function matchImage(match: StoredMatch, now: Date) {
+  const state = resolveAttendance(match, match.offers, now);
   const label = matchLabel(match);
   return render(
     {

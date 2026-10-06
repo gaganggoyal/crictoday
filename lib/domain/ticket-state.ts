@@ -1,7 +1,13 @@
+import { DAY_MINUTES } from "@/lib/domain/calendar";
 import type { AttendanceState, StoredMatch, StoredOffer } from "@/lib/domain/types";
 
 export const PRICE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 export const STALE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+
+const MINUTE_MS = 60 * 1000;
+const DAY_MS = 24 * 60 * MINUTE_MS;
+/** Rain and long days run late, so a match counts as finished only this long after it should end. */
+const OVERRUN_MS = 2 * 60 * MINUTE_MS;
 
 export const ATTENDANCE_COPY: Record<
   AttendanceState,
@@ -48,16 +54,45 @@ export const ATTENDANCE_COPY: Record<
     cta: "Get date alert",
     description: "The date is not confirmed. We email you after a verified reschedule.",
   },
+  IN_PLAY: {
+    label: "Under way",
+    cta: "See upcoming matches",
+    description: "This match has started. Its ticket links and alerts are closed.",
+  },
+  FINISHED: {
+    label: "Finished",
+    cta: "See upcoming matches",
+    description: "This match is over. Its ticket links and alerts are closed.",
+  },
 };
 
+/** When a match should be over: its end time, or a typical day's play after it starts. */
+export function expectedEnd(match: Pick<StoredMatch, "startsAt" | "endsAt" | "format">) {
+  const start = Date.parse(match.startsAt);
+  const end = match.endsAt ? Date.parse(match.endsAt) : Number.NaN;
+  if (end > start) return end;
+  // A Test runs for five days.
+  const days = match.format === "test" ? 4 : 0;
+  return start + days * DAY_MS + DAY_MINUTES[match.format] * MINUTE_MS;
+}
+
+/**
+ * The one attendance state a match shows. Cancelled and postponed come first, then a match that is
+ * over. A private or free match keeps its state while it is on, since people can still walk in to a
+ * free one. Any other match that has started closes its ticket links and alerts.
+ */
 export function resolveAttendance(
-  match: Pick<StoredMatch, "status" | "attendanceType">,
+  match: Pick<StoredMatch, "status" | "attendanceType" | "format" | "startsAt" | "endsAt">,
   offers: StoredOffer[],
+  now: Date,
 ): AttendanceState {
   if (match.status === "cancelled") return "CANCELLED";
   if (match.status === "postponed") return "POSTPONED";
+  const time = now.getTime();
+  if (match.status === "completed" || time >= expectedEnd(match) + OVERRUN_MS) return "FINISHED";
   if (match.attendanceType === "private") return "PRIVATE_EVENT";
   if (match.attendanceType === "free") return "FREE_ENTRY";
+  if (time >= Date.parse(match.startsAt)) return "IN_PLAY";
 
   const active = offers.filter((offer) => offer.approved && offer.status === "active");
   if (active.some((offer) => offer.kind === "official")) return "OFFICIAL_LINK";
@@ -106,6 +141,8 @@ export function ticketSortRank(state: AttendanceState) {
     "SOLD_OUT",
     "POSTPONED",
     "PRIVATE_EVENT",
+    "IN_PLAY",
+    "FINISHED",
     "CANCELLED",
   ];
   return order.indexOf(state);

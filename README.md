@@ -60,7 +60,7 @@
 
 ## Engineering highlights
 
-- **Rules in pure, tested functions.** Each match has exactly one attendance state, such as `OFFICIAL_LINK`, `SOLD_OUT` or `POSTPONED`, worked out in [`lib/domain/ticket-state.ts`](lib/domain/ticket-state.ts). A ticket link goes public only after a moderator approves it. Links that are not HTTPS, or that use a URL shortener, are refused ([`lib/domain/urls.ts`](lib/domain/urls.ts)).
+- **Rules in pure, tested functions.** Each match has exactly one attendance state, such as `OFFICIAL_LINK`, `SOLD_OUT` or `IN_PLAY`, worked out from its offers, its status and the time in [`lib/domain/ticket-state.ts`](lib/domain/ticket-state.ts). A ticket link goes public only after a moderator approves it. Links that are not HTTPS, or that use a URL shortener, are refused ([`lib/domain/urls.ts`](lib/domain/urls.ts)).
 - **Time zones done properly.** Start times are stored in UTC with the ground's IANA time zone. "Today" means today at the ground, and calendar files follow RFC 5545 ([`lib/domain/time.ts`](lib/domain/time.ts), [`lib/domain/filters.ts`](lib/domain/filters.ts), [`lib/domain/calendar.ts`](lib/domain/calendar.ts)).
 - **Spreadsheets are read in the browser.** A small .xlsx reader runs on the owner's device and refuses compressed bombs, so the server never opens an uploaded workbook. The schedule reader understands day-first dates, Excel's date numbers and times like "9.30 am". Uploading the sheet again updates only the rows that changed ([`lib/sheets/xlsx.ts`](lib/sheets/xlsx.ts), [`lib/domain/schedule.ts`](lib/domain/schedule.ts)).
 - **Uploads are treated as hostile.** A picture's format is checked from its first bytes before any decoder sees it, and SVG is never decoded. Every photo is turned upright, stripped of camera and GPS data and re-encoded as WebP with sharp ([`lib/media/store.ts`](lib/media/store.ts)).
@@ -125,7 +125,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:3000. Without a database the app runs on a labelled demo catalogue, so the demo banner is intentional. These sign-in addresses work only in local development, and the sign-in page shows the link instead of emailing it:
+Open http://127.0.0.1:3000. Without a database the app runs on a labelled demo catalogue, so the demo banner is intentional. The demo is dated October 2026; to see it as it was then, run `DEMO_NOW=2026-10-05T12:00:00Z pnpm dev`, as the end-to-end tests do. These sign-in addresses work only in local development, and the sign-in page shows the link instead of emailing it:
 
 - `admin@cricketmatch.today`
 - `moderator@cricketmatch.today`

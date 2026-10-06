@@ -7,7 +7,7 @@ import type { StoredMatch } from "@/lib/domain/types";
 import { TicketBadge } from "@/components/match/ticket-badge";
 
 export function MatchCard({ match, now }: { match: StoredMatch; now: Date }) {
-  const state = resolveAttendance(match, match.offers);
+  const state = resolveAttendance(match, match.offers, now);
   const stale = isStale(match.lastVerifiedAt, now);
   const muted = state === "CANCELLED" || state === "POSTPONED";
   return (

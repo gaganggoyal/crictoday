@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid } from "@/components/match/match-grid";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const team = await loadTeam(slug);
   if (!team) notFound();
-  const summary = upcomingSummary(team.matches, new Date());
+  const summary = upcomingSummary(team.matches, currentTime());
   return pageMetadata(
     `${team.name} fixtures and tickets`,
     summary
@@ -32,7 +33,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const team = await loadTeam(slug);
   if (!team) notFound();
-  const summary = upcomingSummary(team.matches, new Date());
+  const summary = upcomingSummary(team.matches, currentTime());
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
       <Breadcrumbs
@@ -45,7 +46,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       <h1 className="font-display text-5xl font-extrabold tracking-tight">{team.name}</h1>
       {summary ? <p className="mt-3 max-w-2xl font-medium">{summary}.</p> : null}
       <div className="mt-8">
-        <MatchGrid matches={team.matches} now={new Date()} />
+        <MatchGrid matches={team.matches} now={currentTime()} />
       </div>
     </div>
   );

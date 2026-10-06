@@ -4,7 +4,8 @@ Attendance product for upcoming cricket. The public question is where the match 
 
 ## Product rules
 
-- One attendance state per match: `OFFICIAL_LINK`, `AUTHORISED_PARTNER`, `REQUEST_ALERT`, `FREE_ENTRY`, `SOLD_OUT`, `PRIVATE_EVENT`, `CANCELLED`, `POSTPONED`.
+- One attendance state per match: `OFFICIAL_LINK`, `AUTHORISED_PARTNER`, `REQUEST_ALERT`, `FREE_ENTRY`, `SOLD_OUT`, `PRIVATE_EVENT`, `CANCELLED`, `POSTPONED`, `IN_PLAY`, `FINISHED`.
+- A match that has started is `IN_PLAY`: its ticket links and alerts are closed. It is `FINISHED` two hours after it should end, which is its end time or a typical day's play for its format; a Test runs for five days. Free and private matches keep their state while they are on.
 - A price is shown only with a currency and a check newer than 7 days.
 - Ticket links open `/go/[offerId]` first. The seller and domain are visible before the external site.
 - A fixture is public only when its status is published, postponed, cancelled, or completed, and it has a source URL.

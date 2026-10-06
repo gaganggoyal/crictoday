@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { ATTENDANCE_COPY, priceLabel, primaryOffer } from "@/lib/domain/ticket-state";
+import {
+  ATTENDANCE_COPY,
+  priceLabel,
+  primaryOffer,
+  resolveAttendance,
+} from "@/lib/domain/ticket-state";
 import type { StoredMatch } from "@/lib/domain/types";
 import { RequestForm } from "@/components/forms/request-form";
 import { TicketBadge } from "@/components/match/ticket-badge";
-import { resolveAttendance } from "@/lib/domain/ticket-state";
 
 export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
-  const state = resolveAttendance(match, match.offers);
+  const state = resolveAttendance(match, match.offers, now);
   const copy = ATTENDANCE_COPY[state];
   const offer = primaryOffer(match.offers);
   const price = priceLabel(offer, now);
@@ -54,6 +58,14 @@ export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
         </div>
       ) : null}
       {alert ? <RequestForm matchSlug={match.slug} cta={copy.cta} /> : null}
+      {state === "IN_PLAY" || state === "FINISHED" ? (
+        <Link
+          href="/matches"
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-medium no-underline"
+        >
+          {copy.cta}
+        </Link>
+      ) : null}
       <p className="text-xs leading-5 text-muted">
         cricketmatch.today does not sell tickets. Leaving this site is your choice, and only after
         the seller domain is shown.

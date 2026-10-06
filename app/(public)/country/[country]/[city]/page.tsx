@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { indiaCity, placeState } from "@/lib/data/india";
 import { countries } from "@/lib/data/seed";
@@ -18,7 +19,7 @@ async function loadCity(countrySlug: string, citySlug: string) {
   const country = countries.find((item) => item.slug === countrySlug);
   if (!country) return null;
   const directory = await getDirectory();
-  const now = new Date();
+  const now = currentTime();
   const all = directory.matches.filter(
     (match) => match.countrySlug === countrySlug && match.citySlug === citySlug,
   );

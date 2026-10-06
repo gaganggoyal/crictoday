@@ -5,6 +5,7 @@ import { BellRing, Clock, ShieldCheck, Ticket } from "lucide-react";
 import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
 import { SearchForm } from "@/components/match/search-form";
 import { JsonLd } from "@/components/seo/json-ld";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { filterMatches, pickHero } from "@/lib/domain/filters";
 import { profilePath } from "@/lib/domain/profiles";
@@ -56,12 +57,12 @@ const HOW = [
 
 export default async function HomePage() {
   const directory = await getDirectory();
-  const now = new Date();
+  const now = currentTime();
   const upcoming = filterMatches(directory.matches, { sort: "featured", page: 1 }, now).items;
   const featured = pickHero(directory.matches, now);
   const withTickets = directory.matches
     .filter((match) => {
-      const state = resolveAttendance(match, match.offers);
+      const state = resolveAttendance(match, match.offers, now);
       return state === "OFFICIAL_LINK" || state === "AUTHORISED_PARTNER";
     })
     .slice(0, 3);

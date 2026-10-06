@@ -180,13 +180,13 @@ export function filterMatches(matches: StoredMatch[], filters: MatchFilters, now
     ) {
       return false;
     }
-    if (wanted && resolveAttendance(match, match.offers) !== wanted) return false;
+    if (wanted && resolveAttendance(match, match.offers, now) !== wanted) return false;
     return true;
   });
 
   // A day's matches read best in the order they start.
   const sort = filters.when && filters.sort === "featured" ? "soonest" : filters.sort;
-  const sorted = [...filtered].sort((a, b) => compareMatches(a, b, sort));
+  const sorted = [...filtered].sort((a, b) => compareMatches(a, b, sort, now));
   const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const page = Math.min(filters.page, pageCount);
   const start = (page - 1) * PAGE_SIZE;
@@ -198,15 +198,15 @@ export function filterMatches(matches: StoredMatch[], filters: MatchFilters, now
   };
 }
 
-function compareMatches(a: StoredMatch, b: StoredMatch, sort: MatchSort) {
+function compareMatches(a: StoredMatch, b: StoredMatch, sort: MatchSort, now: Date) {
   if (sort === "soonest") return +new Date(a.startsAt) - +new Date(b.startsAt);
   if (sort === "verified") {
     return +new Date(b.lastVerifiedAt || 0) - +new Date(a.lastVerifiedAt || 0);
   }
   if (sort === "tickets") {
     const rank =
-      ticketSortRank(resolveAttendance(a, a.offers)) -
-      ticketSortRank(resolveAttendance(b, b.offers));
+      ticketSortRank(resolveAttendance(a, a.offers, now)) -
+      ticketSortRank(resolveAttendance(b, b.offers, now));
     if (rank !== 0) return rank;
     return +new Date(a.startsAt) - +new Date(b.startsAt);
   }

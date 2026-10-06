@@ -13,6 +13,9 @@ export default defineConfig({
     url: "http://127.0.0.1:3000",
     reuseExistingServer: true,
     timeout: 120000,
+    // The demo catalogue is dated October 2026. Judging it as of then keeps each match's state
+    // fixed, so a dev server started without DEMO_NOW may fail these tests.
+    env: { DEMO_NOW: "2026-10-05T12:00:00.000Z" },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

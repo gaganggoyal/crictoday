@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { leagues } from "@/lib/data/seed";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const directory = await getDirectory();
   const summary = upcomingSummary(
     directory.matches.filter((match) => match.competitionSlug === league.slug),
-    new Date(),
+    currentTime(),
   );
   return pageMetadata(
     `${league.name} fixtures and tickets: ${league.seasonName}`,
@@ -29,7 +30,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
   const directory = await getDirectory();
   const matches = directory.matches.filter((match) => match.competitionSlug === league.slug);
   const teams = [...new Set(matches.flatMap((match) => [match.homeSlug, match.awaySlug]))];
-  const summary = upcomingSummary(matches, new Date());
+  const summary = upcomingSummary(matches, currentTime());
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
       <Breadcrumbs
@@ -58,7 +59,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
       <p className="mt-4 text-sm text-muted">{teams.length} sides in the current listings.</p>
       <div className="mt-8">
         {matches.length ? (
-          <MatchGrid matches={matches} now={new Date()} />
+          <MatchGrid matches={matches} now={currentTime()} />
         ) : (
           <NothingListedYet title={`${league.seasonName} fixtures are not listed yet`} />
         )}

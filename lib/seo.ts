@@ -77,14 +77,16 @@ export function groundTime(match: StoredMatch) {
  * A title no other match shares: the teams, the match label, the town and the day, as in
  * "India vs West Indies 1st T20I tickets – Lucknow, 6 Oct 2026".
  */
-export function matchTitle(match: StoredMatch) {
-  const state = resolveAttendance(match, match.offers);
+export function matchTitle(match: StoredMatch, now: Date) {
+  const state = resolveAttendance(match, match.offers, now);
   const label = matchLabel(match);
   const teams = `${match.homeName} vs ${match.awayName}${label ? ` ${label}` : ""}`;
   const day = dayAt(match, { day: "numeric", month: "short", year: "numeric" });
   if (state === "POSTPONED") return `${teams} (postponed) – ${match.cityName}`;
   if (state === "CANCELLED") return `${teams} (cancelled) – ${match.cityName}, ${day}`;
-  const tickets = match.attendanceType === "ticketed" ? " tickets" : "";
+  // Once a match has started, its page is no longer the place to find tickets.
+  const started = state === "IN_PLAY" || state === "FINISHED";
+  const tickets = match.attendanceType === "ticketed" && !started ? " tickets" : "";
   return `${teams}${tickets} – ${match.cityName}, ${day}`;
 }
 
@@ -106,14 +108,18 @@ function attendanceSentence(state: AttendanceState, offer: StoredOffer | null) {
       return "This match is cancelled.";
     case "POSTPONED":
       return "This match is postponed until a new date is confirmed.";
+    case "IN_PLAY":
+      return "This match is under way.";
+    case "FINISHED":
+      return "This match is over.";
     default:
       return "Tickets are not on sale here yet: get an email when an official link appears.";
   }
 }
 
 /** A description no other match shares, with the ground, the local start and how to get in. */
-export function matchDescription(match: StoredMatch) {
-  const state = resolveAttendance(match, match.offers);
+export function matchDescription(match: StoredMatch, now: Date) {
+  const state = resolveAttendance(match, match.offers, now);
   const label = matchLabel(match);
   const what = label
     ? `${match.homeName} vs ${match.awayName}, ${label}`
@@ -160,9 +166,9 @@ export function matchSocialImage(match: StoredMatch): SocialImage {
   };
 }
 
-export function sportsEventJsonLd(match: StoredMatch) {
+export function sportsEventJsonLd(match: StoredMatch, now: Date) {
   if (!match.sourceUrl || !match.startsAt || !match.venueName) return null;
-  const state = resolveAttendance(match, match.offers);
+  const state = resolveAttendance(match, match.offers, now);
   const status =
     match.status === "cancelled"
       ? "https://schema.org/EventCancelled"
@@ -173,12 +179,12 @@ export function sportsEventJsonLd(match: StoredMatch) {
   const away = { "@type": "SportsTeam", name: match.awayName };
   const offer = primaryOffer(match.offers);
   const live = offer && (state === "OFFICIAL_LINK" || state === "AUTHORISED_PARTNER");
-  const price = live ? priceLabel(offer, new Date()) : null;
+  const price = live ? priceLabel(offer, now) : null;
   return {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     name: matchName(match),
-    description: matchDescription(match),
+    description: matchDescription(match, now),
     image: [matchSocialImage(match).url],
     startDate: match.startsAt,
     ...(match.endsAt ? { endDate: match.endsAt } : {}),
