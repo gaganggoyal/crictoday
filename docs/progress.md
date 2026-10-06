@@ -1,6 +1,6 @@
 # Progress
 
-Updated 6 October 2026, after adding the about, contact and policy pages and the SEO work.
+Updated 6 October 2026, after adding CI and rewriting the README for people reviewing the code.
 
 ## Done
 
@@ -43,6 +43,9 @@ Updated 6 October 2026, after adding the about, contact and policy pages and the
   - filtered `/matches` views and places with nothing listed are noindex and left out of the sitemap;
   - sitemap dates come from when a match, its ticket links or a profile last changed.
 - Today, tomorrow and this weekend shortcuts on the home page and `/matches`, judged by the date at each ground. A Test counts for its five days.
+- CI since 6 October 2026. GitHub Actions runs lint, typecheck, formatting, every Vitest suite (the MySQL ones against MySQL 8.0, as in production), the production build and the Playwright tests on every push and pull request. `pnpm typecheck` generates Next's route types first, so it also passes on a fresh clone.
+- The README is written for people reviewing the code: what the site does, screenshots, the engineering choices, the stack and how to run it.
+- On a phone, a match page shows its tickets straight after the details, before the correction form. The source line and the last-checked time read normally on match and profile pages.
 
 ## Not done
 
