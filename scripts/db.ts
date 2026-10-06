@@ -1,6 +1,8 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { buildFixtureMatches } from "@/lib/data/fixtures";
 import { createMagicLink, upsertUserRole } from "@/lib/data/mysql/auth";
 import { removeDemo, seedDemo } from "@/lib/data/mysql/demo";
+import { loadFixtures } from "@/lib/data/mysql/fixtures";
 import { migrate } from "@/lib/data/mysql/migrate";
 import { createPool } from "@/lib/data/mysql/pool";
 import type { Role } from "@/lib/domain/types";
@@ -14,6 +16,8 @@ const USAGE = `Usage: pnpm db <command>
   migrate                   apply db/mysql/*.sql that have not run yet
   seed-demo                 load the labelled DEMO catalogue (existing rows are kept)
   remove-demo               delete every DEMO match and academy
+  load-fixtures <file>      add or update the real fixtures in a data/fixtures file;
+                            --dry-run only checks the file
   set-role <email> <role>   create the account if needed and set its role
                             roles: ${ROLES.join(", ")}
   sign-in-link <email>      print a one-time sign-in link, valid for 30 minutes,
@@ -31,6 +35,11 @@ async function main() {
   const [command, ...args] = process.argv.slice(2);
   if (!command || command === "help") {
     console.log(USAGE);
+    return;
+  }
+  if (command === "load-fixtures" && args.includes("--dry-run")) {
+    const fixtures = buildFixtureMatches(JSON.parse(readFileSync(fixtureFile(args), "utf8")));
+    console.log(`${fixtures.length} fixtures are valid.`);
     return;
   }
   const url = process.env.DATABASE_URL;
@@ -59,6 +68,13 @@ async function main() {
       }
       const user = await upsertUserRole(pool, email, role as Role, new Date());
       console.log(`${user.email} is ${user.role}.`);
+    } else if (command === "load-fixtures") {
+      const fixtures = buildFixtureMatches(JSON.parse(readFileSync(fixtureFile(args), "utf8")));
+      const result = await loadFixtures(pool, fixtures, new Date());
+      console.log(
+        `Inserted ${result.inserted}, updated ${result.updated}, unchanged ${result.unchanged}, skipped ${result.skipped.length}.`,
+      );
+      for (const line of result.skipped) console.log(`  skipped ${line}`);
     } else if (command === "sign-in-link") {
       const [email] = args;
       if (!email?.includes("@")) throw new Error("Usage: pnpm db sign-in-link <email>");
@@ -71,6 +87,12 @@ async function main() {
   } finally {
     await pool.end();
   }
+}
+
+function fixtureFile(args: string[]) {
+  const file = args.find((arg) => !arg.startsWith("--"));
+  if (!file) throw new Error("Usage: pnpm db load-fixtures <file.json> [--dry-run]");
+  return file;
 }
 
 main().catch((error: unknown) => {

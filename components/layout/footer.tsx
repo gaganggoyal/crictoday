@@ -35,7 +35,7 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
             ["/legal/terms", "Terms"],
             ["/legal/privacy", "Privacy"],
             ["/legal/ticket-policy", "Ticket policy"],
-            ["/about/demo-data", "Demo data"],
+            ...(demo ? [["/about/demo-data", "Demo data"]] : []),
           ]}
         />
       </div>
