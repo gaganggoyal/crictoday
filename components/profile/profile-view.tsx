@@ -11,6 +11,7 @@ import {
   telHref,
   whatsappHref,
 } from "@/lib/domain/profiles";
+import { formatDateHeading } from "@/lib/domain/time";
 import type { StoredAcademy, StoredMatch } from "@/lib/domain/types";
 import { jsonLdScript, profileJsonLd } from "@/lib/seo";
 
@@ -196,7 +197,7 @@ export function ProfileView({
 
       <p className="mt-12 text-sm text-muted">
         {profile.lastVerifiedAt
-          ? `Checked by a moderator on ${new Date(profile.lastVerifiedAt).toUTCString()}. `
+          ? `Checked by a moderator on ${formatDateHeading(profile.lastVerifiedAt, profile.timezone ?? "UTC")}. `
           : ""}
         Is this yours, or is something wrong?{" "}
         <Link href={`/submit/academy?claim=${profile.slug}`}>Tell us</Link>.

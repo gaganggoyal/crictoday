@@ -141,7 +141,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
                     {match.sourceLabel}
                     {match.sourceUrl ? (
                       <a
-                        className="inline-flex min-h-11 items-center text-sm font-normal text-link"
+                        className="flex min-h-11 w-fit items-center text-sm font-normal text-link"
                         href={match.sourceUrl}
                       >
                         View source
@@ -155,7 +155,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
               <dt className="text-sm text-muted">Last verified</dt>
               <dd className="font-medium">
                 {match.lastVerifiedAt
-                  ? new Date(match.lastVerifiedAt).toUTCString()
+                  ? formatInTimeZone(match.lastVerifiedAt, match.timezone)
                   : "Not verified"}
               </dd>
             </div>
@@ -188,14 +188,17 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
             )}
             <ShareButton title={`${match.homeName} vs ${match.awayName}`} />
           </div>
-          <section>
-            <h2 className="font-display text-2xl font-extrabold">Report a correction</h2>
-            <div className="mt-3">
-              <CorrectionForm matchSlug={match.slug} />
-            </div>
-          </section>
         </div>
-        <TicketPanel match={match} now={now} />
+        {/* Phones get the tickets straight after the details; desktops keep them in the side column. */}
+        <div className="lg:col-start-2 lg:row-[1/span_2]">
+          <TicketPanel match={match} now={now} />
+        </div>
+        <section className="lg:col-start-1">
+          <h2 className="font-display text-2xl font-extrabold">Report a correction</h2>
+          <div className="mt-3">
+            <CorrectionForm matchSlug={match.slug} />
+          </div>
+        </section>
       </div>
       {related.length ? (
         <section className="mt-14">
