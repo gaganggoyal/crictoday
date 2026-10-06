@@ -39,6 +39,9 @@ const fixtures: StoredMatch[] = buildFixtureMatches(file).map(
   }),
 );
 
+/** Before any match in the file starts. */
+const before = new Date("2026-10-01T00:00:00Z");
+
 function find(key: string) {
   const match = fixtures.find((item) => item.sourceExternalId === `fixtures:${key}`);
   if (!match) throw new Error(`No fixture ${key}`);
@@ -47,8 +50,8 @@ function find(key: string) {
 
 describe("match titles and descriptions", () => {
   it("gives every real fixture its own title and description", () => {
-    const titles = fixtures.map((match) => matchTitle(match));
-    const descriptions = fixtures.map((match) => matchDescription(match));
+    const titles = fixtures.map((match) => matchTitle(match, before));
+    const descriptions = fixtures.map((match) => matchDescription(match, before));
     expect(fixtures.length).toBeGreaterThan(200);
     expect(new Set(titles).size).toBe(titles.length);
     expect(new Set(descriptions).size).toBe(descriptions.length);
@@ -58,23 +61,35 @@ describe("match titles and descriptions", () => {
     const match = find("west-indies-in-india-2026-27:t20i-1");
     expect(matchLabel(match)).toBe("1st T20I");
     expect(seriesName(match)).toBe("West Indies tour of India");
-    expect(matchTitle(match)).toBe("India vs West Indies 1st T20I tickets – Lucknow, 6 Oct 2026");
-    expect(matchDescription(match)).toBe(
+    expect(matchTitle(match, before)).toBe(
+      "India vs West Indies 1st T20I tickets – Lucknow, 6 Oct 2026",
+    );
+    expect(matchDescription(match, before)).toBe(
       "India vs West Indies, 1st T20I, at Ekana Cricket Stadium, Lucknow, Tue, 6 Oct 2026 at 19:00 local time. Official tickets from District by Zomato.",
     );
   });
 
   it("says when a match is postponed, cancelled or free", () => {
     const match = find("west-indies-in-india-2026-27:t20i-1");
-    expect(matchTitle({ ...match, status: "postponed" })).toBe(
+    expect(matchTitle({ ...match, status: "postponed" }, before)).toBe(
       "India vs West Indies 1st T20I (postponed) – Lucknow",
     );
-    expect(matchTitle({ ...match, status: "cancelled" })).toBe(
+    expect(matchTitle({ ...match, status: "cancelled" }, before)).toBe(
       "India vs West Indies 1st T20I (cancelled) – Lucknow, 6 Oct 2026",
     );
     const free = { ...match, attendanceType: "free" as const, offers: [] };
-    expect(matchTitle(free)).toBe("India vs West Indies 1st T20I – Lucknow, 6 Oct 2026");
-    expect(matchDescription(free)).toMatch(/Free entry\.$/);
+    expect(matchTitle(free, before)).toBe("India vs West Indies 1st T20I – Lucknow, 6 Oct 2026");
+    expect(matchDescription(free, before)).toMatch(/Free entry\.$/);
+  });
+
+  it("stops offering tickets once a match has started", () => {
+    const match = find("west-indies-in-india-2026-27:t20i-1");
+    const during = new Date("2026-10-06T15:00:00Z");
+    const after = new Date("2026-10-07T00:00:00Z");
+    expect(matchTitle(match, during)).toBe("India vs West Indies 1st T20I – Lucknow, 6 Oct 2026");
+    expect(matchDescription(match, during)).toMatch(/local time\. This match is under way\.$/);
+    expect(matchDescription(match, after)).toMatch(/local time\. This match is over\.$/);
+    expect(sportsEventJsonLd(match, during)).not.toHaveProperty("offers");
   });
 });
 
@@ -82,7 +97,7 @@ describe("structured data", () => {
   const match = find("west-indies-in-india-2026-27:t20i-1");
 
   it("marks a real, approved sale as an offer and nothing else", () => {
-    const listed = sportsEventJsonLd(match);
+    const listed = sportsEventJsonLd(match, before);
     expect(listed).toMatchObject({
       "@type": "SportsEvent",
       name: "India vs West Indies, 1st T20I",
@@ -99,11 +114,13 @@ describe("structured data", () => {
     );
 
     const soldOut: StoredOffer = { ...match.offers[0]!, status: "sold_out" };
-    expect(sportsEventJsonLd({ ...match, offers: [soldOut] })?.offers?.availability).toBe(
+    expect(sportsEventJsonLd({ ...match, offers: [soldOut] }, before)?.offers?.availability).toBe(
       "https://schema.org/SoldOut",
     );
-    expect(sportsEventJsonLd({ ...match, offers: [] })).not.toHaveProperty("offers");
-    expect(sportsEventJsonLd({ ...match, attendanceType: "free", offers: [] })).toMatchObject({
+    expect(sportsEventJsonLd({ ...match, offers: [] }, before)).not.toHaveProperty("offers");
+    expect(
+      sportsEventJsonLd({ ...match, attendanceType: "free", offers: [] }, before),
+    ).toMatchObject({
       isAccessibleForFree: true,
     });
   });

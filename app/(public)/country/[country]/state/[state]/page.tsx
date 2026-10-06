@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { indiaState, placeState } from "@/lib/data/india";
 import { inDefaultWindow } from "@/lib/domain/filters";
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: { params: Params }) {
   const state = findState(country, slug);
   if (!state) notFound();
   const directory = await getDirectory();
-  const now = new Date();
+  const now = currentTime();
   const matches = directory.matches.filter((match) => placeState(match)?.slug === state.slug);
   const profiles = directory.academies.filter(
     (profile) => placeState(profile)?.slug === state.slug,
@@ -45,7 +46,7 @@ export default async function StatePage({ params }: { params: Params }) {
   const state = findState(country, slug);
   if (!state) notFound();
   const directory = await getDirectory();
-  const now = new Date();
+  const now = currentTime();
   const matches = directory.matches
     .filter((match) => placeState(match)?.slug === state.slug && inDefaultWindow(match, now))
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { currentTime } from "@/lib/clock";
 import { POLICIES_UPDATED } from "@/lib/company";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, placeState } from "@/lib/data/india";
@@ -28,7 +29,7 @@ function changed(match: StoredMatch) {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const directory = await getDirectory();
   const root = siteUrl();
-  const now = new Date();
+  const now = currentTime();
   const { matches, academies } = directory;
   const upcoming = matches.filter((match) => inDefaultWindow(match, now));
   const entry = (path: string, lastModified?: Date) => ({

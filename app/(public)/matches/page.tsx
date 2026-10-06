@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { filterHref, MatchFiltersForm } from "@/components/match/filters";
 import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import {
   filterMatches,
@@ -60,7 +61,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 export default async function MatchesPage({ searchParams }: { searchParams: SearchParams }) {
   const filters = await readFilters(searchParams);
   const directory = await getDirectory();
-  const now = new Date();
+  const now = currentTime();
   const result = filterMatches(directory.matches, filters, now);
   const cities = uniqueCities(directory.matches);
 

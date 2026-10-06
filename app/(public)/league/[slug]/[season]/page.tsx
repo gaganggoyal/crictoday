@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { leagues } from "@/lib/data/seed";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
@@ -28,7 +29,7 @@ export async function generateMetadata({
   const loaded = await loadSeason(slug, season);
   if (!loaded) notFound();
   const { league, matches, seasonName } = loaded;
-  const summary = upcomingSummary(matches, new Date());
+  const summary = upcomingSummary(matches, currentTime());
   // The current season lists the same fixtures as the league's page, which is the one to index.
   const current = league.seasonSlug === season;
   return pageMetadata(
@@ -47,7 +48,7 @@ export default async function SeasonPage({
   const loaded = await loadSeason(slug, season);
   if (!loaded) notFound();
   const { league, matches, seasonName } = loaded;
-  const summary = upcomingSummary(matches, new Date());
+  const summary = upcomingSummary(matches, currentTime());
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
       <Breadcrumbs
@@ -63,7 +64,7 @@ export default async function SeasonPage({
       {summary ? <p className="mt-3 max-w-2xl font-medium">{summary}.</p> : null}
       <div className="mt-8">
         {matches.length ? (
-          <MatchGrid matches={matches} now={new Date()} />
+          <MatchGrid matches={matches} now={currentTime()} />
         ) : (
           <NothingListedYet title={`${seasonName} fixtures are not listed yet`} />
         )}

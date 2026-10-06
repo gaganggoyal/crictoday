@@ -37,7 +37,7 @@ describe("attendance and price", () => {
       (item) => item.slug === "india-vs-australia-1st-test-ahmedabad-2026-10-16",
     );
     expect(match).toBeTruthy();
-    expect(resolveAttendance(match!, match!.offers)).toBe("OFFICIAL_LINK");
+    expect(resolveAttendance(match!, match!.offers, now)).toBe("OFFICIAL_LINK");
     expect(priceLabel(match!.offers[0], now)).toContain("1,500");
     expect(priceLabel(offer({ lastCheckedAt: "2026-09-01T12:00:00.000Z" }), now)).toBeNull();
     expect(priceLabel(offer({ currency: null }), now)).toBeNull();
@@ -45,12 +45,51 @@ describe("attendance and price", () => {
 
   it("keeps cancelled, free, private and sold out ahead of a ticket link", () => {
     const base = matches[0];
-    expect(resolveAttendance({ ...base, status: "cancelled" }, [offer()])).toBe("CANCELLED");
-    expect(resolveAttendance({ ...base, status: "postponed" }, [offer()])).toBe("POSTPONED");
-    expect(resolveAttendance({ ...base, attendanceType: "free" }, [])).toBe("FREE_ENTRY");
-    expect(resolveAttendance({ ...base, attendanceType: "private" }, [])).toBe("PRIVATE_EVENT");
-    expect(resolveAttendance(base, [offer({ status: "sold_out" })])).toBe("SOLD_OUT");
-    expect(resolveAttendance(base, [offer({ approved: false })])).toBe("REQUEST_ALERT");
+    expect(resolveAttendance({ ...base, status: "cancelled" }, [offer()], now)).toBe("CANCELLED");
+    expect(resolveAttendance({ ...base, status: "postponed" }, [offer()], now)).toBe("POSTPONED");
+    expect(resolveAttendance({ ...base, attendanceType: "free" }, [], now)).toBe("FREE_ENTRY");
+    expect(resolveAttendance({ ...base, attendanceType: "private" }, [], now)).toBe(
+      "PRIVATE_EVENT",
+    );
+    expect(resolveAttendance(base, [offer({ status: "sold_out" })], now)).toBe("SOLD_OUT");
+    expect(resolveAttendance(base, [offer({ approved: false })], now)).toBe("REQUEST_ALERT");
+  });
+
+  it("closes tickets once a match starts, and calls it finished once it should be over", () => {
+    const t20: StoredMatch = {
+      ...matches[0]!,
+      format: "t20",
+      status: "published",
+      attendanceType: "ticketed",
+      startsAt: "2026-10-04T14:00:00.000Z",
+      endsAt: null,
+    };
+    const at = (iso: string) => new Date(iso);
+    expect(resolveAttendance(t20, [offer()], at("2026-10-04T13:59:00.000Z"))).toBe("OFFICIAL_LINK");
+    expect(resolveAttendance(t20, [offer()], at("2026-10-04T14:00:00.000Z"))).toBe("IN_PLAY");
+    expect(resolveAttendance(t20, [], at("2026-10-04T14:00:00.000Z"))).toBe("IN_PLAY");
+    // About three and a half hours of play, and two more for rain and long innings.
+    expect(resolveAttendance(t20, [offer()], at("2026-10-04T19:29:00.000Z"))).toBe("IN_PLAY");
+    expect(resolveAttendance(t20, [offer()], at("2026-10-04T19:30:00.000Z"))).toBe("FINISHED");
+    expect(resolveAttendance({ ...t20, status: "completed" }, [], now)).toBe("FINISHED");
+
+    // A Test runs for five days; an end time, when the fixture has one, wins.
+    const test = { ...t20, format: "test" as const };
+    expect(resolveAttendance(test, [], at("2026-10-07T10:00:00.000Z"))).toBe("IN_PLAY");
+    expect(resolveAttendance(test, [], at("2026-10-09T00:00:00.000Z"))).toBe("FINISHED");
+    const late = { ...t20, endsAt: "2026-10-04T23:00:00.000Z" };
+    expect(resolveAttendance(late, [], at("2026-10-05T00:30:00.000Z"))).toBe("IN_PLAY");
+
+    // A free match stays free to walk in to while it is on. Cancelled and postponed never change.
+    const free = { ...t20, attendanceType: "free" as const };
+    expect(resolveAttendance(free, [], at("2026-10-04T15:00:00.000Z"))).toBe("FREE_ENTRY");
+    expect(resolveAttendance(free, [], at("2026-10-05T00:00:00.000Z"))).toBe("FINISHED");
+    expect(
+      resolveAttendance({ ...t20, status: "cancelled" }, [], at("2026-10-06T00:00:00.000Z")),
+    ).toBe("CANCELLED");
+    expect(
+      resolveAttendance({ ...t20, status: "postponed" }, [], at("2026-10-06T00:00:00.000Z")),
+    ).toBe("POSTPONED");
   });
 });
 

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid } from "@/components/match/match-grid";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const loaded = await loadVenue(slug);
   if (!loaded) notFound();
   const { venue, matches } = loaded;
-  const summary = upcomingSummary(matches, new Date(), { grounds: false });
+  const summary = upcomingSummary(matches, currentTime(), { grounds: false });
   return pageMetadata(
     `${venue.venueName}, ${venue.cityName}: fixtures and tickets`,
     summary
@@ -31,7 +32,7 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
   const loaded = await loadVenue(slug);
   if (!loaded) notFound();
   const { venue, matches } = loaded;
-  const summary = upcomingSummary(matches, new Date(), { grounds: false });
+  const summary = upcomingSummary(matches, currentTime(), { grounds: false });
   const mapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.venueName}, ${venue.venueAddress}`)}`;
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
@@ -61,7 +62,7 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
         Open map
       </a>
       <div className="mt-8">
-        <MatchGrid matches={matches} now={new Date()} />
+        <MatchGrid matches={matches} now={currentTime()} />
       </div>
     </div>
   );

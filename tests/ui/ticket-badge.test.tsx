@@ -7,4 +7,9 @@ describe("TicketBadge", () => {
     const html = renderToStaticMarkup(<TicketBadge state="OFFICIAL_LINK" />);
     expect(html).toContain("Tickets available");
   });
+
+  it("says when a match is under way or finished", () => {
+    expect(renderToStaticMarkup(<TicketBadge state="IN_PLAY" />)).toContain("Under way");
+    expect(renderToStaticMarkup(<TicketBadge state="FINISHED" />)).toContain("Finished");
+  });
 });

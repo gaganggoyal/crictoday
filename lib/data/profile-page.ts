@@ -1,4 +1,5 @@
 import "server-only";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { inDefaultWindow } from "@/lib/domain/filters";
 
@@ -7,7 +8,7 @@ export async function getProfilePage(slug: string) {
   const directory = await getDirectory();
   const profile = directory.academies.find((academy) => academy.slug === slug);
   if (!profile) return null;
-  const now = new Date();
+  const now = currentTime();
   const matches = directory.matches
     .filter((match) => match.academySlug === slug && inDefaultWindow(match, now))
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));

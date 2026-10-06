@@ -3,6 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { currentTime } from "@/lib/clock";
 import { safeNextPath, siteUrl } from "@/lib/utils";
 import { supabaseServer } from "@/lib/auth/supabase-server";
 import { consumeSignInLink } from "@/lib/auth/sign-in-link";
@@ -67,7 +68,7 @@ function honeypot(value: unknown) {
 }
 
 function commit<T>(result: WorkflowResult<T>) {
-  if (result.ok) writeStore(appendOutbox(result.store, result.emails, new Date()));
+  if (result.ok) writeStore(appendOutbox(result.store, result.emails, currentTime()));
   else if (result.store) writeStore(result.store);
   return result;
 }
@@ -156,6 +157,7 @@ export async function requestMagicLinkAction(_state: unknown, formData: FormData
 
   const token = newToken();
   const next = safeNextPath(parsed.data.next);
+  // Sign-in links run on the real clock, like the sessions they start.
   const now = new Date();
   if (dataMode() === "mysql") {
     await createMagicLink(
@@ -240,7 +242,7 @@ export async function submitMatchAction(_state: unknown, formData: FormData) {
     revalidatePath("/admin/submissions");
     return { ok: true as const, id: result.id };
   }
-  const result = commit(createMatchSubmission(readStore(), parsed.data, new Date()));
+  const result = commit(createMatchSubmission(readStore(), parsed.data, currentTime()));
   if (!result.ok) return failure(result.errors);
   await track("submission_completed", { entity: "match" });
   revalidatePath("/admin/submissions");
@@ -272,7 +274,7 @@ export async function submitAcademyAction(_state: unknown, formData: FormData) {
     revalidatePath("/admin/submissions");
     return { ok: true as const, id: result.id };
   }
-  const result = commit(createAcademySubmission(readStore(), parsed.data, new Date()));
+  const result = commit(createAcademySubmission(readStore(), parsed.data, currentTime()));
   if (!result.ok) return failure(result.errors);
   await track("submission_completed", { entity: "academy" });
   revalidatePath("/admin/submissions");
@@ -316,7 +318,7 @@ export async function submitCorrectionAction(_state: unknown, formData: FormData
         email: parsed.data.email || undefined,
         details: parsed.data.details,
       },
-      new Date(),
+      currentTime(),
     ),
   );
   if (!result.ok) return failure(result.errors);
@@ -375,7 +377,7 @@ export async function requestTicketAction(_state: unknown, formData: FormData) {
         verifyTokenHash: hashToken(verify),
         unsubTokenHash: hashToken(unsub),
       },
-      new Date(),
+      currentTime(),
     ),
   );
   if (!result.ok) return failure(result.errors);
@@ -433,7 +435,7 @@ export async function openRequestTokenAction(_state: unknown, formData: FormData
     else await track("ticket_request_verified");
     return result;
   }
-  const now = new Date();
+  const now = currentTime();
   const result = unsubscribe
     ? commit(unsubscribeTicketRequest(readStore(), hashed, now))
     : commit(verifyTicketRequest(readStore(), hashed, now));
@@ -478,7 +480,7 @@ export async function reviewSubmissionAction(_state: unknown, formData: FormData
         mergeTarget: parsed.data.mergeTarget,
         actorEmail: session.email,
       },
-      new Date(),
+      currentTime(),
     ),
   );
   revalidatePath("/");
@@ -504,7 +506,7 @@ export async function approveOfferAction(_state: unknown, formData: FormData) {
     return { ok: true as const, notified: result.notified, failed };
   }
   const result = commit(
-    approveOffer(readStore(), { matchSlug, offerId, actorEmail: session.email }, new Date()),
+    approveOffer(readStore(), { matchSlug, offerId, actorEmail: session.email }, currentTime()),
   );
   if (!result.ok) return failure(result.errors);
   const failed = await deliverAlerts(result.emails);
@@ -526,7 +528,7 @@ export async function markVerifiedAction(_state: unknown, formData: FormData) {
     return { ok: true as const };
   }
   const result = commit(
-    markVerified(readStore(), { matchSlug, actorEmail: session.email }, new Date()),
+    markVerified(readStore(), { matchSlug, actorEmail: session.email }, currentTime()),
   );
   if (!result.ok) return failure(result.errors);
   revalidatePath(`/match/${matchSlug}`);
@@ -555,7 +557,7 @@ export async function setUserRoleAction(_state: unknown, formData: FormData) {
     assignRole(
       readStore(),
       { actorEmail: session.email, actorRole: session.role, account, role: role as Role },
-      new Date(),
+      currentTime(),
     ),
   );
   revalidatePath("/admin");

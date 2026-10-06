@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card";
+import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, POPULAR_CITIES, placeState } from "@/lib/data/india";
 import { countries } from "@/lib/data/seed";
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
   const directory = await getDirectory();
   const matches = directory.matches.filter((match) => match.countrySlug === slug);
   const listed = matches.length > 0 || directory.academies.some((a) => a.countrySlug === slug);
-  const summary = upcomingSummary(matches, new Date());
+  const summary = upcomingSummary(matches, currentTime());
   return pageMetadata(
     `Cricket matches in ${country.name}: fixtures and tickets`,
     summary
@@ -35,7 +36,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
   const country = countries.find((item) => item.slug === slug);
   if (!country) notFound();
   const directory = await getDirectory();
-  const now = new Date();
+  const now = currentTime();
   const matches = directory.matches
     .filter((match) => match.countrySlug === slug)
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));

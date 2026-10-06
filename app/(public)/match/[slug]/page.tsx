@@ -7,10 +7,11 @@ import { ProfileLogo } from "@/components/profile/profile-picture";
 import { TicketBadge } from "@/components/match/ticket-badge";
 import { ShareButton, VisitorTime } from "@/components/match/visitor-time";
 import { TicketPanel } from "@/components/ticket/ticket-panel";
+import { currentTime } from "@/lib/clock";
 import { getDirectory, getMatch } from "@/lib/data/catalog";
 import { FORMAT_LABEL, STATUS_LABEL } from "@/lib/domain/labels";
 import { profilePath } from "@/lib/domain/profiles";
-import { isStale, resolveAttendance } from "@/lib/domain/ticket-state";
+import { ATTENDANCE_COPY, isStale, resolveAttendance } from "@/lib/domain/ticket-state";
 import { formatInTimeZone } from "@/lib/domain/time";
 import {
   jsonLdScript,
@@ -27,9 +28,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const match = await getMatch(slug);
   if (!match) notFound();
+  const now = currentTime();
   return pageMetadata(
-    matchTitle(match),
-    matchDescription(match),
+    matchTitle(match, now),
+    matchDescription(match, now),
     `/match/${match.slug}`,
     true,
     matchSocialImage(match),
@@ -40,7 +42,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const match = await getMatch(slug);
   if (!match) notFound();
-  const now = new Date();
+  const now = currentTime();
   const directory = await getDirectory();
   const related = directory.matches
     .filter(
@@ -53,9 +55,9 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
   const organiser = match.academySlug
     ? (directory.academies.find((academy) => academy.slug === match.academySlug) ?? null)
     : null;
-  const state = resolveAttendance(match, match.offers);
+  const state = resolveAttendance(match, match.offers, now);
   const stale = isStale(match.lastVerifiedAt, now);
-  const jsonLd = sportsEventJsonLd(match);
+  const jsonLd = sportsEventJsonLd(match, now);
   const mapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${match.venueName}, ${match.venueAddress}`)}`;
   await track("match_viewed", { slug: match.slug, state });
 
@@ -109,7 +111,11 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
             </div>
             <div>
               <dt className="text-sm text-muted">Status</dt>
-              <dd className="font-medium">{STATUS_LABEL[match.status]}</dd>
+              <dd className="font-medium">
+                {state === "IN_PLAY" || state === "FINISHED"
+                  ? ATTENDANCE_COPY[state].label
+                  : STATUS_LABEL[match.status]}
+              </dd>
             </div>
             <div className="sm:col-span-2">
               <VisitorTime iso={match.startsAt} />
@@ -141,7 +147,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
                     {match.sourceLabel}
                     {match.sourceUrl ? (
                       <a
-                        className="inline-flex min-h-11 items-center text-sm font-normal text-link"
+                        className="flex min-h-11 w-fit items-center text-sm font-normal text-link"
                         href={match.sourceUrl}
                       >
                         View source
@@ -155,7 +161,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
               <dt className="text-sm text-muted">Last verified</dt>
               <dd className="font-medium">
                 {match.lastVerifiedAt
-                  ? new Date(match.lastVerifiedAt).toUTCString()
+                  ? formatInTimeZone(match.lastVerifiedAt, match.timezone)
                   : "Not verified"}
               </dd>
             </div>
@@ -178,7 +184,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
             >
               Open map
             </a>
-            {state === "CANCELLED" || state === "POSTPONED" ? null : (
+            {state === "CANCELLED" || state === "POSTPONED" || state === "FINISHED" ? null : (
               <a
                 className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-medium"
                 href={`/match/${match.slug}/calendar`}
@@ -188,14 +194,17 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
             )}
             <ShareButton title={`${match.homeName} vs ${match.awayName}`} />
           </div>
-          <section>
-            <h2 className="font-display text-2xl font-extrabold">Report a correction</h2>
-            <div className="mt-3">
-              <CorrectionForm matchSlug={match.slug} />
-            </div>
-          </section>
         </div>
-        <TicketPanel match={match} now={now} />
+        {/* Phones get the tickets straight after the details; desktops keep them in the side column. */}
+        <div className="lg:col-start-2 lg:row-[1/span_2]">
+          <TicketPanel match={match} now={now} />
+        </div>
+        <section className="lg:col-start-1">
+          <h2 className="font-display text-2xl font-extrabold">Report a correction</h2>
+          <div className="mt-3">
+            <CorrectionForm matchSlug={match.slug} />
+          </div>
+        </section>
       </div>
       {related.length ? (
         <section className="mt-14">
