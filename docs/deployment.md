@@ -46,7 +46,15 @@ Owners can also add a season from a spreadsheet at `/dashboard/profiles/<slug>/m
 
 ### Backups
 
-`cricketmatch-backup.timer` runs `deploy/vps/backup.sh` as the app user at about 03:40 server time. It writes `cricketmatch-<time>.sql.gz` with `mysqldump --single-transaction`, using the app's own database login from `.env`, and copies `UPLOAD_DIR` to `uploads-<time>/`. Pictures never change once written, so each night's copy hard-links the files the last one has and costs only the new ones. The newest 14 of each are kept in `/var/backups/cricketmatch` (mode 700). The copies are on the same disk, so they cover mistakes, not a lost server: copy them off the server too.
+`cricketmatch-backup.timer` runs `deploy/vps/backup.sh` as the app user at about 03:40 server time. It writes `cricketmatch-<time>.sql.gz` with `mysqldump --single-transaction`, using the app's own database login from `.env`, and copies `UPLOAD_DIR` to `uploads-<time>/`. Pictures never change once written, so each night's copy hard-links the files the last one has and costs only the new ones. The newest 14 of each are kept in `/var/backups/cricketmatch` (mode 700). The copies are on the same disk, so they cover mistakes, not a lost server.
+
+To keep a copy off the server, run this on a computer that can `ssh root@161.97.97.34`, then upload the folder to Google Drive:
+
+```bash
+deploy/vps/fetch-backup.sh --now
+```
+
+It makes `~/Downloads/cricketmatch-backup-<time>/` with the database dump, the pictures, the server's `.env` (in `settings/`, mode 600), a README with the restore steps, and checksums. Do it weekly, and before any risky change. Keep the Drive folder private: it holds people's email addresses and the site's keys. Without `ENCRYPTION_KEY` from that `.env`, a restored site cannot read the email addresses on ticket alerts.
 
 To run one now and see the result:
 
