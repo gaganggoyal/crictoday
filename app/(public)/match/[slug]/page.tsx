@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CorrectionForm } from "@/components/forms/correction-form";
 import { MatchGrid } from "@/components/match/match-grid";
+import { ProfileLogo } from "@/components/profile/profile-picture";
 import { TicketBadge } from "@/components/match/ticket-badge";
 import { ShareButton, VisitorTime } from "@/components/match/visitor-time";
 import { TicketPanel } from "@/components/ticket/ticket-panel";
 import { getDirectory, getMatch } from "@/lib/data/catalog";
 import { FORMAT_LABEL, STATUS_LABEL } from "@/lib/domain/labels";
+import { profilePath } from "@/lib/domain/profiles";
 import { isStale, resolveAttendance } from "@/lib/domain/ticket-state";
 import { formatInTimeZone } from "@/lib/domain/time";
 import { jsonLdScript, pageMetadata, sportsEventJsonLd } from "@/lib/seo";
@@ -36,6 +38,10 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
         (item.citySlug === match.citySlug || item.competitionSlug === match.competitionSlug),
     )
     .slice(0, 3);
+  // A club or academy that posted the match is its source, with its logo.
+  const organiser = match.academySlug
+    ? (directory.academies.find((academy) => academy.slug === match.academySlug) ?? null)
+    : null;
   const state = resolveAttendance(match, match.offers);
   const stale = isStale(match.lastVerifiedAt, now);
   const jsonLd = sportsEventJsonLd(match);
@@ -113,12 +119,29 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
             <div>
               <dt className="text-sm text-muted">Source</dt>
               <dd className="font-medium">
-                {match.sourceLabel}
-                {match.sourceUrl ? (
-                  <a className="mt-1 block text-sm font-normal text-link" href={match.sourceUrl}>
-                    View source
-                  </a>
-                ) : null}
+                {organiser ? (
+                  <Link
+                    href={profilePath(organiser)}
+                    className="mt-1 flex items-center gap-3 no-underline"
+                  >
+                    <ProfileLogo name={organiser.name} logo={organiser.logo} size={44} />
+                    <span>
+                      Posted by <span className="text-link underline">{organiser.name}</span>
+                    </span>
+                  </Link>
+                ) : (
+                  <>
+                    {match.sourceLabel}
+                    {match.sourceUrl ? (
+                      <a
+                        className="mt-1 block text-sm font-normal text-link"
+                        href={match.sourceUrl}
+                      >
+                        View source
+                      </a>
+                    ) : null}
+                  </>
+                )}
               </dd>
             </div>
             <div>

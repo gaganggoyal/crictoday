@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { MatchGrid } from "@/components/match/match-grid";
+import { PhotoGallery } from "@/components/profile/photo-gallery";
+import { ProfileCover, ProfileLogo } from "@/components/profile/profile-picture";
 import {
   OFFERING_LABEL,
   PROFILE_KIND_LABEL,
@@ -64,6 +66,22 @@ export function ProfileView({
           </li>
         </ol>
       </nav>
+      {profile.cover ? (
+        <ProfileCover
+          cover={profile.cover}
+          size="full"
+          priority
+          className="mt-4 aspect-[16/9] rounded-[1.5rem] sm:aspect-[3/1]"
+        />
+      ) : null}
+      <div className={profile.cover ? "relative -mt-12 ml-4 sm:-mt-16 sm:ml-6" : "mt-5"}>
+        <ProfileLogo
+          name={profile.name}
+          logo={profile.logo}
+          size={profile.cover ? 112 : 88}
+          className={profile.cover ? "shadow-lg ring-4 ring-background" : undefined}
+        />
+      </div>
       <p className="mt-4 text-xs font-semibold tracking-[0.16em] text-link uppercase">
         {PROFILE_KIND_LABEL[profile.kind]}
         {profile.verificationLabel ? ` · ${profile.verificationLabel}` : ""}
@@ -109,6 +127,15 @@ export function ProfileView({
           </a>
         ))}
       </div>
+
+      {profile.photos.length ? (
+        <section aria-labelledby="photos" className="mt-12">
+          <h2 id="photos" className="mb-4 font-display text-3xl font-extrabold">
+            Photos
+          </h2>
+          <PhotoGallery name={profile.name} photos={profile.photos} />
+        </section>
+      ) : null}
 
       {profile.offerings.length ? (
         <section aria-labelledby="offers" className="mt-12">

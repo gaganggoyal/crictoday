@@ -49,7 +49,7 @@ type Place = {
   timezone: string;
 };
 
-const LISTED_BY_PROFILE = "source_type IN ('organiser', 'academy')";
+export const LISTED_BY_PROFILE = "source_type IN ('organiser', 'academy')";
 const TWO_YEARS_MS = 2 * 365 * 24 * 60 * 60 * 1000;
 
 function validZone(zone: string | null | undefined): zone is string {
@@ -63,7 +63,7 @@ function validZone(zone: string | null | undefined): zone is string {
 }
 
 /** Turns the country, state and town typed in a form into stored place fields. */
-function resolvePlace(input: {
+export function resolvePlace(input: {
   country: string;
   state?: string | null;
   city: string;
@@ -123,7 +123,7 @@ function profileFields(input: ProfileInput) {
   };
 }
 
-async function ownedProfile(connection: PoolConnection, owner: Owner, slug: string) {
+export async function ownedProfile(connection: PoolConnection, owner: Owner, slug: string) {
   const [rows] = await connection.query<AcademyRow[]>(
     "SELECT * FROM academies WHERE slug = ? AND (owner_id = ? OR owner_email = ?) FOR UPDATE",
     [slug, owner.userId, owner.email.toLowerCase()],
@@ -174,6 +174,9 @@ export async function createProfile(pool: Pool, owner: Owner, input: ProfileInpu
       ...profileFields(input),
       ...place,
       offerings: [],
+      logo: null,
+      cover: null,
+      photos: [],
       verificationStatus: "pending",
       verificationLabel: null,
       reviewNotes: null,
@@ -469,205 +472,218 @@ export async function reviewProfile(
 export async function saveOwnerMatch(pool: Pool, owner: Owner, input: OwnerMatchInput, now: Date) {
   return attempt(pool, async (connection) => {
     const profile = await ownedProfile(connection, owner, input.profile);
-    if (profile.verificationStatus === "rejected") {
+    return saveMatchWithin(connection, owner, profile, input, now);
+  });
+}
+
+/**
+ * Saves one of a profile's matches inside the caller's transaction, after the caller has locked
+ * the profile. A spreadsheet import calls it once a row.
+ */
+export async function saveMatchWithin(
+  connection: PoolConnection,
+  owner: Owner,
+  profile: StoredAcademy,
+  input: OwnerMatchInput,
+  now: Date,
+) {
+  if (profile.verificationStatus === "rejected") {
+    throw new DomainError({
+      form: "Your profile needs a change before you can post matches. Edit it first.",
+    });
+  }
+  const place = resolvePlace({
+    country: profile.countrySlug,
+    state: input.state || profile.stateSlug,
+    city: input.city,
+    timezone: profile.timezone,
+  });
+  const startsAt = zonedTimeToUtc(`${input.date}T${input.time}`, place.timezone);
+  const start = new Date(startsAt).getTime();
+
+  let existing: StoredMatch | null = null;
+  if (input.match) {
+    const [rows] = await connection.query<MatchRow[]>(
+      `SELECT * FROM matches WHERE slug = ? AND academy_slug = ? AND ${LISTED_BY_PROFILE}
+       FOR UPDATE`,
+      [input.match, profile.slug],
+    );
+    if (!rows[0]) throw new DomainError({ form: "That match is not on this profile." });
+    existing = toMatch(rows[0], []);
+  }
+  if (!existing) {
+    const [upcoming] = await connection.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS total FROM matches
+       WHERE academy_slug = ? AND starts_at > ? AND status IN ('published', 'pending', 'postponed')`,
+      [profile.slug, now],
+    );
+    if (Number(upcoming[0]?.total ?? 0) >= MAX_UPCOMING_MATCHES) {
       throw new DomainError({
-        form: "Your profile needs a change before you can post matches. Edit it first.",
+        form: `A profile can list up to ${MAX_UPCOMING_MATCHES} upcoming matches.`,
       });
     }
-    const place = resolvePlace({
-      country: profile.countrySlug,
-      state: input.state || profile.stateSlug,
-      city: input.city,
-      timezone: profile.timezone,
-    });
-    const startsAt = zonedTimeToUtc(`${input.date}T${input.time}`, place.timezone);
-    const start = new Date(startsAt).getTime();
+  }
+  if (!existing && start <= now.getTime()) {
+    throw new DomainError({ date: "Choose a date and time that has not passed." });
+  }
+  if (start > now.getTime() + TWO_YEARS_MS) {
+    throw new DomainError({ date: "Choose a date within the next two years." });
+  }
 
-    let existing: StoredMatch | null = null;
-    if (input.match) {
-      const [rows] = await connection.query<MatchRow[]>(
-        `SELECT * FROM matches WHERE slug = ? AND academy_slug = ? AND ${LISTED_BY_PROFILE}
-         FOR UPDATE`,
-        [input.match, profile.slug],
-      );
-      if (!rows[0]) throw new DomainError({ form: "That match is not on this profile." });
-      existing = toMatch(rows[0], []);
-    }
-    if (!existing) {
-      const [upcoming] = await connection.query<RowDataPacket[]>(
-        `SELECT COUNT(*) AS total FROM matches
-         WHERE academy_slug = ? AND starts_at > ? AND status IN ('published', 'pending', 'postponed')`,
-        [profile.slug, now],
-      );
-      if (Number(upcoming[0]?.total ?? 0) >= MAX_UPCOMING_MATCHES) {
-        throw new DomainError({
-          form: `A profile can list up to ${MAX_UPCOMING_MATCHES} upcoming matches.`,
-        });
-      }
-    }
-    if (!existing && start <= now.getTime()) {
-      throw new DomainError({ date: "Choose a date and time that has not passed." });
-    }
-    if (start > now.getTime() + TWO_YEARS_MS) {
-      throw new DomainError({ date: "Choose a date within the next two years." });
-    }
+  const verified = profile.verificationStatus === "verified";
+  const status: MatchStatus = !verified ? "pending" : existing ? input.status : "published";
+  const competition = input.competition || "Friendly match";
+  const fields = {
+    competitionName: competition,
+    competitionSlug: slugify(competition),
+    kind: profile.kind === "academy" ? ("academy" as const) : ("local" as const),
+    homeName: input.homeTeam,
+    homeShort: shortName(input.homeTeam),
+    homeSlug: slugify(input.homeTeam),
+    awayName: input.awayTeam,
+    awayShort: shortName(input.awayTeam),
+    awaySlug: slugify(input.awayTeam),
+    venueName: input.ground,
+    venueSlug: slugify(input.ground),
+    venueAddress: `${input.ground}, ${place.cityName}`,
+    ...place,
+    startsAt,
+    format: input.format,
+    status,
+    attendanceType: input.attendance,
+    sourceType: profile.kind === "academy" ? ("academy" as const) : ("organiser" as const),
+    sourceUrl: `${siteUrl()}${profilePath(profile)}`,
+    sourceLabel: `Posted by ${profile.name}`,
+    entryNotes: input.entryNotes || null,
+  };
 
-    const verified = profile.verificationStatus === "verified";
-    const status: MatchStatus = !verified ? "pending" : existing ? input.status : "published";
-    const competition = input.competition || "Friendly match";
-    const fields = {
-      competitionName: competition,
-      competitionSlug: slugify(competition),
-      kind: profile.kind === "academy" ? ("academy" as const) : ("local" as const),
-      homeName: input.homeTeam,
-      homeShort: shortName(input.homeTeam),
-      homeSlug: slugify(input.homeTeam),
-      awayName: input.awayTeam,
-      awayShort: shortName(input.awayTeam),
-      awaySlug: slugify(input.awayTeam),
-      venueName: input.ground,
-      venueSlug: slugify(input.ground),
-      venueAddress: `${input.ground}, ${place.cityName}`,
-      ...place,
-      startsAt,
-      format: input.format,
-      status,
-      attendanceType: input.attendance,
-      sourceType: profile.kind === "academy" ? ("academy" as const) : ("organiser" as const),
-      sourceUrl: `${siteUrl()}${profilePath(profile)}`,
-      sourceLabel: `Posted by ${profile.name}`,
-      entryNotes: input.entryNotes || null,
-    };
-
-    let matchId: string;
-    let slug: string;
-    if (existing) {
-      matchId = existing.id;
-      slug = existing.slug;
-      await connection.query(
-        `UPDATE matches
-         SET competition_name = ?, competition_slug = ?, kind = ?, home_name = ?, home_short = ?,
-             home_slug = ?, away_name = ?, away_short = ?, away_slug = ?, venue_name = ?,
-             venue_slug = ?, venue_address = ?, city_name = ?, city_slug = ?, state_name = ?,
-             state_slug = ?, country_name = ?, country_slug = ?, starts_at = ?, timezone = ?,
-             format = ?, status = ?, attendance_type = ?, source_type = ?, source_url = ?,
-             source_label = ?, entry_notes = ?, last_verified_at = ?,
-             published_at = CASE WHEN ? = 'published' THEN COALESCE(published_at, ?) ELSE published_at END,
-             updated_at = ?
-         WHERE id = ?`,
-        [
-          fields.competitionName,
-          fields.competitionSlug,
-          fields.kind,
-          fields.homeName,
-          fields.homeShort,
-          fields.homeSlug,
-          fields.awayName,
-          fields.awayShort,
-          fields.awaySlug,
-          fields.venueName,
-          fields.venueSlug,
-          fields.venueAddress,
-          fields.cityName,
-          fields.citySlug,
-          fields.stateName,
-          fields.stateSlug,
-          fields.countryName,
-          fields.countrySlug,
-          new Date(startsAt),
-          fields.timezone,
-          fields.format,
-          fields.status,
-          fields.attendanceType,
-          fields.sourceType,
-          fields.sourceUrl,
-          fields.sourceLabel,
-          fields.entryNotes,
-          now,
-          fields.status,
-          now,
-          now,
-          matchId,
-        ],
-      );
-    } else {
-      matchId = randomUUID();
-      slug = await freeSlug(
-        connection,
-        "matches",
-        `${input.homeTeam} vs ${input.awayTeam} ${place.cityName} ${input.date}`,
-      );
-      await insertMatch(
-        connection,
-        {
-          id: matchId,
-          slug,
-          ...fields,
-          seasonName: null,
-          seasonSlug: null,
-          endsAt: null,
-          sourceExternalId: null,
-          featuredRank: 0,
-          lastVerifiedAt: now.toISOString(),
-          publishedAt: status === "published" ? now.toISOString() : null,
-          demo: false,
-          academySlug: profile.slug,
-          offers: [],
-        },
+  let matchId: string;
+  let slug: string;
+  if (existing) {
+    matchId = existing.id;
+    slug = existing.slug;
+    await connection.query(
+      `UPDATE matches
+       SET competition_name = ?, competition_slug = ?, kind = ?, home_name = ?, home_short = ?,
+           home_slug = ?, away_name = ?, away_short = ?, away_slug = ?, venue_name = ?,
+           venue_slug = ?, venue_address = ?, city_name = ?, city_slug = ?, state_name = ?,
+           state_slug = ?, country_name = ?, country_slug = ?, starts_at = ?, timezone = ?,
+           format = ?, status = ?, attendance_type = ?, source_type = ?, source_url = ?,
+           source_label = ?, entry_notes = ?, last_verified_at = ?,
+           published_at = CASE WHEN ? = 'published' THEN COALESCE(published_at, ?) ELSE published_at END,
+           updated_at = ?
+       WHERE id = ?`,
+      [
+        fields.competitionName,
+        fields.competitionSlug,
+        fields.kind,
+        fields.homeName,
+        fields.homeShort,
+        fields.homeSlug,
+        fields.awayName,
+        fields.awayShort,
+        fields.awaySlug,
+        fields.venueName,
+        fields.venueSlug,
+        fields.venueAddress,
+        fields.cityName,
+        fields.citySlug,
+        fields.stateName,
+        fields.stateSlug,
+        fields.countryName,
+        fields.countrySlug,
+        new Date(startsAt),
+        fields.timezone,
+        fields.format,
+        fields.status,
+        fields.attendanceType,
+        fields.sourceType,
+        fields.sourceUrl,
+        fields.sourceLabel,
+        fields.entryNotes,
         now,
-        owner.userId,
-      );
-    }
-
-    if (input.attendance === "ticketed" && input.ticketUrl) {
-      const ticket = assertHttpsUrl(input.ticketUrl);
-      if (!ticket)
-        throw new DomainError({ ticketUrl: "Ticket link must be a full https address." });
-      const host = ticket.hostname.replace(/^www\./, "").toLowerCase();
-      if (await domainDenied(connection, host)) {
-        throw new DomainError({ ticketUrl: "That ticket site is blocked." });
-      }
-      const [offers] = await connection.query<RowDataPacket[]>(
-        "SELECT id FROM ticket_offers WHERE match_id = ? AND url = ?",
-        [matchId, ticket.toString()],
-      );
-      if (!offers[0]) {
-        // As for every organiser, the link stays pending until a moderator approves it.
-        await insertOffer(
-          connection,
-          matchId,
-          {
-            id: randomUUID(),
-            sellerName: host,
-            sellerDomain: host,
-            url: ticket.toString(),
-            kind: "official",
-            currency: null,
-            priceFrom: null,
-            status: "pending",
-            lastCheckedAt: null,
-            approved: false,
-          },
-          now,
-        );
-      }
-    }
-
-    await writeAudit(
+        fields.status,
+        now,
+        now,
+        matchId,
+      ],
+    );
+  } else {
+    matchId = randomUUID();
+    slug = await freeSlug(
+      connection,
+      "matches",
+      `${input.homeTeam} vs ${input.awayTeam} ${place.cityName} ${input.date}`,
+    );
+    await insertMatch(
       connection,
       {
-        actorId: owner.userId,
-        actorEmail: owner.email,
-        action: existing ? "match.update" : "match.create",
-        entityType: "match",
-        entityId: matchId,
-        before: existing ? { startsAt: existing.startsAt, status: existing.status } : null,
-        after: { slug, startsAt, status },
+        id: matchId,
+        slug,
+        ...fields,
+        seasonName: null,
+        seasonSlug: null,
+        endsAt: null,
+        sourceExternalId: null,
+        featuredRank: 0,
+        lastVerifiedAt: now.toISOString(),
+        publishedAt: status === "published" ? now.toISOString() : null,
+        demo: false,
+        academySlug: profile.slug,
+        offers: [],
       },
       now,
+      owner.userId,
     );
-    return { ok: true as const, slug, status };
-  });
+  }
+
+  if (input.attendance === "ticketed" && input.ticketUrl) {
+    const ticket = assertHttpsUrl(input.ticketUrl);
+    if (!ticket) throw new DomainError({ ticketUrl: "Ticket link must be a full https address." });
+    const host = ticket.hostname.replace(/^www\./, "").toLowerCase();
+    if (await domainDenied(connection, host)) {
+      throw new DomainError({ ticketUrl: "That ticket site is blocked." });
+    }
+    const [offers] = await connection.query<RowDataPacket[]>(
+      "SELECT id FROM ticket_offers WHERE match_id = ? AND url = ?",
+      [matchId, ticket.toString()],
+    );
+    if (!offers[0]) {
+      // As for every organiser, the link stays pending until a moderator approves it.
+      await insertOffer(
+        connection,
+        matchId,
+        {
+          id: randomUUID(),
+          sellerName: host,
+          sellerDomain: host,
+          url: ticket.toString(),
+          kind: "official",
+          currency: null,
+          priceFrom: null,
+          status: "pending",
+          lastCheckedAt: null,
+          approved: false,
+        },
+        now,
+      );
+    }
+  }
+
+  await writeAudit(
+    connection,
+    {
+      actorId: owner.userId,
+      actorEmail: owner.email,
+      action: existing ? "match.update" : "match.create",
+      entityType: "match",
+      entityId: matchId,
+      before: existing ? { startsAt: existing.startsAt, status: existing.status } : null,
+      after: { slug, startsAt, status },
+    },
+    now,
+  );
+  return { ok: true as const, slug, status, startsAt };
 }
 
 /** Every profile on an account, whatever its state. */

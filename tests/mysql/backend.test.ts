@@ -445,7 +445,12 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
       now,
     );
     expect(first).toMatchObject({ ok: true, already: false });
-    expect(again).toEqual({ ok: true, id: first.ok ? first.id : "", already: true });
+    // Not confirmed yet: asking again sends new links, and the first ones stop working.
+    expect(again).toEqual({ ok: true, id: first.ok ? first.id : "", already: false, resent: true });
+    expect(await openTicketRequest(pool, hash("dv1"), "verify", now)).toEqual({
+      ok: false,
+      errors: { form: "This confirmation link is not valid." },
+    });
     expect(
       await createTicketRequest(
         pool,
@@ -461,13 +466,13 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
     ).toEqual({ ok: false, errors: { form: "Alerts are closed for this match." } });
 
     const afterStart = new Date("2026-10-25T00:00:00.000Z");
-    expect(await openTicketRequest(pool, hash("dv1"), "verify", afterStart)).toEqual({
+    expect(await openTicketRequest(pool, hash("dv2"), "verify", afterStart)).toEqual({
       ok: false,
       errors: { form: "This match has started or been cancelled, so the alert was not activated." },
     });
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT status FROM ticket_requests WHERE verify_token_hash = ?",
-      [hash("dv1")],
+      [hash("dv2")],
     );
     expect(rows[0]!.status).toBe("expired");
 
@@ -486,6 +491,27 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
       ok: false,
       errors: { form: "This alert was unsubscribed." },
     });
+
+    // A confirmed alert is not sent again.
+    const confirmed = await createTicketRequest(
+      pool,
+      { ...base, emailHash: hash("d3"), verifyTokenHash: hash("dv5"), unsubTokenHash: hash("du5") },
+      now,
+    );
+    await openTicketRequest(pool, hash("dv5"), "verify", now);
+    expect(
+      await createTicketRequest(
+        pool,
+        {
+          ...base,
+          emailHash: hash("d3"),
+          verifyTokenHash: hash("dv6"),
+          unsubTokenHash: hash("du6"),
+        },
+        now,
+      ),
+    ).toEqual({ ok: true, id: confirmed.ok ? confirmed.id : "", already: true });
+    expect(await openTicketRequest(pool, hash("dv5"), "verify", now)).toMatchObject({ ok: true });
   });
 
   it("limits hits per key in a shared window", async () => {

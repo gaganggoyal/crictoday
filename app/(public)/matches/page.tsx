@@ -61,9 +61,9 @@ export default async function MatchesPage({
   const cities = uniqueCities(directory.matches);
 
   return (
-    <div className="mx-auto grid w-full max-w-[1120px] gap-8 px-5 py-10 lg:grid-cols-[280px_minmax(0,1fr)]">
-      <MatchFiltersForm filters={filters} countries={directory.countries} cities={cities} />
-      <section>
+    <div className="mx-auto grid w-full max-w-[1120px] gap-x-8 gap-y-6 px-5 py-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
+      {/* On a phone: heading, folded filters, results. On a wide screen the filters are a sidebar. */}
+      <header className="lg:col-start-2 lg:row-start-1">
         <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">Directory</p>
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
           Upcoming matches
@@ -72,7 +72,12 @@ export default async function MatchesPage({
           {result.total} {result.total === 1 ? "match" : "matches"} · page {result.page} of{" "}
           {result.pageCount}
         </p>
-        <div className="mt-6">
+      </header>
+      <div className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
+        <MatchFiltersForm filters={filters} countries={directory.countries} cities={cities} />
+      </div>
+      <section aria-label="Results" className="lg:col-start-2 lg:row-start-2">
+        <div>
           {result.total ? <MatchGrid matches={result.items} now={now} /> : <EmptyResults />}
         </div>
         <nav aria-label="Pagination" className="mt-8 flex items-center gap-3">

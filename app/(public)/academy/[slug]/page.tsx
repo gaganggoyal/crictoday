@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { ProfileView } from "@/components/profile/profile-view";
 import { getProfilePage } from "@/lib/data/profile-page";
 import { profilePath } from "@/lib/domain/profiles";
-import { pageMetadata } from "@/lib/seo";
+import { profileMetadata } from "@/lib/seo";
 
 type Params = Promise<{ slug: string }>;
 
@@ -11,9 +11,9 @@ export async function generateMetadata({ params }: { params: Params }) {
   const page = await getProfilePage(slug);
   if (!page) notFound();
   const { profile } = page;
-  return pageMetadata(
+  return profileMetadata(
+    profile,
     `${profile.name}, cricket academy in ${profile.cityName}`,
-    profile.description,
     profilePath(profile),
   );
 }

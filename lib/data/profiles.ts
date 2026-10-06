@@ -2,6 +2,7 @@ import "server-only";
 import type { Session } from "@/lib/auth/session";
 import { dataMode } from "@/lib/data/mode";
 import { mysqlPool } from "@/lib/data/mysql/pool";
+import { loadRecentImages } from "@/lib/data/mysql/media";
 import { loadOwnerProfile, loadOwnerProfiles, loadProfileQueue } from "@/lib/data/mysql/profiles";
 import { readStore } from "@/lib/data/store";
 import type { StoredAcademy, StoredMatch } from "@/lib/domain/types";
@@ -38,4 +39,10 @@ export async function profileQueue(): Promise<{
 }> {
   if (dataMode() !== "mysql") return { pending: [], recent: [] };
   return loadProfileQueue(mysqlPool());
+}
+
+/** Pictures added to live profiles in the last two weeks, for moderators to look over. */
+export async function recentProfileImages() {
+  if (dataMode() !== "mysql") return [];
+  return loadRecentImages(mysqlPool(), new Date(Date.now() - 14 * 24 * 60 * 60 * 1000));
 }

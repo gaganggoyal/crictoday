@@ -20,12 +20,12 @@ export async function database() {
   await db.exec(
     readFileSync(path.join(root, "supabase/migrations/20261004120000_init.sql"), "utf8"),
   );
-  await db.exec(
-    readFileSync(
-      path.join(root, "supabase/migrations/20261004180000_service_workflows.sql"),
-      "utf8",
-    ),
-  );
+  for (const migration of [
+    "20261004180000_service_workflows.sql",
+    "20261006120000_resend_pending_alert.sql",
+  ]) {
+    await db.exec(readFileSync(path.join(root, "supabase/migrations", migration), "utf8"));
+  }
   await db.exec(`
     INSERT INTO auth.users (id, email) VALUES
       ('${FAN}', 'fan@example.com'),

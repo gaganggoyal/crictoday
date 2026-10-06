@@ -59,12 +59,7 @@ export function ProfileForm({
   };
 
   return (
-    <form
-      action={action}
-      onSubmit={submit}
-      className="grid gap-8"
-      noValidate
-    >
+    <form action={action} onSubmit={submit} className="grid gap-8" noValidate>
       <Honeypot />
       {slug ? <input type="hidden" name="slug" value={slug} /> : null}
 

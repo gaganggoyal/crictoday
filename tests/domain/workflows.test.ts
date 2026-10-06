@@ -72,7 +72,13 @@ describe("ticket request workflow", () => {
       },
       now,
     );
-    expect(second.ok && second.result.already).toBe(true);
+    // Not confirmed yet: asking again replaces the links so the email can go out again.
+    expect(second.ok && second.result).toEqual({
+      id: first.ok ? first.result.id : "",
+      already: false,
+    });
+    expect(second.ok && second.store.requests).toHaveLength(1);
+    expect(second.ok && second.store.requests[0]?.verifyTokenHash).toBe("other");
 
     const verified = verifyTicketRequest(first.ok ? first.store : emptyStore(), "verify-hash", now);
     expect(verified.ok).toBe(true);

@@ -29,15 +29,19 @@ describe("India's states and towns", () => {
     expect(indian.length).toBeGreaterThan(0);
     expect(indian.filter((match) => !match.stateSlug)).toEqual([]);
     expect(
-      fixtures.find((match) => match.sourceExternalId === "fixtures:west-indies-in-india-2026-27:t20i-1"),
+      fixtures.find(
+        (match) => match.sourceExternalId === "fixtures:west-indies-in-india-2026-27:t20i-1",
+      ),
     ).toMatchObject({ stateName: "Uttar Pradesh", stateSlug: "uttar-pradesh" });
-    expect(fixtures.filter((match) => match.countrySlug !== "india" && match.stateSlug)).toEqual([]);
+    expect(fixtures.filter((match) => match.countrySlug !== "india" && match.stateSlug)).toEqual(
+      [],
+    );
   });
 
   it("reads a stored state first, then the town list, and never outside India", () => {
-    expect(placeState({ countrySlug: "india", citySlug: "sangamner", stateSlug: "maharashtra" })?.name).toBe(
-      "Maharashtra",
-    );
+    expect(
+      placeState({ countrySlug: "india", citySlug: "sangamner", stateSlug: "maharashtra" })?.name,
+    ).toBe("Maharashtra");
     expect(placeState({ countrySlug: "india", citySlug: "indore", stateSlug: null })?.name).toBe(
       "Madhya Pradesh",
     );

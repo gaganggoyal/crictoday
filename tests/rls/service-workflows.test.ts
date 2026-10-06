@@ -110,9 +110,35 @@ describe("service role workflows", () => {
       `),
     );
     expect(request.rows[0]?.create_ticket_request.already).toBe(false);
-    await asService(db, () =>
-      db.query(`SELECT open_ticket_request('${"c".repeat(64)}', 'verify')`),
+    // Not confirmed yet: asking again replaces the links so the email can go out again.
+    const again = await asService(db, () =>
+      db.query<{ create_ticket_request: { id: string; already: boolean; resent?: boolean } }>(`
+        SELECT create_ticket_request(
+          'india-australia-public', '${"b".repeat(64)}', 'cipher-mail', 3, 'IN', '',
+          '${"e".repeat(64)}', '${"f".repeat(64)}', '${FAN}'
+        ) AS create_ticket_request
+      `),
     );
+    expect(again.rows[0]?.create_ticket_request).toEqual({
+      id: request.rows[0]?.create_ticket_request.id,
+      already: false,
+      resent: true,
+    });
+    await expect(
+      asService(db, () => db.query(`SELECT open_ticket_request('${"c".repeat(64)}', 'verify')`)),
+    ).rejects.toThrow();
+    await asService(db, () =>
+      db.query(`SELECT open_ticket_request('${"e".repeat(64)}', 'verify')`),
+    );
+    const confirmed = await asService(db, () =>
+      db.query<{ create_ticket_request: { already: boolean } }>(`
+        SELECT create_ticket_request(
+          'india-australia-public', '${"b".repeat(64)}', 'cipher-mail', 3, 'IN', '',
+          '${"1".repeat(64)}', '${"2".repeat(64)}', '${FAN}'
+        ) AS create_ticket_request
+      `),
+    );
+    expect(confirmed.rows[0]?.create_ticket_request.already).toBe(true);
     const approved = await asService(db, () =>
       db.query<{ approve_ticket_offer: { notified: number; emails: Array<{ to: string }> } }>(`
         SELECT approve_ticket_offer('${offer.rows[0]?.id}', 'india-australia-public', '${MOD}') AS approve_ticket_offer

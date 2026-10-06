@@ -1,11 +1,16 @@
 import Link from "next/link";
+import { ImageTakedown } from "@/components/admin/image-takedown";
 import { ProfileReview } from "@/components/admin/profile-review";
-import { profileQueue } from "@/lib/data/profiles";
+import { profileQueue, recentProfileImages } from "@/lib/data/profiles";
+import { profileImages } from "@/lib/domain/media";
 import { PROFILE_KIND_LABEL, profilePath } from "@/lib/domain/profiles";
 import type { StoredAcademy } from "@/lib/domain/types";
 
 export default async function AdminProfilesPage() {
-  const { pending, recent } = await profileQueue();
+  const [{ pending, recent }, pictures] = await Promise.all([
+    profileQueue(),
+    recentProfileImages(),
+  ]);
   return (
     <>
       <h1 className="font-display text-4xl font-extrabold">Profiles</h1>
@@ -30,6 +35,29 @@ export default async function AdminProfilesPage() {
           </ul>
         ) : (
           <p className="mt-3 text-muted">Nothing is waiting.</p>
+        )}
+      </section>
+      <section className="mt-10">
+        <h2 className="font-display text-2xl font-bold">
+          New pictures on live profiles ({pictures.length})
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm text-muted">
+          Logos and photos go live as soon as a checked profile adds them. These are the last two
+          weeks&apos;. Take down anything that is not theirs to use or not about cricket.
+        </p>
+        {pictures.length ? (
+          <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {pictures.map(({ profile, role, image }) => (
+              <li key={image.id} className="grid content-start gap-1">
+                <Link href={profilePath(profile)} className="truncate text-sm font-medium">
+                  {profile.name}
+                </Link>
+                <ImageTakedown profile={profile.slug} role={role} image={image} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-muted">None.</p>
         )}
       </section>
       <section className="mt-10">
@@ -93,6 +121,7 @@ function ProfileFacts({ profile }: { profile: StoredAcademy }) {
     ],
     ["Offers", String(profile.offerings.length)],
   ];
+  const pictures = profileImages(profile);
   return (
     <div className="min-w-0">
       <p className="font-display text-2xl font-extrabold">{profile.name}</p>
@@ -105,6 +134,15 @@ function ProfileFacts({ profile }: { profile: StoredAcademy }) {
           </div>
         ))}
       </dl>
+      {pictures.length ? (
+        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Pictures">
+          {pictures.map(({ role, image }) => (
+            <li key={image.id}>
+              <ImageTakedown profile={profile.slug} role={role} image={image} />
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

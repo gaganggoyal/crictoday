@@ -394,6 +394,9 @@ async function verifyAcademy(
     ageGroups: listField(payload, "ageGroups"),
     facilities: listField(payload, "facilities"),
     offerings: [],
+    logo: null,
+    cover: null,
+    photos: [],
     verificationStatus: "verified",
     verificationLabel: "Contact verified",
     reviewNotes: null,
@@ -476,16 +479,34 @@ export async function createTicketRequest(
     }
     const openRequest = async () => {
       const [rows] = await connection.query<RowDataPacket[]>(
-        `SELECT id FROM ticket_requests
+        `SELECT id, status FROM ticket_requests
          WHERE match_id = ? AND email_hash = ?
            AND status IN ('pending_verification', 'active', 'notified')
-         LIMIT 1`,
+         LIMIT 1 FOR UPDATE`,
         [match.id, input.emailHash],
       );
-      return rows[0] ? String(rows[0].id) : null;
+      return rows[0] ? { id: String(rows[0].id), status: String(rows[0].status) } : null;
     };
     const existing = await openRequest();
-    if (existing) return { ok: true as const, id: existing, already: true };
+    if (existing?.status === "pending_verification") {
+      // The first confirmation may never have arrived. New links replace the old ones, and the
+      // caller sends the email again.
+      await connection.query(
+        `UPDATE ticket_requests
+         SET verify_token_hash = ?, unsub_token_hash = ?, quantity = ?, country_code = ?, notes = ?
+         WHERE id = ?`,
+        [
+          input.verifyTokenHash,
+          input.unsubTokenHash,
+          input.quantity,
+          input.countryCode.trim() || null,
+          input.notes.trim() || null,
+          existing.id,
+        ],
+      );
+      return { ok: true as const, id: existing.id, already: false, resent: true };
+    }
+    if (existing) return { ok: true as const, id: existing.id, already: true };
 
     const id = randomUUID();
     try {
@@ -513,7 +534,7 @@ export async function createTicketRequest(
       // Another request for the same address and match won the race.
       const raced =
         (error as { code?: string }).code === "ER_DUP_ENTRY" ? await openRequest() : null;
-      if (raced) return { ok: true as const, id: raced, already: true };
+      if (raced) return { ok: true as const, id: raced.id, already: true };
       throw error;
     }
     return { ok: true as const, id, already: false };

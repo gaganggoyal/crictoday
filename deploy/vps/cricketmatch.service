@@ -11,8 +11,10 @@ Group=cricketmatch
 WorkingDirectory=/var/www/cricketmatch
 EnvironmentFile=/var/www/cricketmatch/.env
 Environment=NODE_ENV=production
+# Node 24 LTS from deploy/vps/install-node.sh, beside the system's Node, which other apps use.
+Environment=PATH=/opt/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # Caddy runs in Docker and reaches the host on the bridge. ufw admits 3300 only from 172.16.0.0/12.
-ExecStart=/usr/bin/node node_modules/next/dist/bin/next start --hostname 0.0.0.0 --port 3300
+ExecStart=/opt/node24/bin/node node_modules/next/dist/bin/next start --hostname 0.0.0.0 --port 3300
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=15

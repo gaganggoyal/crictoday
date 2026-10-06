@@ -31,7 +31,11 @@ export default async function NewMatchPage({ params }: { params: Promise<{ slug:
           ? "It goes live as soon as you post it, with your profile as its source."
           : "It goes live when your profile passes its check."}{" "}
         For a tournament, use Post and add another: the next match keeps the tournament, ground and
-        date.
+        date. Have the schedule in a sheet?{" "}
+        <Link className="text-link" href={`/dashboard/profiles/${profile.slug}/matches/import`}>
+          Add it from a spreadsheet
+        </Link>
+        .
       </p>
       <div className="mt-8">
         <MatchForm

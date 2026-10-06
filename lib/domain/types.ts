@@ -94,6 +94,20 @@ export type Offering = {
 
 export type ProfileLinks = { instagram?: string; facebook?: string; youtube?: string };
 
+/**
+ * A picture on a profile, stored as two WebP files: `<id>.webp` at full size and `<id>-sm.webp`
+ * for cards and thumbnails. Sizes are in pixels.
+ */
+export type ProfileImage = {
+  id: string;
+  width: number;
+  height: number;
+  smallWidth: number;
+  smallHeight: number;
+  caption: string | null;
+  addedAt: string;
+};
+
 /** A public profile for an academy, club, committee or ground. */
 export type StoredAcademy = {
   id: string;
@@ -118,6 +132,10 @@ export type StoredAcademy = {
   ageGroups: string[];
   facilities: string[];
   offerings: Offering[];
+  logo: ProfileImage | null;
+  /** The wide photo across the top of the profile and its card. */
+  cover: ProfileImage | null;
+  photos: ProfileImage[];
   verificationStatus: "unverified" | "pending" | "verified" | "rejected";
   verificationLabel: string | null;
   /** Why a moderator sent the profile back; shown to its owner. */

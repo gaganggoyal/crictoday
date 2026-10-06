@@ -1,0 +1,18 @@
+[Unit]
+Description=cricketmatch.today nightly backup of the database and uploaded pictures
+After=mysql.service
+
+[Service]
+Type=oneshot
+User=cricketmatch
+Group=cricketmatch
+EnvironmentFile=/var/www/cricketmatch/.env
+# Runs as root (the +), so the cricketmatch user can own its backup folder under /var/backups.
+ExecStartPre=+/usr/bin/install -d -o cricketmatch -g cricketmatch -m 700 /var/backups/cricketmatch
+ExecStart=/var/www/cricketmatch/deploy/vps/backup.sh
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

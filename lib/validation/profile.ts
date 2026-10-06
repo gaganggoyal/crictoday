@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { indiaState } from "@/lib/data/india";
 import { normalizeName } from "@/lib/domain/duplicates";
+import { MAX_CAPTION } from "@/lib/domain/media";
+import { MAX_SHEET_CELL, MAX_SHEET_COLUMNS, MAX_SHEET_ROWS } from "@/lib/domain/schedule";
 import { OFFERING_CATEGORIES, PROFILE_KINDS } from "@/lib/domain/profiles";
 import type { OfferingCategory, ProfileKind } from "@/lib/domain/types";
 import { assertHttpsUrl } from "@/lib/domain/urls";
@@ -107,6 +109,32 @@ export const offeringSchema = z.object({
   schedule: optionalLine(80),
   details: optional(500),
   url: link("Booking link must be a full https address."),
+});
+
+export const captionSchema = z.object({
+  profile: z.string().trim().min(1),
+  id: z.string().regex(/^[0-9a-f]{32}$/, "That photo was removed."),
+  caption: optionalLine(MAX_CAPTION).transform((value) => value ?? ""),
+});
+
+/** A spreadsheet's cells as the browser read them, sent as JSON. */
+export const scheduleSheetSchema = z.object({
+  profile: z.string().trim().min(1),
+  rows: z
+    .string()
+    .max(4_000_000)
+    .transform((text, context) => {
+      try {
+        return JSON.parse(text) as unknown;
+      } catch {
+        context.addIssue({ code: "custom", message: "That sheet could not be read." });
+        return z.NEVER;
+      }
+    })
+    .pipe(
+      z.array(z.array(z.string().max(MAX_SHEET_CELL)).max(MAX_SHEET_COLUMNS)).max(MAX_SHEET_ROWS),
+    ),
+  date1904: z.preprocess((value) => value === "1", z.boolean()),
 });
 
 /** Formats a club can choose, in the words local organisers use. */

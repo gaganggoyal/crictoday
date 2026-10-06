@@ -86,6 +86,9 @@ export type AcademyRow = RowDataPacket & {
   age_groups: string[] | null;
   facilities: string[] | null;
   offerings: StoredAcademy["offerings"] | null;
+  logo: StoredAcademy["logo"];
+  cover: StoredAcademy["cover"];
+  photos: StoredAcademy["photos"] | null;
   verification_status: StoredAcademy["verificationStatus"];
   verification_label: string | null;
   review_notes: string | null;
@@ -202,6 +205,9 @@ export function toAcademy(row: AcademyRow): StoredAcademy {
     ageGroups: row.age_groups ?? [],
     facilities: row.facilities ?? [],
     offerings: row.offerings ?? [],
+    logo: row.logo ?? null,
+    cover: row.cover ?? null,
+    photos: row.photos ?? [],
     verificationStatus: row.verification_status,
     verificationLabel: row.verification_label,
     reviewNotes: row.review_notes,
@@ -372,9 +378,10 @@ export async function insertAcademy(
     `INSERT INTO academies (
       id, slug, kind, name, description, address, city_name, city_slug, state_name, state_slug,
       country_name, country_slug, timezone, website, phone, whatsapp, contact_email, links,
-      age_groups, facilities, offerings, verification_status, verification_label, review_notes,
-      last_verified_at, owner_id, owner_email, demo, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      age_groups, facilities, offerings, logo, cover, photos, verification_status,
+      verification_label, review_notes, last_verified_at, owner_id, owner_email, demo, created_at,
+      updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       academy.id,
       academy.slug,
@@ -397,6 +404,9 @@ export async function insertAcademy(
       JSON.stringify(academy.ageGroups),
       JSON.stringify(academy.facilities),
       JSON.stringify(academy.offerings),
+      academy.logo ? JSON.stringify(academy.logo) : null,
+      academy.cover ? JSON.stringify(academy.cover) : null,
+      JSON.stringify(academy.photos),
       academy.verificationStatus,
       academy.verificationLabel,
       academy.reviewNotes,
