@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { Analytics } from "@/components/analytics";
@@ -9,6 +9,7 @@ import { AppThemeProvider } from "@/components/theme/provider";
 import { getSession, isStaff } from "@/lib/auth/session";
 import { showDemoBanner } from "@/lib/data/catalog";
 import { countries, leagues } from "@/lib/data/seed";
+import { siteSocialImage } from "@/lib/seo";
 import { siteUrl } from "@/lib/utils";
 import "./globals.css";
 
@@ -32,19 +33,37 @@ const satoshi = localFont({
   display: "swap",
 });
 
+const description =
+  "Find cricket matches today and upcoming fixtures by country, city and league, with grounds, local start times and official ticket links checked by a person.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
+  applicationName: "cricketmatch.today",
   title: {
-    default: "cricketmatch.today — Find the match. Feel the ground.",
+    default: "Cricket matches today, fixtures and tickets · cricketmatch.today",
     template: "%s · cricketmatch.today",
   },
-  description: "Upcoming cricket matches, venues and official ticket links by country.",
+  description,
   openGraph: {
     siteName: "cricketmatch.today",
-    title: "Find the match. Feel the ground.",
-    description: "Upcoming cricket matches, venues and official ticket links by country.",
+    title: "Cricket matches today, fixtures and tickets",
+    description,
     type: "website",
+    locale: "en_IN",
+    images: [siteSocialImage()],
   },
+  twitter: { card: "summary_large_image" },
+  // Set GOOGLE_SITE_VERIFICATION to the token Search Console gives for the HTML tag method.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f3f5ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#101612" },
+  ],
 };
 
 // India first, then the other countries by name.

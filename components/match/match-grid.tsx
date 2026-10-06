@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MatchCard } from "@/components/match/match-card";
 import type { StoredMatch } from "@/lib/domain/types";
 
@@ -32,6 +33,33 @@ export function EmptyResults({ title = "No matches in this view" }: { title?: st
         >
           Submit a missing match
         </a>
+      </div>
+    </div>
+  );
+}
+
+/** A place, league or team with nothing listed yet: where to look instead, and how to add a match. */
+export function NothingListedYet({ title }: { title: string }) {
+  return (
+    <div className="rounded-[1.25rem] border border-dashed border-line bg-surface p-8">
+      <h2 className="font-display text-2xl font-extrabold">{title}</h2>
+      <p className="mt-2 max-w-lg text-muted">
+        Matches appear here as soon as they are announced and checked. Until then, see every
+        upcoming match, or tell us about one we have missed.
+      </p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link
+          className="inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+          href="/matches"
+        >
+          See all upcoming matches
+        </Link>
+        <Link
+          className="inline-flex min-h-11 items-center rounded-full border border-line px-5 font-medium"
+          href="/submit/match"
+        >
+          Tell us about a match
+        </Link>
       </div>
     </div>
   );

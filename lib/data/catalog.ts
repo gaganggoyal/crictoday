@@ -1,5 +1,6 @@
 import "server-only";
 import { connection } from "next/server";
+import { cache } from "react";
 import { countries, leagues } from "@/lib/data/seed";
 import { dataMode } from "@/lib/data/mode";
 import { mysqlPool } from "@/lib/data/mysql/pool";
@@ -17,7 +18,9 @@ export type Directory = {
   leagues: typeof leagues;
 };
 
-export async function getDirectory(): Promise<Directory> {
+// A page reads the directory for its metadata and again for its body; cache keeps that to one
+// load per request.
+export const getDirectory = cache(async function getDirectory(): Promise<Directory> {
   await connection();
   const mode = dataMode();
   if (mode === "mysql") {
@@ -52,7 +55,7 @@ export async function getDirectory(): Promise<Directory> {
     countries,
     leagues,
   };
-}
+});
 
 export async function getMatch(slug: string) {
   const directory = await getDirectory();

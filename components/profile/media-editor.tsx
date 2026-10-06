@@ -178,6 +178,8 @@ export function MediaEditor({
           </h3>
           <p className="text-sm text-muted">
             Your ground, nets, coaching sessions, teams and trophies. The first ones show first.
+            Only add photos you are allowed to use, and ask a parent or guardian before showing
+            anyone under 18.
           </p>
         </div>
         {photos.length ? (

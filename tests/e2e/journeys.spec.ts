@@ -105,6 +105,8 @@ test("directories, leagues, and a missing match resolve", async ({ page }) => {
   await expect(page.getByText("That page is not on the card.")).toBeVisible();
 
   for (const path of [
+    "/about",
+    "/contact",
     "/legal/terms",
     "/legal/privacy",
     "/legal/ticket-policy",
@@ -298,7 +300,7 @@ test("theme, share, sign-out, and a phone layout hold up", async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard/);
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Find the match. Feel the ground.",
+    "Cricket matches today and upcoming fixtures",
   );
 
   await page.setViewportSize({ width: 375, height: 812 });

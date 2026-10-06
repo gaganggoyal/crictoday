@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("home states the product", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Find the match. Feel the ground.",
+    "Cricket matches today and upcoming fixtures",
   );
   await expect(
     page.getByText("Demo inventory. Fixtures, prices and ticket links are illustrative"),

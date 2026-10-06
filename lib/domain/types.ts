@@ -30,6 +30,8 @@ export type StoredOffer = {
   status: TicketOfferStatus;
   lastCheckedAt: string | null;
   approved: boolean;
+  /** When the offer last changed. Only the MySQL store records it. */
+  updatedAt?: string;
 };
 
 export type StoredMatch = {
@@ -73,6 +75,8 @@ export type StoredMatch = {
   demo: boolean;
   academySlug: string | null;
   offers: StoredOffer[];
+  /** When the match last changed. Only the MySQL store records it. */
+  updatedAt?: string;
 };
 
 /** Who runs a profile. Academies live at /academy, the others at /club. */
@@ -143,6 +147,8 @@ export type StoredAcademy = {
   lastVerifiedAt: string | null;
   ownerEmail: string | null;
   demo: boolean;
+  /** When the profile last changed. Only the MySQL store records it. */
+  updatedAt?: string;
 };
 
 export type CountryInfo = {

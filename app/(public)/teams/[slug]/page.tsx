@@ -1,34 +1,51 @@
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid } from "@/components/match/match-grid";
 import { getDirectory } from "@/lib/data/catalog";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, upcomingSummary } from "@/lib/seo";
+
+async function loadTeam(slug: string) {
+  const directory = await getDirectory();
+  const matches = directory.matches.filter(
+    (match) => match.homeSlug === slug || match.awaySlug === slug,
+  );
+  const first = matches[0];
+  if (!first) return null;
+  return { name: first.homeSlug === slug ? first.homeName : first.awayName, matches };
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const directory = await getDirectory();
-  const match = directory.matches.find((item) => item.homeSlug === slug || item.awaySlug === slug);
-  if (!match) notFound();
-  const name = match.homeSlug === slug ? match.homeName : match.awayName;
+  const team = await loadTeam(slug);
+  if (!team) notFound();
+  const summary = upcomingSummary(team.matches, new Date());
   return pageMetadata(
-    `${name} fixtures`,
-    `Upcoming cricket for ${name}, with venue and ticket state.`,
+    `${team.name} fixtures and tickets`,
+    summary
+      ? `${team.name}: ${summary}. Start times, grounds and official ticket links.`
+      : `${team.name} cricket fixtures, grounds and official ticket links.`,
     `/teams/${slug}`,
   );
 }
 
 export default async function TeamPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const directory = await getDirectory();
-  const matches = directory.matches.filter(
-    (match) => match.homeSlug === slug || match.awaySlug === slug,
-  );
-  if (!matches.length) notFound();
-  const name = matches[0]!.homeSlug === slug ? matches[0]!.homeName : matches[0]!.awayName;
+  const team = await loadTeam(slug);
+  if (!team) notFound();
+  const summary = upcomingSummary(team.matches, new Date());
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
-      <h1 className="font-display text-5xl font-extrabold tracking-tight">{name}</h1>
+      <Breadcrumbs
+        crumbs={[
+          { name: "Matches", path: "/matches" },
+          { name: team.name, path: `/teams/${slug}` },
+        ]}
+      />
+      <p className="mt-4 text-xs font-semibold tracking-[0.16em] text-link uppercase">Team</p>
+      <h1 className="font-display text-5xl font-extrabold tracking-tight">{team.name}</h1>
+      {summary ? <p className="mt-3 max-w-2xl font-medium">{summary}.</p> : null}
       <div className="mt-8">
-        <MatchGrid matches={matches} now={new Date()} />
+        <MatchGrid matches={team.matches} now={new Date()} />
       </div>
     </div>
   );

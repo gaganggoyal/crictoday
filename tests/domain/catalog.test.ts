@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { findDuplicateCandidates } from "@/lib/domain/duplicates";
-import { filterMatches, parseFilters, pickHero } from "@/lib/domain/filters";
+import { filterMatches, isFiltered, parseFilters, pickHero, playsOn } from "@/lib/domain/filters";
 import {
   planImport,
   normalizeSportMonksFixture,
@@ -227,5 +227,61 @@ describe("submission schema", () => {
     ).toBe(false);
     expect(matchSubmissionSchema.safeParse({ ...valid, consent: false }).success).toBe(false);
     expect(matchSubmissionSchema.safeParse(valid).success).toBe(true);
+  });
+});
+
+describe("day shortcuts", () => {
+  const base = matches.find(
+    (item) => item.slug === "india-vs-australia-1st-test-ahmedabad-2026-10-16",
+  )!;
+  const at = (startsAt: string, patch: Partial<StoredMatch> = {}): StoredMatch => ({
+    ...base,
+    slug: `at-${startsAt}`,
+    format: "t20",
+    status: "published",
+    startsAt,
+    endsAt: null,
+    ...patch,
+  });
+
+  it("judges today and tomorrow by the date at the ground", () => {
+    // 10:30 in India on Tuesday 6 October 2026; 21:30 Sydney time is already Wednesday there.
+    const tuesday = new Date("2026-10-06T05:00:00.000Z");
+    const evening = at("2026-10-06T13:30:00.000Z", { timezone: "Asia/Kolkata" });
+    const sydney = at("2026-10-07T03:00:00.000Z", { timezone: "Australia/Sydney" });
+    expect(playsOn(evening, "today", tuesday)).toBe(true);
+    expect(playsOn(evening, "tomorrow", tuesday)).toBe(false);
+    expect(playsOn(sydney, "today", tuesday)).toBe(false);
+    expect(playsOn(sydney, "tomorrow", tuesday)).toBe(true);
+  });
+
+  it("keeps a Test on the list for its five days", () => {
+    const test = at("2026-10-04T04:00:00.000Z", { format: "test", timezone: "Asia/Kolkata" });
+    expect(playsOn(test, "today", new Date("2026-10-06T05:00:00.000Z"))).toBe(true);
+    expect(playsOn(test, "today", new Date("2026-10-09T05:00:00.000Z"))).toBe(false);
+    const result = filterMatches(
+      [test],
+      parseFilters({ when: "today" }),
+      new Date("2026-10-06T05:00:00.000Z"),
+    );
+    expect(result.items.map((item) => item.slug)).toEqual([test.slug]);
+  });
+
+  it("finds the coming weekend, or what is left of it on a Sunday", () => {
+    const saturday = at("2026-10-10T08:00:00.000Z", { timezone: "Asia/Kolkata" });
+    const sunday = at("2026-10-11T08:00:00.000Z", { timezone: "Asia/Kolkata" });
+    const wednesday = new Date("2026-10-07T05:00:00.000Z");
+    expect(playsOn(saturday, "weekend", wednesday)).toBe(true);
+    expect(playsOn(sunday, "weekend", wednesday)).toBe(true);
+    const sundayMorning = new Date("2026-10-11T02:00:00.000Z");
+    expect(playsOn(saturday, "weekend", sundayMorning)).toBe(false);
+    expect(playsOn(sunday, "weekend", sundayMorning)).toBe(true);
+  });
+
+  it("counts a shortcut as a filter, so the view stays out of search", () => {
+    expect(isFiltered(parseFilters({}))).toBe(false);
+    expect(isFiltered(parseFilters({ page: "2" }))).toBe(false);
+    expect(isFiltered(parseFilters({ when: "weekend" }))).toBe(true);
+    expect(isFiltered(parseFilters({ when: "someday" }))).toBe(false);
   });
 });

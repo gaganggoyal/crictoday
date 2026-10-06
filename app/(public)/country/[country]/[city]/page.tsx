@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card";
 import { getDirectory } from "@/lib/data/catalog";
 import { indiaCity, placeState } from "@/lib/data/india";
 import { countries } from "@/lib/data/seed";
 import { inDefaultWindow } from "@/lib/domain/filters";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
 type Params = Promise<{ country: string; city: string }>;
 
@@ -33,7 +33,7 @@ async function loadCity(countrySlug: string, citySlug: string) {
   const matches = all
     .filter((match) => inDefaultWindow(match, now))
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
-  return { country, name, state, matches, profiles, now };
+  return { country, name, state, all, matches, profiles, now };
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
@@ -41,10 +41,15 @@ export async function generateMetadata({ params }: { params: Params }) {
   const place = await loadCity(country, city);
   if (!place) notFound();
   const where = place.state ? `${place.name}, ${place.state.name}` : place.name;
+  const summary = upcomingSummary(place.all, place.now);
   return pageMetadata(
     `Cricket in ${place.name}: matches, clubs and academies`,
-    `Upcoming matches, ticket state, and local clubs, academies and grounds in ${where}.`,
+    summary
+      ? `${summary} in ${where}, with ticket links and local clubs, academies and grounds.`
+      : `Cricket clubs, academies, grounds and local matches in ${where}.`,
     `/country/${country}/${city}`,
+    // Listed Indian towns have a page before anything is there; it stays out of search until then.
+    place.matches.length > 0 || place.profiles.length > 0,
   );
 }
 
@@ -53,32 +58,21 @@ export default async function CityPage({ params }: { params: Params }) {
   const place = await loadCity(country, city);
   if (!place) notFound();
   const { matches, profiles, state } = place;
+  const summary = upcomingSummary(place.all, place.now);
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <ol className="flex flex-wrap gap-2">
-          <li>
-            <Link href="/countries">Countries</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href={`/country/${place.country.slug}`}>{place.country.name}</Link>
-          </li>
-          {state ? (
-            <>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href={`/country/india/state/${state.slug}`}>{state.name}</Link>
-              </li>
-            </>
-          ) : null}
-          <li aria-hidden="true">/</li>
-          <li aria-current="page">{place.name}</li>
-        </ol>
-      </nav>
+      <Breadcrumbs
+        crumbs={[
+          { name: "Countries", path: "/countries" },
+          { name: place.country.name, path: `/country/${place.country.slug}` },
+          ...(state ? [{ name: state.name, path: `/country/india/state/${state.slug}` }] : []),
+          { name: place.name, path: `/country/${place.country.slug}/${city}` },
+        ]}
+      />
       <h1 className="mt-3 font-display text-5xl font-extrabold tracking-tight">
         Cricket in {place.name}
       </h1>
+      {summary ? <p className="mt-3 max-w-2xl font-medium">{summary}.</p> : null}
       <section aria-labelledby="matches" className="mt-8">
         <h2 id="matches" className="mb-4 font-display text-3xl font-extrabold">
           Upcoming matches
@@ -86,7 +80,7 @@ export default async function CityPage({ params }: { params: Params }) {
         {matches.length ? (
           <MatchGrid matches={matches} now={place.now} />
         ) : (
-          <EmptyResults title={`No upcoming matches listed in ${place.name} yet`} />
+          <NothingListedYet title={`No upcoming matches listed in ${place.name} yet`} />
         )}
       </section>
       <section aria-labelledby="clubs" className="mt-12">

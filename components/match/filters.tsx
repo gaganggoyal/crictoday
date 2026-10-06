@@ -20,10 +20,14 @@ export function MatchFiltersForm({
     >
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-xl font-bold">Filters</h2>
-        <Link href="/matches" className="text-sm font-medium text-link">
+        <Link
+          href="/matches"
+          className="inline-flex min-h-11 items-center px-1 text-sm font-medium text-link"
+        >
           Clear
         </Link>
       </div>
+      {filters.when ? <input type="hidden" name="when" value={filters.when} /> : null}
       <Field label="Search" name="q" defaultValue={filters.q} placeholder="Team, ground, league" />
       <MoreFilters active={activeFilters(filters)}>
         <Select

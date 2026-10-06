@@ -48,6 +48,7 @@ export type MatchRow = RowDataPacket & {
   entry_notes: string | null;
   demo: number;
   academy_slug: string | null;
+  updated_at?: Date;
 };
 
 export type OfferRow = RowDataPacket & {
@@ -62,6 +63,7 @@ export type OfferRow = RowDataPacket & {
   status: StoredOffer["status"];
   last_checked_at: Date | null;
   approved: number;
+  updated_at?: Date;
 };
 
 export type AcademyRow = RowDataPacket & {
@@ -96,6 +98,7 @@ export type AcademyRow = RowDataPacket & {
   owner_id: string | null;
   owner_email: string | null;
   demo: number;
+  updated_at?: Date;
 };
 
 export type SubmissionRow = RowDataPacket & {
@@ -135,6 +138,7 @@ export function toOffer(row: OfferRow): StoredOffer {
     status: row.status,
     lastCheckedAt: iso(row.last_checked_at),
     approved: Boolean(row.approved),
+    ...(row.updated_at ? { updatedAt: row.updated_at.toISOString() } : {}),
   };
 }
 
@@ -179,6 +183,7 @@ export function toMatch(row: MatchRow, offers: StoredOffer[]): StoredMatch {
     demo: Boolean(row.demo),
     academySlug: row.academy_slug,
     offers,
+    ...(row.updated_at ? { updatedAt: row.updated_at.toISOString() } : {}),
   };
 }
 
@@ -214,6 +219,7 @@ export function toAcademy(row: AcademyRow): StoredAcademy {
     lastVerifiedAt: iso(row.last_verified_at),
     ownerEmail: row.owner_email,
     demo: Boolean(row.demo),
+    ...(row.updated_at ? { updatedAt: row.updated_at.toISOString() } : {}),
   };
 }
 

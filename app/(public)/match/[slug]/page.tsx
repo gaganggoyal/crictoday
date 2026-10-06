@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CorrectionForm } from "@/components/forms/correction-form";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid } from "@/components/match/match-grid";
 import { ProfileLogo } from "@/components/profile/profile-picture";
 import { TicketBadge } from "@/components/match/ticket-badge";
@@ -11,7 +12,15 @@ import { FORMAT_LABEL, STATUS_LABEL } from "@/lib/domain/labels";
 import { profilePath } from "@/lib/domain/profiles";
 import { isStale, resolveAttendance } from "@/lib/domain/ticket-state";
 import { formatInTimeZone } from "@/lib/domain/time";
-import { jsonLdScript, pageMetadata, sportsEventJsonLd } from "@/lib/seo";
+import {
+  jsonLdScript,
+  matchDescription,
+  matchName,
+  matchSocialImage,
+  matchTitle,
+  pageMetadata,
+  sportsEventJsonLd,
+} from "@/lib/seo";
 import { track } from "@/lib/analytics/track";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -19,9 +28,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const match = await getMatch(slug);
   if (!match) notFound();
   return pageMetadata(
-    `${match.homeName} vs ${match.awayName} tickets, date and venue`,
-    `${match.competitionName} at ${match.venueName}, ${match.cityName}. Ticket state, source and last verification are on this page.`,
+    matchTitle(match),
+    matchDescription(match),
     `/match/${match.slug}`,
+    true,
+    matchSocialImage(match),
   );
 }
 
@@ -56,21 +67,17 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
           dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
         />
       ) : null}
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <ol className="flex flex-wrap gap-2">
-          <li>
-            <Link href="/matches">Matches</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href={`/country/${match.countrySlug}`}>{match.countryName}</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href={`/country/${match.countrySlug}/${match.citySlug}`}>{match.cityName}</Link>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumbs
+        crumbs={[
+          { name: "Matches", path: "/matches" },
+          { name: match.countryName, path: `/country/${match.countrySlug}` },
+          ...(match.countrySlug === "india" && match.stateSlug && match.stateName
+            ? [{ name: match.stateName, path: `/country/india/state/${match.stateSlug}` }]
+            : []),
+          { name: match.cityName, path: `/country/${match.countrySlug}/${match.citySlug}` },
+          { name: matchName(match), path: `/match/${match.slug}` },
+        ]}
+      />
       {(state === "CANCELLED" || state === "POSTPONED") && (
         <p
           className={`mt-4 rounded-2xl px-4 py-3 font-semibold text-white ${state === "CANCELLED" ? "bg-[#8C2F1B]" : "bg-[#8A5A12]"}`}
@@ -134,7 +141,7 @@ export default async function MatchPage({ params }: { params: Promise<{ slug: st
                     {match.sourceLabel}
                     {match.sourceUrl ? (
                       <a
-                        className="mt-1 block text-sm font-normal text-link"
+                        className="inline-flex min-h-11 items-center text-sm font-normal text-link"
                         href={match.sourceUrl}
                       >
                         View source
