@@ -4,15 +4,15 @@ cricketmatch.today runs on the shared VPS (`161.97.97.34`) with MySQL. The Supab
 
 ## 1. VPS with MySQL (production)
 
-| Piece    | Where                                                                                                                                         |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Code     | `/var/www/cricketmatch`, a clone of `main`, owned by the `cricketmatch` user                                                                  |
-| Process  | `cricketmatch.service` runs `next start` on port 3300                                                                                         |
-| HTTPS    | The Caddy container from `/root/cricketverse_deploy` proxies to `172.18.0.1:3300`                                                             |
-| Firewall | ufw admits 3300 only from the Docker bridge range `172.16.0.0/12`                                                                             |
-| Data     | The `cricketmatch` database on the server's MySQL 8, with its own `cricketmatch` user. It shares the server with indiaoffers, not its tables. |
-| Settings | `/var/www/cricketmatch/.env`, mode 600                                                                                                        |
-| Sync     | `cricketmatch-sync.timer` calls `/api/cron/sync` every hour                                                                                   |
+| Piece    | Where                                                                                                                                                      |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code     | `/var/www/cricketmatch`, a clone of `main`, owned by the `cricketmatch` user                                                                               |
+| Process  | `cricketmatch.service` runs `next start` on port 3300                                                                                                      |
+| HTTPS    | The Caddy container from `/root/cricketverse_deploy` proxies to `172.18.0.1:3300`                                                                          |
+| Firewall | ufw admits 3300 only from the Docker bridge range `172.16.0.0/12`                                                                                          |
+| Data     | The `cricketmatch` database on the server's MySQL 8, with its own `cricketmatch` user. It shares the server with indiaoffers, not its tables.              |
+| Settings | `/var/www/cricketmatch/.env`, mode 600                                                                                                                     |
+| Sync     | `cricketmatch-sync.timer` calls `/api/cron/sync` every hour. It loads `data/fixtures`, emails the ticket alerts new links answer, and expires past offers. |
 
 The unit files, the Caddy block and the scripts are in `deploy/vps/`.
 
@@ -29,7 +29,7 @@ It checks out `origin/main` (or the branch or commit you pass as the first argum
 Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cricketmatch -- env HOME=/var/lib/cricketmatch corepack pnpm db migrate`.
 
 - `pnpm db migrate` applies `db/mysql/*.sql` files that have not run.
-- `pnpm db load-fixtures data/fixtures/2026-27.json` adds the real fixtures in that file and updates the ones it loaded before. Add `--dry-run` to check the file first. [data/fixtures/README.md](../data/fixtures/README.md) explains the format and the sourcing rules.
+- `pnpm db load-fixtures data/fixtures/2026-27.json` adds the real fixtures and official ticket links in that file and updates the ones it loaded before. Add `--dry-run` to check the file first. The hourly sync does the same for every file in `data/fixtures`, so a deploy is enough; run this to apply a file at once. [data/fixtures/README.md](../data/fixtures/README.md) explains the format and the sourcing rules.
 - `pnpm db seed-demo` loads the labelled DEMO catalogue. `pnpm db remove-demo` deletes it, with its offers, alerts and clicks.
 - `pnpm db set-role <email> <role>` creates the account if needed and sets its role. `admin@cricketmatch.today` is the first admin.
 - `pnpm db sign-in-link <email>` prints a one-time sign-in link, valid for 30 minutes. Use it when email cannot reach that address.

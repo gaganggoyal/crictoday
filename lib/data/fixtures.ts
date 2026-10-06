@@ -2,6 +2,7 @@ import { z } from "zod";
 import { slugify } from "@/lib/domain/slug";
 import { zonedTimeToUtc } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
+import { assertHttpsUrl } from "@/lib/domain/urls";
 
 // A fixture file lists real matches with the official page each one comes from.
 // Times are local to the ground, as boards publish them; the ground's time zone converts them.
@@ -17,17 +18,28 @@ const timeZone = z.string().refine((zone) => {
   }
 }, "Unknown time zone.");
 
+const localTime = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Use the ground's local time, YYYY-MM-DDTHH:MM.");
+
+// The board's or organiser's own ticket link, or one at the seller it names.
+const ticketsSchema = z.object({
+  seller: z.string().trim().min(2).max(120),
+  url: z.url({ protocol: /^https$/ }),
+  status: z.enum(["active", "sold_out"]).default("active"),
+  onSale: localTime.optional(),
+});
+
 const fixtureSchema = z.object({
   key: slug,
   label: z.string().trim().min(1).max(40).optional(),
   format: z.enum(["test", "odi", "t20", "t10", "hundred", "other"]),
-  status: z.enum(["published", "postponed", "cancelled"]).default("published"),
+  status: z.enum(["published", "draft", "postponed", "cancelled"]).default("published"),
   home: slug,
   away: slug,
   venue: slug,
-  start: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Use the ground's local time, YYYY-MM-DDTHH:MM."),
+  start: localTime,
+  tickets: ticketsSchema.optional(),
 });
 
 const seriesSchema = z.object({
@@ -42,11 +54,18 @@ const seriesSchema = z.object({
     label: z.string().trim().min(2).max(80),
   }),
   attendance: z.enum(["ticketed", "free", "unknown"]),
+  tickets: ticketsSchema.optional(),
   matches: z.array(fixtureSchema).min(1),
 });
 
 export const fixtureFileSchema = z.object({
-  checkedAt: z.iso.datetime(),
+  // Five minutes' grace for clock skew; a check cannot be dated later than that.
+  checkedAt: z.iso
+    .datetime()
+    .refine(
+      (value) => new Date(value).getTime() <= Date.now() + 5 * 60 * 1000,
+      "checkedAt cannot be in the future.",
+    ),
   countries: z.record(slug, z.string().trim().min(2)),
   teams: z.record(
     slug,
@@ -64,10 +83,21 @@ export const fixtureFileSchema = z.object({
   series: z.array(seriesSchema).min(1),
 });
 
+/** A match's official ticket link. */
+export type FixtureTickets = {
+  sellerName: string;
+  sellerDomain: string;
+  url: string;
+  status: "active" | "sold_out";
+  /** When the sale opens. Until then the match is listed without the link. */
+  onSaleAt: string | null;
+};
+
 /** A match ready to store, without the id and slug the database assigns. */
 export type FixtureMatch = Omit<StoredMatch, "id" | "slug" | "offers"> & {
   sourceExternalId: string;
   slugBase: string;
+  tickets: FixtureTickets | null;
 };
 
 /** Validates a fixture file and builds its matches. Throws with every problem found. */
@@ -104,6 +134,22 @@ export function buildFixtureMatches(input: unknown): FixtureMatch[] {
       );
       if (slugs.has(slugBase)) problems.push(`${where}: another fixture has the slug ${slugBase}.`);
       slugs.add(slugBase);
+
+      let tickets: FixtureTickets | null = null;
+      const listed = fixture.tickets ?? series.tickets;
+      if (listed) {
+        const url = assertHttpsUrl(listed.url);
+        if (!url) problems.push(`${where}: the ticket link must be a full https address.`);
+        else {
+          tickets = {
+            sellerName: listed.seller,
+            sellerDomain: url.hostname.replace(/^www\./, "").toLowerCase(),
+            url: url.toString(),
+            status: listed.status,
+            onSaleAt: listed.onSale ? zonedTimeToUtc(listed.onSale, venue.timezone) : null,
+          };
+        }
+      }
 
       matches.push({
         sourceExternalId,
@@ -143,6 +189,7 @@ export function buildFixtureMatches(input: unknown): FixtureMatch[] {
         entryNotes: null,
         demo: false,
         academySlug: null,
+        tickets,
       });
     }
   }

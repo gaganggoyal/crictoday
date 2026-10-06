@@ -8,6 +8,7 @@ import { ticketAlertEmail, type EmailDraft } from "@/lib/domain/workflows";
 import type { EmailMatch } from "@/lib/email/messages";
 import { DomainError, withTransaction } from "@/lib/data/mysql/pool";
 import {
+  domainDenied,
   insertAcademy,
   insertMatch,
   insertOffer,
@@ -56,20 +57,6 @@ async function userExists(connection: PoolConnection, id: string | null) {
   if (!id) return null;
   const [rows] = await connection.query<RowDataPacket[]>("SELECT id FROM users WHERE id = ?", [id]);
   return rows[0] ? id : null;
-}
-
-/** A host is blocked when it, or a parent domain, has a deny rule. */
-async function domainDenied(connection: PoolConnection, host: string) {
-  const labels = host.toLowerCase().split(".");
-  const candidates = labels
-    .map((_, index) => labels.slice(index).join("."))
-    .filter((item) => item.includes("."));
-  if (candidates.length === 0) return false;
-  const [rows] = await connection.query<RowDataPacket[]>(
-    "SELECT 1 FROM domain_rules WHERE decision = 'deny' AND host IN (?) LIMIT 1",
-    [candidates],
-  );
-  return rows.length > 0;
 }
 
 async function freeSlug(connection: PoolConnection, table: "matches" | "academies", base: string) {
@@ -620,7 +607,7 @@ export async function approveOffer(
        WHERE id = ?`,
       [actor.id, now, now, offer.id],
     );
-    // Approval is the only way a domain joins the allow list. A deny rule stays a deny rule.
+    // A domain joins the allow list through approval or a fixture file. A deny rule stays a deny rule.
     await connection.query(
       "INSERT IGNORE INTO domain_rules (host, decision, created_at) VALUES (?, 'allow', ?)",
       [host, now],
@@ -668,6 +655,56 @@ export async function approveOffer(
       now,
     );
     return { ok: true as const, notified: emails.length, emails };
+  });
+}
+
+/**
+ * Alerts for matches that list an active offer however it was listed. Approval sends its own
+ * alerts; this catches links a fixture file listed, including ones that opened at a set time.
+ */
+export async function notifyListedAlerts(pool: Pool, now: Date) {
+  return withTransaction(pool, async (connection) => {
+    const [rows] = await connection.query<RowDataPacket[]>(
+      `SELECT r.id, r.encrypted_email, o.seller_name, o.seller_domain, o.url,
+              m.slug, m.home_name, m.away_name, m.venue_name, m.city_name, m.competition_name,
+              m.format, m.starts_at, m.timezone
+       FROM ticket_requests r
+       JOIN matches m ON m.id = r.match_id
+       JOIN ticket_offers o ON o.match_id = m.id AND o.approved = 1 AND o.status = 'active'
+       WHERE r.status = 'active' AND m.status = 'published' AND m.starts_at > ?
+       ORDER BY r.id, o.kind = 'official' DESC, o.updated_at DESC
+       FOR UPDATE`,
+      [now],
+    );
+    const emails: EmailDraft[] = [];
+    const notified = new Set<string>();
+    for (const row of rows) {
+      if (notified.has(row.id)) continue;
+      notified.add(row.id);
+      const match: EmailMatch = {
+        slug: String(row.slug),
+        homeName: String(row.home_name),
+        awayName: String(row.away_name),
+        venueName: String(row.venue_name),
+        cityName: String(row.city_name),
+        competitionName: String(row.competition_name),
+        format: row.format as MatchFormat,
+        startsAt: (row.starts_at as Date).toISOString(),
+        timezone: String(row.timezone),
+      };
+      const sold = {
+        sellerName: String(row.seller_name),
+        sellerDomain: String(row.seller_domain),
+        url: String(row.url),
+      };
+      emails.push(ticketAlertEmail(match, sold, String(row.encrypted_email)));
+    }
+    if (notified.size > 0) {
+      await connection.query("UPDATE ticket_requests SET status = 'notified' WHERE id IN (?)", [
+        [...notified],
+      ]);
+    }
+    return emails;
   });
 }
 

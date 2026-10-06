@@ -16,8 +16,10 @@ const USAGE = `Usage: pnpm db <command>
   migrate                   apply db/mysql/*.sql that have not run yet
   seed-demo                 load the labelled DEMO catalogue (existing rows are kept)
   remove-demo               delete every DEMO match and academy
-  load-fixtures <file>      add or update the real fixtures in a data/fixtures file;
-                            --dry-run only checks the file
+  load-fixtures <file>      add or update the real fixtures and ticket links in a
+                            data/fixtures file; --dry-run only checks the file.
+                            The hourly sync also loads every data/fixtures file and
+                            emails the ticket alerts new links answer.
   set-role <email> <role>   create the account if needed and set its role
                             roles: ${ROLES.join(", ")}
   sign-in-link <email>      print a one-time sign-in link, valid for 30 minutes,
@@ -39,7 +41,8 @@ async function main() {
   }
   if (command === "load-fixtures" && args.includes("--dry-run")) {
     const fixtures = buildFixtureMatches(JSON.parse(readFileSync(fixtureFile(args), "utf8")));
-    console.log(`${fixtures.length} fixtures are valid.`);
+    const tickets = fixtures.filter((fixture) => fixture.tickets).length;
+    console.log(`${fixtures.length} fixtures are valid, ${tickets} with ticket links.`);
     return;
   }
   const url = process.env.DATABASE_URL;
@@ -71,8 +74,12 @@ async function main() {
     } else if (command === "load-fixtures") {
       const fixtures = buildFixtureMatches(JSON.parse(readFileSync(fixtureFile(args), "utf8")));
       const result = await loadFixtures(pool, fixtures, new Date());
+      const { tickets } = result;
       console.log(
         `Inserted ${result.inserted}, updated ${result.updated}, unchanged ${result.unchanged}, skipped ${result.skipped.length}.`,
+      );
+      console.log(
+        `Ticket links: ${tickets.added} added, ${tickets.updated} updated, ${tickets.withdrawn} withdrawn, ${tickets.waiting} waiting for their sale to open.`,
       );
       for (const line of result.skipped) console.log(`  skipped ${line}`);
     } else if (command === "sign-in-link") {
