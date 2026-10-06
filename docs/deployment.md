@@ -44,6 +44,12 @@ Owners add a logo, a cover photo and up to 12 photos. The browser shrinks each p
 
 Owners can also add a season from a spreadsheet at `/dashboard/profiles/<slug>/matches/import`: an .xlsx or CSV file, or rows pasted from Excel or Google Sheets. The browser reads the file, so the server never opens a workbook; it gets the cells as text, checks every row as if posted from the match form, and shows what each row would do before anything is saved. Adding the same sheet again updates changed matches and skips the rest. The template is `public/templates/match-schedule.csv`.
 
+### Search and link previews
+
+- `app/sitemap.ts` lists the pages worth finding, with the time each match, its ticket links or a profile last changed. Filtered `/matches` views and places with nothing listed are noindex and stay out of it.
+- Link previews are drawn by `lib/og.tsx`: `/og/site` once at build time, and `/og/match/<slug>` on request, kept by browsers and chat apps for an hour. They use Geist from `assets/fonts` (SIL Open Font License), because the image renderer cannot read the site's WOFF2 fonts.
+- To verify the site in Google Search Console with the HTML tag method, put the token in `GOOGLE_SITE_VERIFICATION` in `.env` and run `systemctl restart cricketmatch`. A domain property, verified with a TXT record at Spaceship, covers `www` too.
+
 ### Backups
 
 `cricketmatch-backup.timer` runs `deploy/vps/backup.sh` as the app user at about 03:40 server time. It writes `cricketmatch-<time>.sql.gz` with `mysqldump --single-transaction`, using the app's own database login from `.env`, and copies `UPLOAD_DIR` to `uploads-<time>/`. Pictures never change once written, so each night's copy hard-links the files the last one has and costs only the new ones. The newest 14 of each are kept in `/var/backups/cricketmatch` (mode 700). The copies are on the same disk, so they cover mistakes, not a lost server.

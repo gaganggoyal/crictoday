@@ -12,9 +12,13 @@ import { withTransaction } from "@/lib/data/mysql/pool";
 import { insertMatch, insertOffer } from "@/lib/data/mysql/rows";
 
 const RUN_LOCK_MS = 10 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 const LOOKAHEAD_MS = 180 * 24 * 60 * 60 * 1000;
 
-/** Close offers and alerts for matches that have started, and alerts for cancelled matches. */
+/**
+ * Close offers and alerts for matches that have started, and alerts for cancelled matches. Sign-in
+ * links and rate-limit counts go a day after they lapse, as the privacy policy says.
+ */
 export async function expireDue(pool: Pool, now: Date) {
   await pool.query(
     `UPDATE ticket_offers o JOIN matches m ON m.id = o.match_id
@@ -29,6 +33,9 @@ export async function expireDue(pool: Pool, now: Date) {
        AND (m.status = 'cancelled' OR m.starts_at <= ?)`,
     [now],
   );
+  const dayAgo = new Date(now.getTime() - DAY_MS);
+  await pool.query("DELETE FROM magic_links WHERE expires_at < ?", [dayAgo]);
+  await pool.query("DELETE FROM rate_limits WHERE reset_at < ?", [dayAgo]);
 }
 
 async function deadLetter(pool: Pool, provider: string, reason: string, now: Date) {

@@ -76,9 +76,14 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
 
   it("reads the seeded DEMO catalogue back exactly", async () => {
     const directory = await loadDirectory(pool);
-    expect(bySlug(directory.matches)).toEqual(
-      bySlug(seedMatches.filter((match) => isPublicMatch(match))),
-    );
+    // The database stamps each row with when it last changed; the seed has no such time.
+    expect(directory.matches.every((match) => match.updatedAt === now.toISOString())).toBe(true);
+    const stamped = directory.matches.map((match) => ({
+      ...match,
+      updatedAt: undefined,
+      offers: match.offers.map((offer) => ({ ...offer, updatedAt: undefined })),
+    }));
+    expect(bySlug(stamped)).toEqual(bySlug(seedMatches.filter((match) => isPublicMatch(match))));
     expect(directory.academies.every((academy) => academy.verificationStatus === "verified")).toBe(
       true,
     );
@@ -573,11 +578,29 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
     );
     expect(runs.map((run) => run.status)).toEqual(["succeeded", "succeeded", "skipped"]);
 
+    // A sign-in link and a rate-limit count that lapsed over a day ago, and ones that did not.
+    await pool.query(
+      `INSERT INTO magic_links (token_hash, email, expires_at, used_at, created_at)
+       VALUES (?, 'old@example.com', '2026-10-15 00:00:00', NULL, '2026-10-14 23:30:00'),
+              (?, 'new@example.com', '2026-10-16 12:00:00', NULL, '2026-10-16 11:30:00')`,
+      [hash("lapsed"), hash("recent")],
+    );
+    await pool.query(
+      `INSERT INTO rate_limits (key_hash, hits, reset_at)
+       VALUES (?, 1, '2026-10-15 00:00:00'), (?, 1, '2026-10-16 12:00:00')`,
+      [hash("lapsed"), hash("recent")],
+    );
     await expireDue(pool, new Date("2026-10-17T00:00:00.000Z"));
     const [offers] = await pool.query<RowDataPacket[]>(
       "SELECT status FROM ticket_offers WHERE id = 'offer-india-a'",
     );
     expect(offers[0]!.status).toBe("expired");
+    const [links] = await pool.query<RowDataPacket[]>("SELECT email FROM magic_links");
+    expect(links.map((link) => link.email)).not.toContain("old@example.com");
+    expect(links.map((link) => link.email)).toContain("new@example.com");
+    const [limits] = await pool.query<RowDataPacket[]>("SELECT key_hash FROM rate_limits");
+    expect(limits.map((limit) => limit.key_hash)).not.toContain(hash("lapsed"));
+    expect(limits.map((limit) => limit.key_hash)).toContain(hash("recent"));
   });
 
   it("removes every DEMO row with its offers and alerts", async () => {

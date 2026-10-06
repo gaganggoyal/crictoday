@@ -14,6 +14,10 @@ function contentSecurityPolicy() {
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
+    // Only where the site itself is served over HTTPS, so a local production build still loads.
+    ...(process.env.NEXT_PUBLIC_SITE_URL?.startsWith("https://")
+      ? ["upgrade-insecure-requests"]
+      : []),
   ].join("; ");
 }
 
@@ -34,6 +38,18 @@ const nextConfig: NextConfig = {
     // Profile pictures are sent through server actions. Browsers shrink them first; this leaves
     // room for an 8 MB original when they cannot.
     serverActions: { bodySizeLimit: "9mb" },
+  },
+  // The addresses people guess for the about, contact and policy pages.
+  async redirects() {
+    return [
+      { source: "/about-us", destination: "/about", permanent: true },
+      { source: "/contact-us", destination: "/contact", permanent: true },
+      { source: "/privacy", destination: "/legal/privacy", permanent: true },
+      { source: "/privacy-policy", destination: "/legal/privacy", permanent: true },
+      { source: "/terms", destination: "/legal/terms", permanent: true },
+      { source: "/terms-of-use", destination: "/legal/terms", permanent: true },
+      { source: "/terms-and-conditions", destination: "/legal/terms", permanent: true },
+    ];
   },
   async headers() {
     const headers = [...securityHeaders];

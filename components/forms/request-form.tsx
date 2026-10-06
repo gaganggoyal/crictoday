@@ -102,6 +102,17 @@ export function RequestForm({ matchSlug, cta }: { matchSlug: string; cta: string
           Email me about this match only. I understand a request does not reserve a ticket.
         </span>
       </label>
+      <p className="text-xs text-muted">
+        We encrypt your address and use it only for this alert.{" "}
+        <a
+          href="/legal/privacy#ticket-alerts"
+          target="_blank"
+          rel="noopener"
+          className="text-link underline underline-offset-4"
+        >
+          Privacy policy
+        </a>
+      </p>
       <Error message={form.formState.errors.consent?.message || errors.consent || errors.form} />
       <button
         className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white disabled:opacity-60"

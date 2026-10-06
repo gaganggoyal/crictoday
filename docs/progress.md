@@ -1,6 +1,6 @@
 # Progress
 
-Updated 6 October 2026, after adding profile pictures, spreadsheet schedules and nightly backups.
+Updated 6 October 2026, after adding the about, contact and policy pages and the SEO work.
 
 ## Done
 
@@ -33,6 +33,16 @@ Updated 6 October 2026, after adding profile pictures, spreadsheet schedules and
 - On a phone, `/matches` shows its heading, the search box and folded filters, then the results.
 - Nightly backups of the database and the uploaded pictures, kept for 14 nights in `/var/backups/cricketmatch`. See [deployment.md](deployment.md#backups).
 - The app runs on Node 24 LTS in `/opt/node24`, beside the system's Node 20, which reached its end of life in April 2026 and stays for the server's other apps.
+- About, contact and policy pages since 6 October 2026: `/about` with the founders, Gagan and Vansh; `/contact` with the Grievance Officer the IT Rules, 2021 ask for; and a full privacy policy and terms of use at `/legal/privacy` and `/legal/terms`, written from what the site stores. The texts live in the pages; names and the contact address are in `lib/company.ts`. `/privacy`, `/terms`, `/about-us` and `/contact-us` redirect to them.
+- Search and sharing since 6 October 2026, after an outside audit:
+  - every match has its own title and description, such as "India vs West Indies 1st T20I tickets – Lucknow, 6 Oct 2026";
+  - countries, states, towns, leagues, teams and grounds describe their own upcoming matches;
+  - SportsEvent data marks only a real, approved sale as an offer;
+  - the home page carries WebSite and Organization data, and deeper pages carry breadcrumbs;
+  - link previews show a 1200×630 picture, drawn per match at `/og/match/<slug>` and site-wide at `/og/site`;
+  - filtered `/matches` views and places with nothing listed are noindex and left out of the sitemap;
+  - sitemap dates come from when a match, its ticket links or a profile last changed.
+- Today, tomorrow and this weekend shortcuts on the home page and `/matches`, judged by the date at each ground. A Test counts for its five days.
 
 ## Not done
 
@@ -47,7 +57,9 @@ Updated 6 October 2026, after adding profile pictures, spreadsheet schedules and
 
 ## Next
 
-1. Recheck `data/fixtures` at least weekly: listings older than seven days are marked unverified. Add the waiting matches, ticket links as sales open, and sold-out states, then deploy.
-2. Invite the first academies, clubs, committees and grounds with [outreach/invite-emails.md](outreach/invite-emails.md), and approve new profiles at `/admin/profiles` the same day.
-3. Weekly, run `deploy/vps/fetch-backup.sh --now` and upload the folder to the private Google Drive folder.
-4. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
+1. In Google Search Console, add `cricketmatch.today` as a domain property (a TXT record at Spaceship), submit `https://cricketmatch.today/sitemap.xml`, and inspect the home page and a few match pages. The HTML tag method also works: put its token in `GOOGLE_SITE_VERIFICATION` in `.env` and restart.
+2. Keep the promises the policies make: acknowledge complaints within 24 hours and resolve them within 15 days, take down photos of children within 24 hours of a request, and email profile owners before a change to the terms that affects them.
+3. Recheck `data/fixtures` at least weekly: listings older than seven days are marked unverified. Add the waiting matches, ticket links as sales open, and sold-out states, then deploy.
+4. Invite the first academies, clubs, committees and grounds with [outreach/invite-emails.md](outreach/invite-emails.md), and approve new profiles at `/admin/profiles` the same day.
+5. Weekly, run `deploy/vps/fetch-backup.sh --now` and upload the folder to the private Google Drive folder.
+6. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.

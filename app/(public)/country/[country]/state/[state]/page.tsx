@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card";
 import { getDirectory } from "@/lib/data/catalog";
 import { indiaState, placeState } from "@/lib/data/india";
 import { inDefaultWindow } from "@/lib/domain/filters";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
 type Params = Promise<{ country: string; state: string }>;
 
@@ -17,10 +18,25 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { country, state: slug } = await params;
   const state = findState(country, slug);
   if (!state) notFound();
+  const directory = await getDirectory();
+  const now = new Date();
+  const matches = directory.matches.filter((match) => placeState(match)?.slug === state.slug);
+  const profiles = directory.academies.filter(
+    (profile) => placeState(profile)?.slug === state.slug,
+  );
+  const summary = upcomingSummary(matches, now);
+  const towns = state.cities
+    .slice(0, 3)
+    .map((city) => city.name)
+    .join(", ");
   return pageMetadata(
     `Cricket in ${state.name}: matches, clubs and academies`,
-    `Upcoming matches, local clubs, academies and grounds in ${state.name}, city by city.`,
+    summary
+      ? `${summary} in ${state.name}, with local clubs, academies and grounds, city by city.`
+      : `Cricket clubs, academies, grounds and matches in ${state.name}, city by city, from ${towns}.`,
     `/country/india/state/${state.slug}`,
+    // An empty state page is thin, so it stays out of search until something is listed there.
+    profiles.length > 0 || matches.some((match) => inDefaultWindow(match, now)),
   );
 }
 
@@ -50,19 +66,13 @@ export default async function StatePage({ params }: { params: Params }) {
 
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <ol className="flex flex-wrap gap-2">
-          <li>
-            <Link href="/countries">Countries</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/country/india">India</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page">{state.name}</li>
-        </ol>
-      </nav>
+      <Breadcrumbs
+        crumbs={[
+          { name: "Countries", path: "/countries" },
+          { name: "India", path: "/country/india" },
+          { name: state.name, path: `/country/india/state/${state.slug}` },
+        ]}
+      />
       <h1 className="mt-3 font-display text-5xl font-extrabold tracking-tight">
         Cricket in {state.name}
       </h1>
@@ -102,7 +112,7 @@ export default async function StatePage({ params }: { params: Params }) {
         {matches.length ? (
           <MatchGrid matches={matches} now={now} />
         ) : (
-          <EmptyResults title={`No upcoming matches listed in ${state.name} yet`} />
+          <NothingListedYet title={`No upcoming matches listed in ${state.name} yet`} />
         )}
       </section>
 

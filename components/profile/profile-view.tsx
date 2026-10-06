@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MatchGrid } from "@/components/match/match-grid";
 import { PhotoGallery } from "@/components/profile/photo-gallery";
 import { ProfileCover, ProfileLogo } from "@/components/profile/profile-picture";
@@ -45,27 +46,16 @@ export function ProfileView({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(profileJsonLd(profile, path)) }}
       />
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <ol className="flex flex-wrap gap-2">
-          <li>
-            <Link href="/academies">Clubs and academies</Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          {profile.stateSlug ? (
-            <>
-              <li>
-                <Link href={`/country/india/state/${profile.stateSlug}`}>{profile.stateName}</Link>
-              </li>
-              <li aria-hidden="true">/</li>
-            </>
-          ) : null}
-          <li>
-            <Link href={`/country/${profile.countrySlug}/${profile.citySlug}`}>
-              {profile.cityName}
-            </Link>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumbs
+        crumbs={[
+          { name: "Clubs and academies", path: "/academies" },
+          ...(profile.stateSlug && profile.stateName
+            ? [{ name: profile.stateName, path: `/country/india/state/${profile.stateSlug}` }]
+            : []),
+          { name: profile.cityName, path: `/country/${profile.countrySlug}/${profile.citySlug}` },
+          { name: profile.name, path },
+        ]}
+      />
       {profile.cover ? (
         <ProfileCover
           cover={profile.cover}

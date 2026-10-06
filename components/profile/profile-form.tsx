@@ -253,7 +253,16 @@ export function ProfileForm({
           />
           <span>
             I run this {country === "india" ? "club or academy" : "organisation"}, or I am allowed
-            to list it. A moderator checks it once before it goes public.
+            to list it, and I agree to the{" "}
+            <a
+              href="/legal/terms#listings"
+              target="_blank"
+              rel="noopener"
+              className="text-link underline underline-offset-4"
+            >
+              rules for listings
+            </a>
+            . A moderator checks it once before it goes public.
           </span>
         </label>
       )}

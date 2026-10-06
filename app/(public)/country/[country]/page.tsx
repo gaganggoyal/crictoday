@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, POPULAR_CITIES, placeState } from "@/lib/data/india";
@@ -8,16 +9,24 @@ import { countries } from "@/lib/data/seed";
 import { inDefaultWindow } from "@/lib/domain/filters";
 import { formatDateHeading, formatDateKey } from "@/lib/domain/time";
 import type { StoredAcademy, StoredMatch } from "@/lib/domain/types";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ country: string }> }) {
   const { country: slug } = await params;
   const country = countries.find((item) => item.slug === slug);
   if (!country) notFound();
+  const directory = await getDirectory();
+  const matches = directory.matches.filter((match) => match.countrySlug === slug);
+  const listed = matches.length > 0 || directory.academies.some((a) => a.countrySlug === slug);
+  const summary = upcomingSummary(matches, new Date());
   return pageMetadata(
-    `Cricket matches in ${country.name}`,
-    country.blurb,
+    `Cricket matches in ${country.name}: fixtures and tickets`,
+    summary
+      ? `${summary}. Start times, grounds and official ticket links for cricket in ${country.name}.`
+      : country.blurb,
     `/country/${country.slug}`,
+    // A country with nothing listed is a thin page, so it stays out of search until it has some.
+    listed,
   );
 }
 
@@ -38,14 +47,24 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
   }
   const academies = directory.academies.filter((academy) => academy.countrySlug === slug);
   const upcoming = matches.filter((match) => inDefaultWindow(match, now));
+  const summary = upcomingSummary(matches, now);
 
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
-      <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">{country.iso2}</p>
+      <Breadcrumbs
+        crumbs={[
+          { name: "Countries", path: "/countries" },
+          { name: country.name, path: `/country/${country.slug}` },
+        ]}
+      />
+      <p className="mt-4 text-xs font-semibold tracking-[0.16em] text-link uppercase">
+        {country.iso2}
+      </p>
       <h1 className="font-display text-5xl font-extrabold tracking-tight">
         Cricket in {country.name}
       </h1>
       <p className="mt-3 max-w-2xl text-muted">{country.blurb}</p>
+      {summary ? <p className="mt-3 max-w-2xl font-medium">{summary}.</p> : null}
       <p className="mt-3 max-w-2xl text-sm">{country.ticketGuidance}</p>
       {slug === "india" ? (
         <IndiaPlaces matches={upcoming} academies={academies} />
@@ -64,7 +83,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
       )}
       <div className="mt-10 grid gap-10">
         {matches.length === 0 ? (
-          <EmptyResults title={`No listed matches in ${country.name}`} />
+          <NothingListedYet title={`No listed matches in ${country.name} yet`} />
         ) : null}
         {[...groups.entries()].map(([day, dayMatches]) => (
           <section key={day}>

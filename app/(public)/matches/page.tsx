@@ -2,17 +2,21 @@ import Link from "next/link";
 import { filterHref, MatchFiltersForm } from "@/components/match/filters";
 import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
 import { getDirectory } from "@/lib/data/catalog";
-import { filterMatches, parseFilters } from "@/lib/domain/filters";
+import {
+  filterMatches,
+  isFiltered,
+  parseFilters,
+  type MatchFilters,
+  type MatchWhen,
+} from "@/lib/domain/filters";
 import { pageMetadata } from "@/lib/seo";
 import { firstParam } from "@/lib/utils";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+async function readFilters(searchParams: SearchParams) {
   const raw = await searchParams;
-  const filters = parseFilters({
+  return parseFilters({
     q: firstParam(raw.q),
     country: firstParam(raw.country),
     city: firstParam(raw.city),
@@ -21,40 +25,40 @@ export async function generateMetadata({
     kind: firstParam(raw.kind),
     format: firstParam(raw.format),
     tickets: firstParam(raw.tickets),
+    when: firstParam(raw.when),
     sort: firstParam(raw.sort),
     page: firstParam(raw.page),
   });
-  const directory = await getDirectory();
-  const result = filterMatches(directory.matches, filters, new Date());
-  const title = filters.country
-    ? `Cricket matches in ${filters.country}`
-    : "Upcoming cricket matches";
+}
+
+const WHEN_HEADING: Record<MatchWhen, string> = {
+  today: "Cricket matches today",
+  tomorrow: "Cricket matches tomorrow",
+  weekend: "Cricket matches this weekend",
+};
+
+const SHORTCUTS: [MatchWhen | undefined, string][] = [
+  [undefined, "All upcoming"],
+  ["today", "Today"],
+  ["tomorrow", "Tomorrow"],
+  ["weekend", "This weekend"],
+];
+
+export async function generateMetadata({ searchParams }: { searchParams: SearchParams }) {
+  const filters = await readFilters(searchParams);
+  const heading = filters.when ? WHEN_HEADING[filters.when] : "Upcoming cricket matches";
   return pageMetadata(
-    title,
-    "Search upcoming cricket by country, city, format and ticket state.",
+    filters.page > 1 ? `${heading}, page ${filters.page}` : heading,
+    "Every upcoming cricket match we list, from internationals and top leagues to local clubs: grounds, local start times and official ticket links.",
     `/matches${filterHref(filters).replace("/matches", "")}`,
-    result.total > 0,
+    // Filtered and searched views repeat the directory and the place pages, so only the plain
+    // list and its pages are indexed.
+    !isFiltered(filters),
   );
 }
 
-export default async function MatchesPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const raw = await searchParams;
-  const filters = parseFilters({
-    q: firstParam(raw.q),
-    country: firstParam(raw.country),
-    city: firstParam(raw.city),
-    from: firstParam(raw.from),
-    to: firstParam(raw.to),
-    kind: firstParam(raw.kind),
-    format: firstParam(raw.format),
-    tickets: firstParam(raw.tickets),
-    sort: firstParam(raw.sort),
-    page: firstParam(raw.page),
-  });
+export default async function MatchesPage({ searchParams }: { searchParams: SearchParams }) {
+  const filters = await readFilters(searchParams);
   const directory = await getDirectory();
   const now = new Date();
   const result = filterMatches(directory.matches, filters, now);
@@ -66,7 +70,7 @@ export default async function MatchesPage({
       <header className="lg:col-start-2 lg:row-start-1">
         <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">Directory</p>
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Upcoming matches
+          {filters.when ? WHEN_HEADING[filters.when] : "Upcoming matches"}
         </h1>
         <p className="mt-2 text-muted">
           {result.total} {result.total === 1 ? "match" : "matches"} · page {result.page} of{" "}
@@ -77,6 +81,7 @@ export default async function MatchesPage({
         <MatchFiltersForm filters={filters} countries={directory.countries} cities={cities} />
       </div>
       <section aria-label="Results" className="lg:col-start-2 lg:row-start-2">
+        <WhenShortcuts filters={filters} />
         <div>
           {result.total ? <MatchGrid matches={result.items} now={now} /> : <EmptyResults />}
         </div>
@@ -100,6 +105,31 @@ export default async function MatchesPage({
         </nav>
       </section>
     </div>
+  );
+}
+
+/** Today, tomorrow and this weekend, keeping the other filters. */
+function WhenShortcuts({ filters }: { filters: MatchFilters }) {
+  return (
+    <nav aria-label="When" className="mb-5 flex flex-wrap gap-2">
+      {SHORTCUTS.map(([when, label]) => {
+        const active = filters.when === when;
+        return (
+          <Link
+            key={label}
+            href={filterHref(filters, { when, page: 1 })}
+            aria-current={active ? "page" : undefined}
+            className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-medium ${
+              active
+                ? "border-[#176B43] bg-[#176B43] text-white"
+                : "border-line bg-surface hover:border-[#176B43]"
+            }`}
+          >
+            {label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 

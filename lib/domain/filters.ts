@@ -1,4 +1,5 @@
 import { resolveAttendance, ticketSortRank } from "@/lib/domain/ticket-state";
+import { formatDateKey } from "@/lib/domain/time";
 import type {
   AttendanceState,
   CompetitionKind,
@@ -10,6 +11,9 @@ export const PAGE_SIZE = 12;
 
 export type MatchSort = "featured" | "soonest" | "verified" | "tickets";
 
+/** Shortcuts for the days people plan around, judged by the date at each ground. */
+export type MatchWhen = "today" | "tomorrow" | "weekend";
+
 export type MatchFilters = {
   q?: string;
   country?: string;
@@ -19,6 +23,7 @@ export type MatchFilters = {
   kind?: CompetitionKind;
   format?: MatchFormat;
   tickets?: string;
+  when?: MatchWhen;
   sort: MatchSort;
   page: number;
 };
@@ -26,6 +31,7 @@ export type MatchFilters = {
 const KINDS = new Set<CompetitionKind>(["international", "league", "domestic", "academy", "local"]);
 const FORMATS = new Set<MatchFormat>(["test", "odi", "t20", "t10", "hundred", "other"]);
 const SORTS = new Set<MatchSort>(["featured", "soonest", "verified", "tickets"]);
+const WHENS = new Set<MatchWhen>(["today", "tomorrow", "weekend"]);
 
 export const TICKET_QUERY: Record<string, AttendanceState> = {
   official: "OFFICIAL_LINK",
@@ -51,6 +57,8 @@ export function parseFilters(input: Record<string, string | undefined>): MatchFi
     input.sort && SORTS.has(input.sort as MatchSort) ? (input.sort as MatchSort) : "featured";
   const page = Math.max(1, Number.parseInt(input.page || "1", 10) || 1);
   const tickets = input.tickets && TICKET_QUERY[input.tickets] ? input.tickets : undefined;
+  const when =
+    input.when && WHENS.has(input.when as MatchWhen) ? (input.when as MatchWhen) : undefined;
   return {
     q: input.q?.trim() || undefined,
     country: input.country?.trim() || undefined,
@@ -60,9 +68,26 @@ export function parseFilters(input: Record<string, string | undefined>): MatchFi
     kind,
     format,
     tickets,
+    when,
     sort,
     page,
   };
+}
+
+/** True when anything narrows the list, so the view is not the plain directory. */
+export function isFiltered(filters: MatchFilters) {
+  return Boolean(
+    filters.q ||
+    filters.country ||
+    filters.city ||
+    filters.from ||
+    filters.to ||
+    filters.kind ||
+    filters.format ||
+    filters.tickets ||
+    filters.when ||
+    filters.sort !== "featured",
+  );
 }
 
 export function filtersToQuery(filters: MatchFilters, overrides: Partial<MatchFilters> = {}) {
@@ -76,6 +101,7 @@ export function filtersToQuery(filters: MatchFilters, overrides: Partial<MatchFi
   if (next.kind) params.set("kind", next.kind);
   if (next.format) params.set("format", next.format);
   if (next.tickets) params.set("tickets", next.tickets);
+  if (next.when) params.set("when", next.when);
   if (next.sort !== "featured") params.set("sort", next.sort);
   if (next.page > 1) params.set("page", String(next.page));
   const query = params.toString();
@@ -101,13 +127,42 @@ export function inDefaultWindow(match: StoredMatch, now: Date) {
   return new Date(match.startsAt).getTime() >= now.getTime() - 6 * 60 * 60 * 1000;
 }
 
+function shiftDay(key: string, days: number) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(Date.UTC(year!, month! - 1, day! + days)).toISOString().slice(0, 10);
+}
+
+/** The dates, at the ground, that `when` covers. A weekend seen on a Sunday is that Sunday. */
+function wantedDays(when: MatchWhen, now: Date, timeZone: string) {
+  const today = formatDateKey(now.toISOString(), timeZone);
+  if (when === "today") return [today];
+  if (when === "tomorrow") return [shiftDay(today, 1)];
+  const weekday = new Date(`${today}T00:00:00Z`).getUTCDay();
+  if (weekday === 0) return [today];
+  const saturday = shiftDay(today, 6 - weekday);
+  return [saturday, shiftDay(saturday, 1)];
+}
+
+/** Whether a match is on during any of the days `when` covers. A Test runs for five days. */
+export function playsOn(match: StoredMatch, when: MatchWhen, now: Date) {
+  const first = formatDateKey(match.startsAt, match.timezone);
+  const last = match.endsAt
+    ? formatDateKey(match.endsAt, match.timezone)
+    : match.format === "test"
+      ? shiftDay(first, 4)
+      : first;
+  return wantedDays(when, now, match.timezone).some((day) => day >= first && day <= last);
+}
+
 export function filterMatches(matches: StoredMatch[], filters: MatchFilters, now: Date) {
   const query = filters.q?.toLowerCase();
   const wanted = filters.tickets ? TICKET_QUERY[filters.tickets] : undefined;
   const filtered = matches.filter((match) => {
     if (match.status === "draft" || match.status === "pending") return false;
     if (!match.sourceUrl) return false;
-    if (!filters.from && !filters.to && !inDefaultWindow(match, now)) return false;
+    if (filters.when) {
+      if (match.status === "postponed" || !playsOn(match, filters.when, now)) return false;
+    } else if (!filters.from && !filters.to && !inDefaultWindow(match, now)) return false;
     if (filters.country && match.countrySlug !== filters.country) return false;
     if (filters.city && match.citySlug !== filters.city) return false;
     if (filters.kind && match.kind !== filters.kind) return false;
@@ -129,7 +184,9 @@ export function filterMatches(matches: StoredMatch[], filters: MatchFilters, now
     return true;
   });
 
-  const sorted = [...filtered].sort((a, b) => compareMatches(a, b, filters.sort));
+  // A day's matches read best in the order they start.
+  const sort = filters.when && filters.sort === "featured" ? "soonest" : filters.sort;
+  const sorted = [...filtered].sort((a, b) => compareMatches(a, b, sort));
   const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const page = Math.min(filters.page, pageCount);
   const start = (page - 1) * PAGE_SIZE;

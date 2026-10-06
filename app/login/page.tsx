@@ -53,6 +53,17 @@ export default async function LoginPage({
       <div className="mt-6">
         <LoginForm next={next} />
       </div>
+      <p className="mt-4 text-sm text-muted">
+        By signing in, you agree to our{" "}
+        <Link href="/legal/terms" className="text-link underline underline-offset-4">
+          Terms of use
+        </Link>{" "}
+        and{" "}
+        <Link href="/legal/privacy" className="text-link underline underline-offset-4">
+          Privacy policy
+        </Link>
+        .
+      </p>
       {demoRolesAllowed() ? (
         <aside className="mt-6 rounded-2xl border border-line bg-surface p-4 text-sm text-muted">
           <p className="font-medium text-foreground">Demo roles</p>
