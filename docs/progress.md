@@ -43,11 +43,11 @@ Updated 6 October 2026, after adding profile pictures, spreadsheet schedules and
 - Profiles are created and edited only with the MySQL database. The demo store and the Supabase path show their academies read-only.
 - No live provider tokens are configured.
 - The Supabase path is kept but untested against a hosted project; RLS and its functions are verified with PGlite.
-- Backups stay on the server's own disk. Nothing copies them elsewhere yet, so they do not cover losing the server.
+- Off-server backups are by hand: `deploy/vps/fetch-backup.sh --now` makes a folder to upload to Google Drive. The first copy was made on 6 October 2026. Nothing does it automatically.
 
 ## Next
 
 1. Recheck `data/fixtures` at least weekly: listings older than seven days are marked unverified. Add the waiting matches, ticket links as sales open, and sold-out states, then deploy.
-2. Invite the first academies, clubs and committees to `/get-listed`, and check new profiles at `/admin/profiles`.
-3. Copy `/var/backups/cricketmatch` off the server, for example to object storage, once there is an account to hold it.
+2. Invite the first academies, clubs, committees and grounds with [outreach/invite-emails.md](outreach/invite-emails.md), and approve new profiles at `/admin/profiles` the same day.
+3. Weekly, run `deploy/vps/fetch-backup.sh --now` and upload the folder to the private Google Drive folder.
 4. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
