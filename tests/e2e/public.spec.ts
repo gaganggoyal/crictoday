@@ -12,7 +12,7 @@ test("home states the product", async ({ page }) => {
 
 test("filters stay in the address bar", async ({ page }) => {
   await page.goto("/matches");
-  await page.getByLabel("Search").fill("Ahmedabad");
+  await page.getByLabel("Search", { exact: true }).fill("Ahmedabad");
   await page.getByRole("button", { name: "Apply filters" }).click();
   await expect(page).toHaveURL(/q=Ahmedabad/);
   await expect(page.getByRole("link", { name: /India versus Australia/ }).first()).toBeVisible();

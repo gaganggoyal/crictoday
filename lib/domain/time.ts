@@ -72,3 +72,24 @@ export function toIcsUtc(iso: string) {
     .replace(/[-:]/g, "")
     .replace(/\.\d{3}Z$/, "Z");
 }
+
+/** The local date (YYYY-MM-DD) and time (HH:MM) of an instant in a time zone, for form fields. */
+export function localParts(iso: string, timeZone: string) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(new Date(iso))
+      .map((part) => [part.type, part.value]),
+  );
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    time: `${parts.hour}:${parts.minute}`,
+  };
+}

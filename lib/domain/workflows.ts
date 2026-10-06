@@ -1,3 +1,4 @@
+import { stateOfCity } from "@/lib/data/india";
 import { findDuplicateCandidates } from "@/lib/domain/duplicates";
 import { slugify, uniqueSlug } from "@/lib/domain/slug";
 import { zonedTimeToUtc } from "@/lib/domain/time";
@@ -53,9 +54,21 @@ export function emptyStore(): StoreShape {
   };
 }
 
+/** The Indian state of a typed country and town, when the town is in the list. */
+export function indiaPlace(country: string, city: string) {
+  const home = slugify(country) === "india" ? stateOfCity(slugify(city)) : null;
+  return { stateName: home?.name ?? null, stateSlug: home?.slug ?? null };
+}
+
 export function mergeMatches(store: StoreShape): StoredMatch[] {
   const map = new Map(matches.map((match) => [match.slug, structuredClone(match)]));
-  for (const match of store.extraMatches) map.set(match.slug, structuredClone(match));
+  // Matches saved before states existed get theirs from the town list.
+  for (const match of store.extraMatches) {
+    map.set(match.slug, {
+      ...indiaPlace(match.countryName, match.cityName),
+      ...structuredClone(match),
+    });
+  }
   for (const [slug, patch] of Object.entries(store.overrides)) {
     const base = map.get(slug);
     if (!base) continue;
@@ -66,7 +79,20 @@ export function mergeMatches(store: StoreShape): StoredMatch[] {
 
 export function mergeAcademies(store: StoreShape): StoredAcademy[] {
   const map = new Map(academies.map((academy) => [academy.slug, structuredClone(academy)]));
-  for (const academy of store.extraAcademies) map.set(academy.slug, structuredClone(academy));
+  // Academies saved before profiles had kinds and offerings get the defaults.
+  for (const academy of store.extraAcademies) {
+    const saved: Partial<StoredAcademy> = structuredClone(academy);
+    const defaults = {
+      kind: "academy" as const,
+      ...indiaPlace(academy.countryName, academy.cityName),
+      timezone: null,
+      whatsapp: null,
+      links: {},
+      offerings: [],
+      reviewNotes: null,
+    };
+    map.set(academy.slug, { ...defaults, ...saved } as StoredAcademy);
+  }
   for (const [slug, patch] of Object.entries(store.academyOverrides)) {
     const base = map.get(slug);
     if (!base) continue;
@@ -531,6 +557,7 @@ export function reviewSubmission(
       venueAddress: `${payload.venue}, ${payload.city}`,
       cityName: payload.city,
       citySlug: slugify(payload.city),
+      ...indiaPlace(payload.country, payload.city),
       countryName: payload.country,
       countrySlug,
       startsAt: payload.startsAtUtc || new Date(payload.startsAt).toISOString(),
@@ -588,20 +615,27 @@ export function reviewSubmission(
     const academy: StoredAcademy = {
       id: crypto.randomUUID(),
       slug,
+      kind: "academy",
       name: payload.name,
       description: payload.description,
       address: payload.address,
       cityName: payload.city,
       citySlug: slugify(payload.city),
+      ...indiaPlace(payload.country, payload.city),
       countryName: payload.country,
       countrySlug: slugify(payload.country),
+      timezone: null,
       website: payload.website || null,
       phone: payload.phone || null,
+      whatsapp: null,
       contactEmail: payload.contactEmail,
+      links: {},
       ageGroups: payload.ageGroups,
       facilities: payload.facilities,
+      offerings: [],
       verificationStatus: "verified",
       verificationLabel: "Contact verified",
+      reviewNotes: null,
       lastVerifiedAt: now.toISOString(),
       ownerEmail: payload.contactEmail.toLowerCase(),
       demo: true,
@@ -863,6 +897,7 @@ export function materializeProviderMatch(
     venueAddress: `${match.venue}, ${match.city}`,
     cityName: match.city,
     citySlug: slugify(match.city),
+    ...indiaPlace(match.country, match.city),
     countryName: match.country,
     countrySlug: slugify(match.country),
     startsAt: match.startsAt,

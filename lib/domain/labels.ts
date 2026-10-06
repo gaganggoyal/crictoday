@@ -14,6 +14,7 @@ export const KIND_LABEL: Record<CompetitionKind, string> = {
   league: "League",
   domestic: "Domestic",
   academy: "Academy",
+  local: "Local",
 };
 
 export const STATUS_LABEL: Record<MatchStatus, string> = {

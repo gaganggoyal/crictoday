@@ -9,7 +9,7 @@ const items = [
   { href: "/matches", label: "Matches", icon: CalendarDays },
   { href: "/countries", label: "Countries", icon: Flag },
   { href: "/leagues", label: "Leagues", icon: Trophy },
-  { href: "/academies", label: "Academies", icon: Building2 },
+  { href: "/academies", label: "Clubs", icon: Building2 },
 ];
 
 export function MobileNav() {

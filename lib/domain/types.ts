@@ -4,7 +4,7 @@ export type MatchFormat = "test" | "odi" | "t20" | "t10" | "hundred" | "other";
 export type MatchStatus =
   "draft" | "pending" | "published" | "postponed" | "cancelled" | "completed";
 export type AttendanceType = "ticketed" | "free" | "private" | "unknown";
-export type CompetitionKind = "international" | "league" | "domestic" | "academy";
+export type CompetitionKind = "international" | "league" | "domestic" | "academy" | "local";
 export type SourceType = "api" | "organiser" | "academy" | "admin";
 export type TicketKind = "official" | "authorised_partner" | "affiliate";
 export type TicketOfferStatus = "pending" | "active" | "sold_out" | "expired" | "rejected";
@@ -51,6 +51,9 @@ export type StoredMatch = {
   venueAddress: string;
   cityName: string;
   citySlug: string;
+  /** The Indian state or union territory; null elsewhere. */
+  stateName: string | null;
+  stateSlug: string | null;
   countryName: string;
   countrySlug: string;
   startsAt: string;
@@ -72,23 +75,53 @@ export type StoredMatch = {
   offers: StoredOffer[];
 };
 
+/** Who runs a profile. Academies live at /academy, the others at /club. */
+export type ProfileKind = "academy" | "club" | "committee" | "ground";
+
+export type OfferingCategory =
+  "coaching" | "camp" | "trials" | "nets" | "ground" | "tournament" | "membership" | "other";
+
+/** Something a club or academy offers: coaching, a camp, ground hire, a tournament entry. */
+export type Offering = {
+  id: string;
+  category: OfferingCategory;
+  title: string;
+  price: string | null;
+  schedule: string | null;
+  details: string | null;
+  url: string | null;
+};
+
+export type ProfileLinks = { instagram?: string; facebook?: string; youtube?: string };
+
+/** A public profile for an academy, club, committee or ground. */
 export type StoredAcademy = {
   id: string;
   slug: string;
+  kind: ProfileKind;
   name: string;
   description: string;
   address: string;
   cityName: string;
   citySlug: string;
+  stateName: string | null;
+  stateSlug: string | null;
   countryName: string;
   countrySlug: string;
+  /** Matches the profile posts start in this zone unless the form says otherwise. */
+  timezone: string | null;
   website: string | null;
   phone: string | null;
+  whatsapp: string | null;
   contactEmail: string | null;
+  links: ProfileLinks;
   ageGroups: string[];
   facilities: string[];
+  offerings: Offering[];
   verificationStatus: "unverified" | "pending" | "verified" | "rejected";
   verificationLabel: string | null;
+  /** Why a moderator sent the profile back; shown to its owner. */
+  reviewNotes: string | null;
   lastVerifiedAt: string | null;
   ownerEmail: string | null;
   demo: boolean;

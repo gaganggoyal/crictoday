@@ -1,53 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Search } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { CategoryBar, MenuDrawer, type MenuData } from "@/components/layout/site-menu";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-const links = [
-  { href: "/matches", label: "Matches" },
-  { href: "/countries", label: "Countries" },
-  { href: "/leagues", label: "Top Leagues" },
-  { href: "/academies", label: "Academies" },
-];
-
-export function Header({ email, staff }: { email: string | null; staff: boolean }) {
-  const pathname = usePathname();
+export function Header({
+  email,
+  staff,
+  menu,
+}: {
+  email: string | null;
+  staff: boolean;
+  menu: MenuData;
+}) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center gap-3 px-5">
-        <Link href="/" aria-label="cricketmatch.today home" className="mr-auto md:mr-0">
+      <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center gap-2 px-3 sm:px-5">
+        <MenuDrawer menu={menu} email={email} />
+        <Link href="/" aria-label="cricketmatch.today home" className="mr-auto md:mr-4">
           <Logo compact className="md:hidden" />
           <Logo className="hidden md:inline-flex" />
         </Link>
-        <nav aria-label="Primary" className="mx-auto hidden items-center gap-1 md:flex">
-          {links.map((link) => {
-            const active =
-              pathname === link.href ||
-              pathname.startsWith(`${link.href}/`) ||
-              (link.href === "/matches" && pathname.startsWith("/match/"));
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium",
-                  active ? "bg-surface text-foreground" : "text-muted hover:text-foreground",
-                )}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="ml-auto flex items-center gap-2 md:ml-0">
+        <form
+          action="/matches"
+          method="get"
+          role="search"
+          className="mr-auto hidden max-w-md flex-1 lg:flex"
+        >
+          <label className="flex min-h-11 w-full items-center gap-2 rounded-full border border-line bg-surface px-4">
+            <Search aria-hidden="true" size={17} className="shrink-0 text-muted" />
+            <span className="sr-only">Search matches</span>
+            <input
+              name="q"
+              type="search"
+              placeholder="Search teams, cities and grounds"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
+            />
+          </label>
+        </form>
+        <div className="flex items-center gap-2">
           <Link
             href="/matches?tickets=alert"
-            className="hidden min-h-11 items-center px-2 text-sm font-medium lg:inline-flex"
+            className="hidden min-h-11 items-center px-2 text-sm font-medium xl:inline-flex"
           >
             Request tickets
           </Link>
@@ -65,11 +62,13 @@ export function Header({ email, staff }: { email: string | null; staff: boolean 
               Sign in
             </Button>
           )}
-          <Button href="/submit/match" className="px-4">
-            List a match
+          <Button href="/get-listed" className="px-4">
+            <span className="sm:hidden">List club</span>
+            <span className="hidden sm:inline">List your club</span>
           </Button>
         </div>
       </div>
+      <CategoryBar menu={menu} />
     </header>
   );
 }

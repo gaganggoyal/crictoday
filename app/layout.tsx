@@ -8,6 +8,7 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { AppThemeProvider } from "@/components/theme/provider";
 import { getSession, isStaff } from "@/lib/auth/session";
 import { showDemoBanner } from "@/lib/data/catalog";
+import { countries, leagues } from "@/lib/data/seed";
 import { siteUrl } from "@/lib/utils";
 import "./globals.css";
 
@@ -46,6 +47,16 @@ export const metadata: Metadata = {
   },
 };
 
+// India first, then the other countries by name.
+const menu = {
+  countries: [...countries]
+    .sort((a, b) =>
+      a.slug === "india" ? -1 : b.slug === "india" ? 1 : a.name.localeCompare(b.name),
+    )
+    .map(({ slug, name }) => ({ slug, name })),
+  leagues: leagues.map(({ slug, name, seasonName }) => ({ slug, name, seasonName })),
+};
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const session = await getSession();
   const demo = await showDemoBanner();
@@ -70,7 +81,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               Demo inventory. Fixtures, prices and ticket links are illustrative and labelled DEMO.
             </p>
           ) : null}
-          <Header email={session?.email ?? null} staff={session ? isStaff(session.role) : false} />
+          <Header
+            email={session?.email ?? null}
+            staff={session ? isStaff(session.role) : false}
+            menu={menu}
+          />
           <main id="main" className="min-w-0 flex-1 pb-20 md:pb-0">
             {children}
           </main>

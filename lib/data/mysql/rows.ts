@@ -28,6 +28,8 @@ export type MatchRow = RowDataPacket & {
   venue_address: string;
   city_name: string;
   city_slug: string;
+  state_name: string | null;
+  state_slug: string | null;
   country_name: string;
   country_slug: string;
   starts_at: Date;
@@ -65,21 +67,30 @@ export type OfferRow = RowDataPacket & {
 export type AcademyRow = RowDataPacket & {
   id: string;
   slug: string;
+  kind: StoredAcademy["kind"];
   name: string;
   description: string;
   address: string;
   city_name: string;
   city_slug: string;
+  state_name: string | null;
+  state_slug: string | null;
   country_name: string;
   country_slug: string;
+  timezone: string | null;
   website: string | null;
   phone: string | null;
+  whatsapp: string | null;
   contact_email: string | null;
+  links: StoredAcademy["links"] | null;
   age_groups: string[] | null;
   facilities: string[] | null;
+  offerings: StoredAcademy["offerings"] | null;
   verification_status: StoredAcademy["verificationStatus"];
   verification_label: string | null;
+  review_notes: string | null;
   last_verified_at: Date | null;
+  owner_id: string | null;
   owner_email: string | null;
   demo: number;
 };
@@ -144,6 +155,8 @@ export function toMatch(row: MatchRow, offers: StoredOffer[]): StoredMatch {
     venueAddress: row.venue_address,
     cityName: row.city_name,
     citySlug: row.city_slug,
+    stateName: row.state_name,
+    stateSlug: row.state_slug,
     countryName: row.country_name,
     countrySlug: row.country_slug,
     startsAt: row.starts_at.toISOString(),
@@ -170,20 +183,28 @@ export function toAcademy(row: AcademyRow): StoredAcademy {
   return {
     id: row.id,
     slug: row.slug,
+    kind: row.kind,
     name: row.name,
     description: row.description,
     address: row.address,
     cityName: row.city_name,
     citySlug: row.city_slug,
+    stateName: row.state_name,
+    stateSlug: row.state_slug,
     countryName: row.country_name,
     countrySlug: row.country_slug,
+    timezone: row.timezone,
     website: row.website,
     phone: row.phone,
+    whatsapp: row.whatsapp,
     contactEmail: row.contact_email,
+    links: row.links ?? {},
     ageGroups: row.age_groups ?? [],
     facilities: row.facilities ?? [],
+    offerings: row.offerings ?? [],
     verificationStatus: row.verification_status,
     verificationLabel: row.verification_label,
+    reviewNotes: row.review_notes,
     lastVerifiedAt: iso(row.last_verified_at),
     ownerEmail: row.owner_email,
     demo: Boolean(row.demo),
@@ -245,11 +266,11 @@ export async function insertMatch(
     `INSERT INTO matches (
       id, slug, competition_name, competition_slug, kind, season_name, season_slug,
       home_name, home_short, home_slug, away_name, away_short, away_slug,
-      venue_name, venue_slug, venue_address, city_name, city_slug, country_name, country_slug,
-      starts_at, ends_at, timezone, format, status, attendance_type, source_type,
-      source_external_id, source_url, source_label, featured_rank, last_verified_at,
+      venue_name, venue_slug, venue_address, city_name, city_slug, state_name, state_slug,
+      country_name, country_slug, starts_at, ends_at, timezone, format, status, attendance_type,
+      source_type, source_external_id, source_url, source_label, featured_rank, last_verified_at,
       published_at, entry_notes, demo, academy_slug, submitted_by, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       match.id,
       match.slug,
@@ -269,6 +290,8 @@ export async function insertMatch(
       match.venueAddress,
       match.cityName,
       match.citySlug,
+      match.stateName,
+      match.stateSlug,
       match.countryName,
       match.countrySlug,
       new Date(match.startsAt),
@@ -347,27 +370,36 @@ export async function insertAcademy(
 ) {
   await connection.query(
     `INSERT INTO academies (
-      id, slug, name, description, address, city_name, city_slug, country_name, country_slug,
-      website, phone, contact_email, age_groups, facilities, verification_status,
-      verification_label, last_verified_at, owner_id, owner_email, demo, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, slug, kind, name, description, address, city_name, city_slug, state_name, state_slug,
+      country_name, country_slug, timezone, website, phone, whatsapp, contact_email, links,
+      age_groups, facilities, offerings, verification_status, verification_label, review_notes,
+      last_verified_at, owner_id, owner_email, demo, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       academy.id,
       academy.slug,
+      academy.kind,
       academy.name,
       academy.description,
       academy.address,
       academy.cityName,
       academy.citySlug,
+      academy.stateName,
+      academy.stateSlug,
       academy.countryName,
       academy.countrySlug,
+      academy.timezone,
       academy.website,
       academy.phone,
+      academy.whatsapp,
       academy.contactEmail,
+      JSON.stringify(academy.links),
       JSON.stringify(academy.ageGroups),
       JSON.stringify(academy.facilities),
+      JSON.stringify(academy.offerings),
       academy.verificationStatus,
       academy.verificationLabel,
+      academy.reviewNotes,
       date(academy.lastVerifiedAt),
       ownerId,
       academy.ownerEmail,

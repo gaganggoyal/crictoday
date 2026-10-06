@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { StoredMatch } from "@/lib/domain/types";
+import type { StoredAcademy, StoredMatch } from "@/lib/domain/types";
 import { siteUrl } from "@/lib/utils";
 
 export function pageMetadata(
@@ -53,4 +53,32 @@ export function sportsEventJsonLd(match: StoredMatch) {
 
 export function jsonLdScript(data: unknown) {
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+/** schema.org data for a club or academy profile. */
+export function profileJsonLd(profile: StoredAcademy, path: string) {
+  const sameAs = [
+    profile.website,
+    profile.links.instagram,
+    profile.links.facebook,
+    profile.links.youtube,
+  ].filter(Boolean);
+  return {
+    "@context": "https://schema.org",
+    "@type": profile.kind === "ground" ? "SportsActivityLocation" : "SportsOrganization",
+    name: profile.name,
+    description: profile.description,
+    sport: "Cricket",
+    url: `${siteUrl()}${path}`,
+    ...(profile.contactEmail ? { email: profile.contactEmail } : {}),
+    ...(profile.phone ? { telephone: profile.phone } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: profile.address,
+      addressLocality: profile.cityName,
+      ...(profile.stateName ? { addressRegion: profile.stateName } : {}),
+      addressCountry: profile.countryName,
+    },
+  };
 }

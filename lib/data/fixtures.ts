@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { stateOfCity } from "@/lib/data/india";
 import { slugify } from "@/lib/domain/slug";
 import { zonedTimeToUtc } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
@@ -126,6 +127,10 @@ export function buildFixtureMatches(input: unknown): FixtureMatch[] {
       if (!home || !away || !venue || !countryName) continue;
 
       const citySlug = slugify(venue.city);
+      const place = venue.country === "india" ? stateOfCity(citySlug) : null;
+      if (venue.country === "india" && !place) {
+        problems.push(`${where}: ${venue.city} is not in the list of Indian towns.`);
+      }
       const label = series.kind === "international" ? fixture.label : undefined;
       const slugBase = slugify(
         [fixture.home, "vs", fixture.away, label, citySlug, fixture.start.slice(0, 10)]
@@ -172,6 +177,8 @@ export function buildFixtureMatches(input: unknown): FixtureMatch[] {
         venueAddress: `${venue.city}, ${countryName}`,
         cityName: venue.city,
         citySlug,
+        stateName: place?.name ?? null,
+        stateSlug: place?.slug ?? null,
         countryName,
         countrySlug: venue.country,
         startsAt: zonedTimeToUtc(fixture.start, venue.timezone),

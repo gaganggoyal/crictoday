@@ -117,6 +117,96 @@ export function ticketAlertMessage(match: EmailMatch, offer: EmailOffer): EmailB
   };
 }
 
+type EmailProfile = { name: string; kind: string; place: string };
+
+const PROFILE_REASON =
+  "You are getting this email because this address manages a profile on cricketmatch.today.";
+
+/** To moderators: a new or changed profile is waiting for its check. */
+export function profileReviewNotice(profile: EmailProfile, reviewUrl: string): EmailBody {
+  const subject = `New profile to check: ${profile.name}`;
+  return {
+    subject,
+    text: [
+      `${profile.name} (${profile.kind}, ${profile.place}) is waiting for a check.`,
+      `Review it: ${reviewUrl}`,
+    ].join("\n"),
+    html: renderEmail({
+      subject,
+      preheader: `${profile.kind} in ${profile.place}`,
+      eyebrow: "Moderation",
+      heading: "A profile is waiting for its check",
+      paragraphs: [
+        `${profile.name}, a ${profile.kind.toLowerCase()} in ${profile.place}, asked to be listed. Check that it is real and that the contact belongs to it.`,
+      ],
+      action: { label: "Review the profile", url: reviewUrl },
+      notes: [],
+      reason: "You are getting this email because you moderate cricketmatch.today.",
+    }),
+  };
+}
+
+/** To the owner: the profile passed its check and is public. */
+export function profileApprovedMessage(
+  profile: EmailProfile,
+  publicUrl: string,
+  dashboardUrl: string,
+): EmailBody {
+  const subject = `${profile.name} is live on cricketmatch.today`;
+  return {
+    subject,
+    text: [
+      `${profile.name} passed its check and is now public: ${publicUrl}`,
+      `Post matches and add what you offer from your account: ${dashboardUrl}`,
+      "Matches you post now go live straight away.",
+    ].join("\n"),
+    html: renderEmail({
+      subject,
+      preheader: "Your profile is public. Matches you post go live straight away.",
+      eyebrow: "Profile approved",
+      heading: `${profile.name} is live`,
+      paragraphs: [
+        "Your profile passed its check and is now public. Fans in your city find it on the city and state pages.",
+        "Matches you post from now on go live straight away. Add your coaching, camps, ground hire and other offers too.",
+      ],
+      action: { label: "See your profile", url: publicUrl },
+      secondary: { label: "Post a match", url: dashboardUrl },
+      notes: [],
+      reason: PROFILE_REASON,
+    }),
+  };
+}
+
+/** To the owner: the moderator sent the profile back with a reason. */
+export function profileRejectedMessage(
+  profile: EmailProfile,
+  reason: string,
+  dashboardUrl: string,
+): EmailBody {
+  const subject = `${profile.name} needs a change before it goes live`;
+  return {
+    subject,
+    text: [
+      `A moderator checked ${profile.name} and asked for a change: ${reason}`,
+      `Edit and resubmit it here: ${dashboardUrl}`,
+    ].join("\n"),
+    html: renderEmail({
+      subject,
+      preheader: reason,
+      eyebrow: "Profile check",
+      heading: "Your profile needs a change",
+      paragraphs: [
+        `A moderator checked ${profile.name} and asked for this change:`,
+        reason,
+        "Edit the profile and save it. It goes back for a check straight away.",
+      ],
+      action: { label: "Edit your profile", url: dashboardUrl },
+      notes: [],
+      reason: PROFILE_REASON,
+    }),
+  };
+}
+
 /** The site's layout around text that was written elsewhere, such as Supabase alert drafts. */
 export function plainMessageHtml(subject: string, text: string, reason: string) {
   const lines = text.split("\n").filter((line) => line.trim());

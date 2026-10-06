@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Pool, PoolConnection, RowDataPacket } from "mysql2/promise";
+import { stateOfCity } from "@/lib/data/india";
 import { normalizeName } from "@/lib/domain/duplicates";
 import { slugify, uniqueSlug } from "@/lib/domain/slug";
 import type { MatchFormat, Role, StoredAcademy, StoredMatch } from "@/lib/domain/types";
@@ -20,7 +21,7 @@ import {
 
 export type Failure = { ok: false; errors: Record<string, string> };
 
-const STAFF: Role[] = ["moderator", "admin"];
+export const STAFF: Role[] = ["moderator", "admin"];
 const FORMATS = new Set(["test", "odi", "t20", "t10", "hundred", "other"]);
 const ATTENDANCE = new Set(["ticketed", "free", "private", "unknown"]);
 
@@ -29,7 +30,7 @@ function failure(errors: Record<string, string>): Failure {
 }
 
 /** Run work in a transaction. A DomainError rolls it back and comes back as a failure. */
-async function attempt<T>(pool: Pool, work: (connection: PoolConnection) => Promise<T>) {
+export async function attempt<T>(pool: Pool, work: (connection: PoolConnection) => Promise<T>) {
   try {
     return await withTransaction(pool, work);
   } catch (error) {
@@ -38,7 +39,7 @@ async function attempt<T>(pool: Pool, work: (connection: PoolConnection) => Prom
   }
 }
 
-async function actorWithRole(
+export async function actorWithRole(
   connection: PoolConnection,
   actorId: string,
   roles: Role[],
@@ -59,7 +60,11 @@ async function userExists(connection: PoolConnection, id: string | null) {
   return rows[0] ? id : null;
 }
 
-async function freeSlug(connection: PoolConnection, table: "matches" | "academies", base: string) {
+export async function freeSlug(
+  connection: PoolConnection,
+  table: "matches" | "academies",
+  base: string,
+) {
   const root = slugify(base);
   const [rows] = await connection.query<RowDataPacket[]>(
     `SELECT slug FROM ${table} WHERE slug = ? OR slug LIKE ?`,
@@ -237,6 +242,7 @@ async function publishMatch(
   const city = textField(payload, "city");
   const country = textField(payload, "country");
   const organiser = textField(payload, "organiserType");
+  const place = slugify(country) === "india" ? stateOfCity(slugify(city)) : null;
   const slug = await freeSlug(
     connection,
     "matches",
@@ -261,6 +267,8 @@ async function publishMatch(
     venueAddress: `${venue}, ${city}`,
     cityName: city,
     citySlug: slugify(city),
+    stateName: place?.name ?? null,
+    stateSlug: place?.slug ?? null,
     countryName: country,
     countrySlug: slugify(country),
     startsAt: startsAt.toISOString(),
@@ -363,23 +371,32 @@ async function verifyAcademy(
 
   const city = textField(payload, "city");
   const country = textField(payload, "country");
+  const place = slugify(country) === "india" ? stateOfCity(slugify(city)) : null;
   const academy: StoredAcademy = {
     id: randomUUID(),
     slug,
+    kind: "academy",
     name,
     description: textField(payload, "description"),
     address: textField(payload, "address"),
     cityName: city,
     citySlug: slugify(city),
+    stateName: place?.name ?? null,
+    stateSlug: place?.slug ?? null,
     countryName: country,
     countrySlug: slugify(country),
+    timezone: null,
     website: website ? website.toString() : null,
     phone: textField(payload, "phone") || null,
+    whatsapp: null,
     contactEmail,
+    links: {},
     ageGroups: listField(payload, "ageGroups"),
     facilities: listField(payload, "facilities"),
+    offerings: [],
     verificationStatus: "verified",
     verificationLabel: "Contact verified",
+    reviewNotes: null,
     lastVerifiedAt: now.toISOString(),
     ownerEmail: contactEmail,
     demo: false,
