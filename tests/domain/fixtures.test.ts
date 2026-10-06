@@ -20,6 +20,63 @@ describe("fixture files", () => {
     expect(new Set(matches.map((match) => match.slugBase)).size).toBe(matches.length);
     expect(matches.every((match) => match.sourceUrl?.startsWith("https://"))).toBe(true);
     expect(matches.every((match) => match.sourceType === "admin" && !match.demo)).toBe(true);
+    expect(matches.filter((match) => match.tickets)).toHaveLength(145);
+  });
+
+  it("gives each official ticket link its seller, domain and sale state", () => {
+    expect(find("fixtures:england-in-australia-2026-27:odi-2").tickets).toEqual({
+      sellerName: "Ticketek",
+      sellerDomain: "premier.ticketek.com.au",
+      url: "https://premier.ticketek.com.au/shows/show.aspx?sh=ODIADO0127",
+      status: "active",
+      onSaleAt: null,
+    });
+    expect(find("fixtures:england-in-south-africa-2026-27:test-3").tickets).toMatchObject({
+      sellerName: "Cricket South Africa",
+      sellerDomain: "tickets.cricket.co.za",
+      status: "sold_out",
+    });
+    // Referral parameters from Cricket Australia's links are dropped.
+    const urls = buildFixtureMatches(file).flatMap((match) => match.tickets?.url ?? []);
+    expect(urls.filter((url) => !url.startsWith("https://") || url.includes("did="))).toEqual([]);
+  });
+
+  it("uses a series' ticket link unless a match gives its own", () => {
+    expect(find("fixtures:india-in-new-zealand-2026-27:t20i-1").tickets).toMatchObject({
+      url: "https://tickets.nzc.nz/content/nzc/matches.aspx",
+      status: "active",
+    });
+    expect(find("fixtures:india-in-new-zealand-2026-27:t20i-2").tickets?.status).toBe("sold_out");
+    expect(find("fixtures:india-in-new-zealand-2026-27:t20i-3").tickets?.url).toBe(
+      "https://tickets.nzc.nz/shows/show.aspx?sh=BCINT20327",
+    );
+  });
+
+  it("turns a sale's local opening time into an instant", () => {
+    // 3pm in Rawalpindi and 6pm in Chennai on 10 October.
+    expect(find("fixtures:pakistan-odi-tri-series-2026:match-3").tickets).toMatchObject({
+      sellerDomain: "pcb.tcs.com.pk",
+      onSaleAt: "2026-10-10T10:00:00.000Z",
+    });
+    expect(find("fixtures:bbl-16:match-1").tickets?.onSaleAt).toBe("2026-10-10T12:30:00.000Z");
+  });
+
+  it("hides the Delhi ODI until the BCCI names another ground", () => {
+    expect(find("fixtures:sri-lanka-in-india-2026-27:odi-1")).toMatchObject({
+      status: "draft",
+      tickets: null,
+    });
+  });
+
+  it("rejects a ticket link that is not a full https address", () => {
+    const insecure = structuredClone(file);
+    insecure.series[0].matches[0].tickets = { seller: "Seller", url: "http://tickets.example.com" };
+    expect(() => buildFixtureMatches(insecure)).toThrow();
+    const shortened = structuredClone(file);
+    shortened.series[0].matches[0].tickets = { seller: "Seller", url: "https://bit.ly/tickets" };
+    expect(() => buildFixtureMatches(shortened)).toThrow(
+      "west-indies-in-india-2026-27/t20i-1: the ticket link must be a full https address.",
+    );
   });
 
   it("turns each ground's local start time into the right instant", () => {
@@ -70,6 +127,12 @@ describe("fixture files", () => {
     expect(() => buildFixtureMatches(broken)).toThrow(
       /west-indies-in-india-2026-27\/t20i-1: no team "nobody"[\s\S]*t20i-2: no ground "nowhere"/,
     );
+  });
+
+  it("rejects a check time in the future", () => {
+    const future = structuredClone(file);
+    future.checkedAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    expect(() => buildFixtureMatches(future)).toThrow(/checkedAt cannot be in the future/);
   });
 
   it("rejects a start time without the local date and time", () => {

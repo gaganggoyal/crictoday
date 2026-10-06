@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildFixtureMatches } from "@/lib/data/fixtures";
-import { loadFixtures } from "@/lib/data/mysql/fixtures";
+import { fixtureOfferId, loadFixtures } from "@/lib/data/mysql/fixtures";
 import { matches as seedMatches } from "@/lib/data/seed";
 import {
   consumeMagicLink,
@@ -28,6 +28,7 @@ import {
   createSubmission,
   createTicketRequest,
   markVerified,
+  notifyListedAlerts,
   openTicketRequest,
   recordClick,
   reviewSubmission,
@@ -568,21 +569,21 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
     const fixtures = buildFixtureMatches(
       JSON.parse(readFileSync("data/fixtures/2026-27.json", "utf8")),
     );
+    // Seven links wait for sales that open on 10 October.
     expect(await loadFixtures(pool, fixtures, now)).toEqual({
       inserted: 209,
       updated: 0,
       unchanged: 0,
       skipped: [],
+      tickets: { added: 138, updated: 0, withdrawn: 0, waiting: 7 },
     });
+    // The Delhi ODI is stored but hidden until it has a ground.
     const listed = (await loadDirectory(pool)).matches.filter((match) =>
       match.sourceExternalId?.startsWith("fixtures:"),
     );
-    expect(listed).toHaveLength(209);
-    expect(
-      listed.find(
-        (match) => match.sourceExternalId === "fixtures:west-indies-in-india-2026-27:t20i-1",
-      ),
-    ).toMatchObject({
+    expect(listed).toHaveLength(208);
+    const lucknow = "fixtures:west-indies-in-india-2026-27:t20i-1";
+    expect(listed.find((match) => match.sourceExternalId === lucknow)).toMatchObject({
       slug: "india-vs-west-indies-1st-t20i-lucknow-2026-10-06",
       startsAt: "2026-10-06T13:30:00.000Z",
       competitionName: "West Indies tour of India, 1st T20I",
@@ -590,13 +591,27 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
       status: "published",
       sourceType: "admin",
       demo: false,
-      offers: [],
+      offers: [
+        {
+          id: fixtureOfferId(lucknow),
+          sellerName: "District by Zomato",
+          sellerDomain: "district.in",
+          url: "https://www.district.in/events/1st-t20i-india-vs-west-indies--lucknow-buy-tickets",
+          kind: "official",
+          currency: null,
+          priceFrom: null,
+          status: "active",
+          lastCheckedAt: fixtures[0]!.lastVerifiedAt,
+          approved: true,
+        },
+      ],
     });
 
     expect(await loadFixtures(pool, fixtures, now)).toMatchObject({
       inserted: 0,
       updated: 0,
       unchanged: 209,
+      tickets: { added: 0, updated: 0, withdrawn: 0, waiting: 7 },
     });
 
     // A moved fixture is updated in place and keeps its address.
@@ -643,9 +658,154 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
       "fixtures:bbl-16:match-1: listed by organiser",
       "fixtures:example:started: already started",
     ]);
+    // Only the loads that changed something are audited.
     const [audit] = await pool.query<RowDataPacket[]>(
       "SELECT COUNT(*) AS total FROM audit_log WHERE action = 'fixtures.load'",
     );
-    expect(Number(audit[0]!.total)).toBe(4);
+    expect(Number(audit[0]!.total)).toBe(2);
+  });
+
+  it("keeps ticket links in step with the file and alerts the fans waiting for them", async () => {
+    const fixtures = buildFixtureMatches(
+      JSON.parse(readFileSync("data/fixtures/2026-27.json", "utf8")),
+    );
+    const slugOf = async (sourceExternalId: string) => {
+      const [rows] = await pool.query<RowDataPacket[]>(
+        "SELECT slug FROM matches WHERE source_external_id = ?",
+        [sourceExternalId],
+      );
+      return String(rows[0]!.slug);
+    };
+    const statusOf = async (sourceExternalId: string) => {
+      const [rows] = await pool.query<RowDataPacket[]>(
+        "SELECT status FROM ticket_offers WHERE id = ?",
+        [fixtureOfferId(sourceExternalId)],
+      );
+      return rows[0]?.status;
+    };
+
+    // A fan asks to hear when Pakistan v Sri Lanka in Rawalpindi has tickets.
+    const rawalpindi = await slugOf("fixtures:pakistan-odi-tri-series-2026:match-1");
+    const request = await createTicketRequest(
+      pool,
+      {
+        matchSlug: rawalpindi,
+        emailHash: hash("pk1"),
+        encryptedEmail: "cipher-pk",
+        quantity: 2,
+        countryCode: "Pakistan",
+        notes: "",
+        verifyTokenHash: hash("pkv"),
+        unsubTokenHash: hash("pku"),
+        userId: null,
+      },
+      now,
+    );
+    expect(request.ok).toBe(true);
+    await openTicketRequest(pool, hash("pkv"), "verify", now);
+
+    // Before 3pm in Rawalpindi on 10 October the PCB's link is not listed and nobody is emailed.
+    // The Chennai match is the organiser's listing now, so its link is not touched.
+    const before = new Date("2026-10-10T09:59:00.000Z");
+    expect((await loadFixtures(pool, fixtures, before)).tickets).toMatchObject({
+      added: 0,
+      waiting: 6,
+    });
+    expect(await notifyListedAlerts(pool, before)).toEqual([]);
+
+    const opened = new Date("2026-10-10T10:05:00.000Z");
+    expect((await loadFixtures(pool, fixtures, opened)).tickets).toEqual({
+      added: 6,
+      updated: 0,
+      withdrawn: 0,
+      waiting: 0,
+    });
+    const match = (await loadDirectory(pool)).matches.find((item) => item.slug === rawalpindi)!;
+    expect(match.offers).toEqual([
+      expect.objectContaining({
+        sellerName: "Pakistan Cricket Board",
+        url: "https://pcb.tcs.com.pk/",
+        status: "active",
+        approved: true,
+      }),
+    ]);
+    expect(await notifyListedAlerts(pool, opened)).toEqual([
+      ticketAlertEmail(
+        match,
+        {
+          sellerName: "Pakistan Cricket Board",
+          sellerDomain: "pcb.tcs.com.pk",
+          url: "https://pcb.tcs.com.pk/",
+        },
+        "cipher-pk",
+      ),
+    ]);
+    expect(await notifyListedAlerts(pool, opened)).toEqual([]);
+
+    // A sold-out link that reopens is updated, and a link the file drops comes down.
+    const reopened = "fixtures:england-in-south-africa-2026-27:odi-1";
+    const dropped = "fixtures:australia-women-in-south-africa-2026-27:test";
+    const changed = fixtures.map((fixture) =>
+      fixture.sourceExternalId === reopened
+        ? { ...fixture, tickets: { ...fixture.tickets!, status: "active" as const } }
+        : fixture.sourceExternalId === dropped
+          ? { ...fixture, tickets: null }
+          : fixture,
+    );
+    expect((await loadFixtures(pool, changed, opened)).tickets).toEqual({
+      added: 0,
+      updated: 1,
+      withdrawn: 1,
+      waiting: 0,
+    });
+    expect(await statusOf(reopened)).toBe("active");
+    expect(await statusOf(dropped)).toBe("expired");
+
+    // A moderator's later check survives the next load.
+    const auckland = "fixtures:india-in-new-zealand-2026-27:odi-1";
+    await markVerified(pool, { matchSlug: await slugOf(auckland), actorId: moderator }, opened);
+    expect(await loadFixtures(pool, changed, opened)).toMatchObject({
+      updated: 0,
+      tickets: { added: 0, updated: 0, withdrawn: 0 },
+    });
+    const [verified] = await pool.query<RowDataPacket[]>(
+      "SELECT last_verified_at FROM matches WHERE source_external_id = ?",
+      [auckland],
+    );
+    expect((verified[0]!.last_verified_at as Date).toISOString()).toBe(opened.toISOString());
+
+    // A verification time in the future is a mistake, and the next load corrects it.
+    await pool.query("UPDATE matches SET last_verified_at = ? WHERE source_external_id = ?", [
+      new Date("2026-12-01T00:00:00.000Z"),
+      auckland,
+    ]);
+    expect(await loadFixtures(pool, changed, opened)).toMatchObject({ updated: 1 });
+    const [corrected] = await pool.query<RowDataPacket[]>(
+      "SELECT last_verified_at FROM matches WHERE source_external_id = ?",
+      [auckland],
+    );
+    expect((corrected[0]!.last_verified_at as Date).toISOString()).toBe(
+      fixtures[0]!.lastVerifiedAt,
+    );
+
+    // A blocked seller domain takes its listed link down. Started matches keep theirs for expiry.
+    await pool.query(
+      `INSERT INTO domain_rules (host, decision, created_at) VALUES ('ticketgenie.in', 'deny', ?)
+       ON DUPLICATE KEY UPDATE decision = 'deny'`,
+      [opened],
+    );
+    const hyderabad = "fixtures:west-indies-in-india-2026-27:t20i-4";
+    const blocked = await loadFixtures(pool, changed, opened);
+    expect(blocked.skipped).toContain(`${hyderabad}: ticketgenie.in is blocked`);
+    expect(await statusOf(hyderabad)).toBe("rejected");
+    const lucknow = "fixtures:west-indies-in-india-2026-27:t20i-1";
+    await loadFixtures(
+      pool,
+      changed.map((fixture) =>
+        fixture.sourceExternalId === lucknow ? { ...fixture, tickets: null } : fixture,
+      ),
+      opened,
+    );
+    expect(await statusOf(lucknow)).toBe("active");
   });
 });

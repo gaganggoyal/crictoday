@@ -325,6 +325,20 @@ export async function insertOffer(
   );
 }
 
+/** A host is blocked when it, or a parent domain, has a deny rule. */
+export async function domainDenied(connection: PoolConnection, host: string) {
+  const labels = host.toLowerCase().split(".");
+  const candidates = labels
+    .map((_, index) => labels.slice(index).join("."))
+    .filter((item) => item.includes("."));
+  if (candidates.length === 0) return false;
+  const [rows] = await connection.query<RowDataPacket[]>(
+    "SELECT 1 FROM domain_rules WHERE decision = 'deny' AND host IN (?) LIMIT 1",
+    [candidates],
+  );
+  return rows.length > 0;
+}
+
 export async function insertAcademy(
   connection: PoolConnection,
   academy: StoredAcademy,

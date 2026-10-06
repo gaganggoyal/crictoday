@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { syncFixtureFiles } from "@/lib/providers/fixture-sync";
 import { runImport } from "@/lib/providers/import-job";
 
 async function handle(request: Request) {
@@ -10,8 +11,12 @@ async function handle(request: Request) {
   if (header !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
+  // A bad fixture file or a failed alert must not stop the provider import.
+  const fixtures = await syncFixtureFiles().catch((error: unknown) => ({
+    error: error instanceof Error ? error.message : "Fixture sync failed.",
+  }));
   const result = await runImport();
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, fixtures });
 }
 
 export function GET(request: Request) {

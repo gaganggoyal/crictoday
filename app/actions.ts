@@ -21,20 +21,10 @@ import {
   serviceReview,
 } from "@/lib/data/service-writes";
 import { getMatch } from "@/lib/data/catalog";
-import {
-  ALERT_CLOSED,
-  alertConfirmationMessage,
-  plainMessageHtml,
-  signInMessage,
-} from "@/lib/email/messages";
+import { deliverAlerts } from "@/lib/email/alerts";
+import { alertConfirmationMessage, signInMessage } from "@/lib/email/messages";
 import { emailService } from "@/lib/email/service";
-import {
-  decryptString,
-  encryptString,
-  hashEmail,
-  hashToken,
-  newToken,
-} from "@/lib/security/crypto";
+import { encryptString, hashEmail, hashToken, newToken } from "@/lib/security/crypto";
 import { limitHit } from "@/lib/security/limit";
 import {
   academySubmissionSchema,
@@ -60,7 +50,6 @@ import {
   reviewSubmission,
   verifyTicketRequest,
   unsubscribeTicketRequest,
-  type EmailDraft,
   type WorkflowResult,
 } from "@/lib/domain/workflows";
 import { track } from "@/lib/analytics/track";
@@ -105,34 +94,6 @@ async function gate(scope: string, limit: number, windowMs: number, tooMany: str
   }
   if (!result.ok) return failure({ form: tooMany });
   return null;
-}
-
-/** Send approved-offer alerts. One failed send does not stop the rest. Returns the failure count. */
-async function deliverAlerts(emails: EmailDraft[]) {
-  const service = emailService();
-  let failed = 0;
-  for (const email of emails) {
-    try {
-      const to = email.to.includes("@") ? email.to : decryptString(email.to);
-      const text = `${email.text}\n${ALERT_CLOSED}`;
-      // Supabase drafts its alerts as text; those get the site's layout around the text.
-      const html =
-        email.html ??
-        plainMessageHtml(
-          email.subject,
-          text,
-          "You asked for a ticket alert on cricketmatch.today.",
-        );
-      await service.send({ to, subject: email.subject, text, html });
-    } catch (error) {
-      failed += 1;
-      console.error(
-        "[email] ticket alert not sent:",
-        error instanceof Error ? error.message : error,
-      );
-    }
-  }
-  return failed;
 }
 
 function readForm(formData: FormData) {

@@ -1,6 +1,6 @@
 # Progress
 
-Updated 5 October 2026, after the VPS deployment.
+Updated 6 October 2026, after adding official ticket links.
 
 ## Done
 
@@ -24,11 +24,13 @@ Updated 5 October 2026, after the VPS deployment.
 - Real fixtures since 6 October 2026. [data/fixtures/2026-27.json](../data/fixtures/2026-27.json) lists 209 matches in 23 series, each linked to the board's or organiser's own page: internationals in India, Australia, South Africa, New Zealand, Pakistan, Bangladesh and the UAE, and the WBBL|12, BBL|16 and SA20 2027 regular seasons. `pnpm db load-fixtures` loaded them, and the DEMO matches and academies were removed. The database was backed up first, in `/root/backups/`.
 - Email is on since 5 October 2026. Resend sends from `hello@cricketmatch.today` with a send-only key, and Spaceship forwards `admin@` and `hello@`. A sign-in email to admin@ and a test to hello@ were both delivered. On the server, `pnpm db sign-in-link <email>` prints a one-time sign-in link without email.
 - Emails are HTML in the site's style, with a plain-text part: the logo, the ball-in-grass banner, and for alerts a match panel with kick-off, venue and seller. `pnpm email:preview` writes or sends samples.
+- Official ticket links since 6 October 2026, for 145 of the 209 matches. They come from Cricket Australia's fixture data, Cricket South Africa's Ticketpro shop, New Zealand Cricket's ticket site, the state associations' District and ticketgenie pages, and the PCB's ticket site; sold-out matches say so. The fixture file lists them, and a link can wait for its sale to open. The hourly sync loads `data/fixtures`, so the file goes live within the hour of a deploy, and it emails the ticket alerts that new links answer.
 
 ## Not done
 
-- Some scheduled matches wait for confirmed start times, and knockouts wait for their teams. [data/fixtures/README.md](../data/fixtures/README.md) lists them.
-- No ticket links are listed yet. Cricket Australia's fixture data names a ticket seller for most Australian matches.
+- Some scheduled matches wait for confirmed start times, and knockouts wait for their teams. India v Sri Lanka in Delhi on 13 December is hidden until the BCCI names a new ground. [data/fixtures/README.md](../data/fixtures/README.md) lists them.
+- 64 matches have no ticket link yet, mostly because their sales have not opened. The README lists them.
+- Sold-out states and new ticket links need someone to recheck the boards' pages; nothing fetches them automatically.
 - No academies are listed since the DEMO academies were removed.
 - No live provider tokens are configured.
 - A pending alert whose confirmation email failed cannot get a new one. A retry says the alert exists. Re-sending needs the request's token hashes to be rotated.
@@ -38,7 +40,6 @@ Updated 5 October 2026, after the VPS deployment.
 
 ## Next
 
-1. Keep `data/fixtures` current: add the waiting matches as boards publish start times, and new series as they are announced, then run `pnpm db load-fixtures`.
-2. Add official ticket links, starting with the sellers Cricket Australia lists for its matches.
-3. Add the `cricketmatch` database to the server's scheduled MySQL backups.
-4. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
+1. Recheck `data/fixtures` at least weekly: listings older than seven days are marked unverified. Add the waiting matches, ticket links as sales open, and sold-out states, then deploy.
+2. Add the `cricketmatch` database to the server's scheduled MySQL backups.
+3. Licence SportMonks before setting `SPORTMONKS_API_TOKEN`. Ticketmaster offers stay pending.
