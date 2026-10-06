@@ -1,3 +1,4 @@
+import { stateOfCity } from "@/lib/data/india";
 import { zonedTimeToUtc } from "@/lib/domain/time";
 import type {
   CountryInfo,
@@ -6,6 +7,20 @@ import type {
   StoredMatch,
   StoredOffer,
 } from "@/lib/domain/types";
+
+type SeedMatch = Omit<StoredMatch, "stateName" | "stateSlug">;
+type SeedAcademy = Omit<
+  StoredAcademy,
+  | "kind"
+  | "stateName"
+  | "stateSlug"
+  | "timezone"
+  | "whatsapp"
+  | "links"
+  | "offerings"
+  | "reviewNotes"
+> &
+  Partial<Pick<StoredAcademy, "kind" | "whatsapp" | "links" | "offerings">>;
 
 const VERIFIED = "2026-10-03T12:00:00.000Z";
 const STALE = "2026-09-01T12:00:00.000Z";
@@ -226,7 +241,7 @@ const demoOffer = (
     approved: status === "active" || status === "sold_out",
   });
 
-export const matches: StoredMatch[] = [
+const demoMatches: SeedMatch[] = [
   {
     id: "m-india-a",
     slug: "india-a-vs-australia-a-mumbai-2026-10-04",
@@ -1172,7 +1187,7 @@ export const matches: StoredMatch[] = [
   },
 ];
 
-export const academies: StoredAcademy[] = [
+const demoAcademies: SeedAcademy[] = [
   {
     id: "a-chandigarh",
     slug: "chandigarh-cricket-academy",
@@ -1189,6 +1204,27 @@ export const academies: StoredAcademy[] = [
     contactEmail: "academy@cricketmatch.today",
     ageGroups: ["U12", "U14", "U16", "U19"],
     facilities: ["Nets", "Turf pitch", "Video analysis"],
+    whatsapp: "+91 172 000 0000",
+    offerings: [
+      {
+        id: "o-chandigarh-coaching",
+        category: "coaching",
+        title: "Junior coaching, U12 to U16",
+        price: "₹2,500 a month",
+        schedule: "Mon, Wed and Fri, 4–6pm",
+        details: "Batting, bowling and fielding in groups of eight. Kit can be borrowed.",
+        url: null,
+      },
+      {
+        id: "o-chandigarh-camp",
+        category: "camp",
+        title: "Winter camp",
+        price: "₹6,000 for two weeks",
+        schedule: "15–28 December",
+        details: null,
+        url: null,
+      },
+    ],
     verificationStatus: "verified",
     verificationLabel: "Contact verified",
     lastVerifiedAt: VERIFIED,
@@ -1349,6 +1385,27 @@ export const academies: StoredAcademy[] = [
     demo: true,
   },
 ];
+
+// Seed rows predate profile kinds and states; fill them in the way the forms would.
+export const matches: StoredMatch[] = demoMatches.map((match) => {
+  const home = match.countrySlug === "india" ? stateOfCity(match.citySlug) : null;
+  return { ...match, stateName: home?.name ?? null, stateSlug: home?.slug ?? null };
+});
+
+export const academies: StoredAcademy[] = demoAcademies.map((academy) => {
+  const home = academy.countrySlug === "india" ? stateOfCity(academy.citySlug) : null;
+  return {
+    kind: "academy",
+    stateName: home?.name ?? null,
+    stateSlug: home?.slug ?? null,
+    timezone: countries.find((country) => country.slug === academy.countrySlug)?.timezone ?? null,
+    whatsapp: null,
+    links: {},
+    offerings: [],
+    reviewNotes: null,
+    ...academy,
+  };
+});
 
 export const DEFAULT_ALLOW_DOMAINS = [
   "tickets.demo.cricketmatch.today",

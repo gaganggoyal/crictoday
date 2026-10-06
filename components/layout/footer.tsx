@@ -18,15 +18,15 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
             ["/matches", "Matches"],
             ["/countries", "Countries"],
             ["/leagues", "Top leagues"],
-            ["/academies", "Academies"],
+            ["/academies", "Clubs and academies"],
           ]}
         />
         <FooterColumn
-          title="Organisers"
+          title="Clubs and organisers"
           links={[
-            ["/submit/match", "List a match"],
-            ["/submit/academy", "List an academy"],
-            [email ? "/dashboard" : "/login", email ? "Account" : "Sign in"],
+            ["/get-listed", "List your club or academy"],
+            [email ? "/dashboard" : "/login", email ? "Your account" : "Sign in"],
+            ["/submit/match", "Report a match"],
           ]}
         />
         <FooterColumn

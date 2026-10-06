@@ -1,11 +1,13 @@
 import { RoleForm } from "@/components/admin/role-form";
 import { moderationSnapshot } from "@/lib/data/moderation";
+import { profileQueue } from "@/lib/data/profiles";
 import { isStale } from "@/lib/domain/ticket-state";
 
 export default async function AdminHome() {
-  const queue = await moderationSnapshot();
+  const [queue, profiles] = await Promise.all([moderationSnapshot(), profileQueue()]);
   const now = new Date();
   const cards = [
+    ["Profiles waiting", profiles.pending.length],
     ["Pending submissions", queue.submissions.filter((item) => item.status === "pending").length],
     ["Ticket links waiting", queue.offers.filter((item) => item.offer.status === "pending").length],
     [

@@ -36,6 +36,10 @@ Run these in `/var/www/cricketmatch` as the app user, for example `runuser -u cr
 
 Back up the database with the server's other MySQL backups: `mysqldump --single-transaction cricketmatch`.
 
+### Club and academy profiles
+
+People create profiles from `/get-listed` after signing in. Each new profile waits at `/admin/profiles`, and every moderator and admin account is emailed about it. Approving makes the profile and its waiting matches public and emails the owner; sending it back needs a note, which the owner sees and is emailed. A moderator can take a live profile down the same way, which hides its matches too. Ticket links that owners add to their matches still wait at `/admin/ticket-links`.
+
 ### Email
 
 Until email is configured, mail is written to the service log, `journalctl -u cricketmatch`. To sign in without email at any time, print a link on the server:

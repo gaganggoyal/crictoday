@@ -294,7 +294,7 @@ test("theme, share, sign-out, and a phone layout hold up", async ({ page }) => {
   await signIn(page, "fan@cricketmatch.today");
   await page.goto("/login");
   await expect(page.getByText("fan@cricketmatch.today")).toBeVisible();
-  await page.getByRole("link", { name: "Your account" }).click();
+  await page.getByRole("main").getByRole("link", { name: "Your account" }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(

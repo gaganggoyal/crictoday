@@ -8,6 +8,7 @@ Each file lists real, scheduled matches for the MySQL catalogue, with each match
 - **Start time** comes from that source too. Where the board publishes no time, two independent services (for example Cricket Australia's match centre, Cricbuzz or ESPNcricinfo) must agree on it. If they disagree, leave the match out until the board confirms it.
 - **Teams must be known.** Knockouts whose teams are decided later stay out until they are.
 - **`start` is the ground's local time**, written `YYYY-MM-DDTHH:MM`, as boards publish it. The ground's `timezone` turns it into an instant.
+- **An Indian ground's town must be in [lib/data/india.ts](../../lib/data/india.ts)**, so the match appears on its state and city pages. Add the town under its state first.
 - **`checkedAt`** is when the file was last compared with its sources. The match page shows it as the verification time.
 - **Ticket links are official only.** A link is the board's or organiser's own ticket page, or the event page of the seller it names, such as Cricket Australia's Ticketek and Ticketmaster links or a state association's District page. Resale and travel sites never go in.
 

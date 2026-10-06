@@ -1,4 +1,5 @@
 import "server-only";
+import { stateOfCity } from "@/lib/data/india";
 import { createClient } from "@supabase/supabase-js";
 import type { StoredAcademy, StoredMatch, StoredOffer } from "@/lib/domain/types";
 
@@ -75,6 +76,9 @@ export function mapMatchRow(row: MatchRow): StoredMatch {
     venueAddress: row.venue_address,
     cityName: row.city_name,
     citySlug: row.city_slug,
+    // The Supabase schema predates states, so Indian towns take theirs from the town list.
+    stateName: row.country_slug === "india" ? (stateOfCity(row.city_slug)?.name ?? null) : null,
+    stateSlug: row.country_slug === "india" ? (stateOfCity(row.city_slug)?.slug ?? null) : null,
     countryName: row.country_name,
     countrySlug: row.country_slug,
     startsAt: row.starts_at,
@@ -117,24 +121,34 @@ type AcademyRow = {
   last_verified_at: string | null;
 };
 
+/** Supabase stores academies only, without the profile fields the MySQL schema added. */
 export function mapAcademyRow(row: AcademyRow): StoredAcademy {
+  const home = row.country_slug === "india" ? stateOfCity(row.city_slug) : null;
   return {
     id: row.id,
     slug: row.slug,
+    kind: "academy",
     name: row.name,
     description: row.description,
     address: row.address,
     cityName: row.city_name,
     citySlug: row.city_slug,
+    stateName: home?.name ?? null,
+    stateSlug: home?.slug ?? null,
     countryName: row.country_name,
     countrySlug: row.country_slug,
+    timezone: null,
     website: row.website,
     phone: row.phone,
+    whatsapp: null,
     contactEmail: row.contact_email,
+    links: {},
     ageGroups: row.age_groups ?? [],
     facilities: row.facilities ?? [],
+    offerings: [],
     verificationStatus: row.verification_status,
     verificationLabel: row.verification_label,
+    reviewNotes: null,
     lastVerifiedAt: row.last_verified_at,
     ownerEmail: null,
     demo: false,

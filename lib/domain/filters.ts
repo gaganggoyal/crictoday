@@ -23,7 +23,7 @@ export type MatchFilters = {
   page: number;
 };
 
-const KINDS = new Set<CompetitionKind>(["international", "league", "domestic", "academy"]);
+const KINDS = new Set<CompetitionKind>(["international", "league", "domestic", "academy", "local"]);
 const FORMATS = new Set<MatchFormat>(["test", "odi", "t20", "t10", "hundred", "other"]);
 const SORTS = new Set<MatchSort>(["featured", "soonest", "verified", "tickets"]);
 
@@ -95,7 +95,8 @@ function haystack(match: StoredMatch) {
     .toLowerCase();
 }
 
-function inDefaultWindow(match: StoredMatch, now: Date) {
+/** Upcoming: not yet six hours past its start, or postponed. */
+export function inDefaultWindow(match: StoredMatch, now: Date) {
   if (match.status === "postponed") return true;
   return new Date(match.startsAt).getTime() >= now.getTime() - 6 * 60 * 60 * 1000;
 }

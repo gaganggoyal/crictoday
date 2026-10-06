@@ -5,6 +5,7 @@ import { getSession, isStaff } from "@/lib/auth/session";
 
 const links = [
   ["/admin", "Overview"],
+  ["/admin/profiles", "Profiles"],
   ["/admin/submissions", "Submissions"],
   ["/admin/ticket-links", "Ticket links"],
   ["/admin/corrections", "Corrections"],

@@ -6,7 +6,7 @@ export default async function DashboardMatchesPage() {
   const submissions = session ? (await accountSnapshot(session)).submissions : [];
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Your submissions</h1>
+      <h1 className="font-display text-4xl font-extrabold">Matches you reported</h1>
       <ul className="mt-6 grid gap-3">
         {submissions.map((item) => (
           <li key={item.id} className="rounded-2xl border border-line bg-surface p-4">
