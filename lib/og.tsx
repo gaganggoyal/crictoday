@@ -18,7 +18,7 @@ const fonts = Promise.all([
 
 const BADGE: Record<AttendanceState, string> = {
   OFFICIAL_LINK: "Official tickets",
-  AUTHORISED_PARTNER: "Tickets via partner",
+  AUTHORISED_PARTNER: "Authorised seller",
   REQUEST_ALERT: "Get a ticket alert",
   FREE_ENTRY: "Free entry",
   SOLD_OUT: "Sold out",

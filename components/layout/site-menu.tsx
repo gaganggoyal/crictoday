@@ -94,6 +94,12 @@ export function CategoryBar({ menu }: { menu: MenuData }) {
         {trigger("leagues", "Leagues & internationals")}
         {trigger("clubs", "Clubs & academies")}
         <Link
+          href="/matches?tickets=official"
+          className="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium text-muted hover:text-foreground"
+        >
+          Official tickets
+        </Link>
+        <Link
           href="/matches"
           className="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium text-muted hover:text-foreground"
         >
@@ -425,8 +431,10 @@ export function MenuDrawer({ menu, email }: { menu: MenuData; email: string | nu
                     {next("Countries", { id: "countries" })}
                     {next("Leagues & internationals", { id: "leagues" })}
                     {next("Clubs & academies", { id: "clubs" })}
+                    {link("/matches?tickets=official", "Official tickets")}
                     {link("/matches", "All matches")}
                     {link("/matches?tickets=free", "Free entry matches")}
+                    {link("/how-we-check-ticket-links", "How we check ticket links")}
                     {link(email ? "/dashboard" : "/login", email ? "Your account" : "Sign in")}
                     {link("/get-listed", "List your club for free", true)}
                   </>

@@ -96,8 +96,8 @@ function attendanceSentence(state: AttendanceState, offer: StoredOffer | null) {
       return offer ? `Official tickets from ${offer.sellerName}.` : "Official tickets on sale.";
     case "AUTHORISED_PARTNER":
       return offer
-        ? `Tickets from ${offer.sellerName}, an authorised partner.`
-        : "Tickets from an authorised partner.";
+        ? `Tickets from ${offer.sellerName}, an authorised seller.`
+        : "Tickets from an authorised seller.";
     case "SOLD_OUT":
       return "The official sale is sold out.";
     case "FREE_ENTRY":

@@ -41,7 +41,7 @@ test("a visitor can search, filter, and open a ground", async ({ page }) => {
 
 test("ticket states and the outbound interstitial stay honest", async ({ page }) => {
   await page.goto("/match/victoria-vs-new-south-wales-melbourne-2026-10-27");
-  await expect(page.getByText("Authorised partner").first()).toBeVisible();
+  await expect(page.getByText("Authorised seller").first()).toBeVisible();
   await expect(page.getByText("partner.demo.cricketmatch.today").first()).toBeVisible();
 
   await page.goto("/match/karnataka-vs-mumbai-bengaluru-2026-10-06");
@@ -64,7 +64,7 @@ test("ticket states and the outbound interstitial stay honest", async ({ page })
   await expect(page.getByRole("button", { name: "Request ticket alert" })).toHaveCount(0);
 
   await page.goto("/match/india-vs-australia-1st-test-ahmedabad-2026-10-16");
-  await page.getByRole("link", { name: "View official tickets" }).click();
+  await page.getByRole("link", { name: "View official ticket source" }).click();
   await expect(
     page.getByRole("heading", { name: "Check the seller before you continue" }),
   ).toBeVisible();
@@ -109,7 +109,7 @@ test("directories, leagues, and a missing match resolve", async ({ page }) => {
     "/contact",
     "/legal/terms",
     "/legal/privacy",
-    "/legal/ticket-policy",
+    "/how-we-check-ticket-links",
     "/about/demo-data",
   ]) {
     const response = await page.goto(path);
@@ -300,7 +300,7 @@ test("theme, share, sign-out, and a phone layout hold up", async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard/);
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Cricket matches today and upcoming fixtures",
+    "Find cricket matches. Buy from the official source.",
   );
 
   await page.setViewportSize({ width: 375, height: 812 });

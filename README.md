@@ -157,4 +157,4 @@ Live since 5 October 2026. Next come Google Search Console, the first club and a
 - **Gagan**, founder ([@gaganggoyal](https://github.com/gaganggoyal)). An engineer from one of India's top engineering colleges, Gagan leads product and engineering.
 - **Vansh**, co-founder. Young, cricket-mad and set on becoming a cricketer, Vansh brings the player's view.
 
-Read more [about us](https://cricketmatch.today/about), or write to [hello@cricketmatch.today](mailto:hello@cricketmatch.today).
+cricketmatch.today is from the team behind [indiaoffers.in](https://indiaoffers.in). Read more [about us](https://cricketmatch.today/about), or write to [hello@cricketmatch.today](mailto:hello@cricketmatch.today).

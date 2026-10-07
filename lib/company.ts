@@ -5,6 +5,12 @@ export const CONTACT_EMAIL = "hello@cricketmatch.today";
 /** When the privacy policy and the terms last changed, as YYYY-MM-DD. */
 export const POLICIES_UPDATED = "2026-10-06";
 
+/** When "How we check ticket links", the ticket policy, last changed, as YYYY-MM-DD. */
+export const TICKET_POLICY_UPDATED = "2026-10-07";
+
+/** The other site the same team runs, named in the footer and on the about page. */
+export const SISTER_SITE = { name: "indiaoffers.in", url: "https://indiaoffers.in" } as const;
+
 export const FOUNDERS = [
   {
     name: "Gagan",

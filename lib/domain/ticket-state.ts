@@ -15,16 +15,16 @@ export const ATTENDANCE_COPY: Record<
 > = {
   OFFICIAL_LINK: {
     label: "Tickets available",
-    cta: "View official tickets",
+    cta: "View official ticket source",
     description: "Opens a reviewed seller. The destination domain is shown before you leave.",
   },
   AUTHORISED_PARTNER: {
-    label: "Authorised partner",
-    cta: "View ticket options",
-    description: "Opens an approved partner. This is not a resale listing.",
+    label: "Authorised seller",
+    cta: "View authorised ticket seller",
+    description: "Opens a seller the organiser has authorised. This is not a resale listing.",
   },
   REQUEST_ALERT: {
-    label: "Sale not found/open",
+    label: "No official link yet",
     cta: "Request ticket alert",
     description:
       "We email you if an approved offer is later listed. A request does not reserve a seat.",
@@ -111,6 +111,15 @@ export function primaryOffer(offers: StoredOffer[]) {
     offers.find((offer) => offer.approved && offer.status === "sold_out") ??
     null
   );
+}
+
+/** The approved seller a match's ticket button opens, and when that link was last checked. */
+export function ticketRoute(match: StoredMatch, now: Date) {
+  const state = resolveAttendance(match, match.offers, now);
+  if (state !== "OFFICIAL_LINK" && state !== "AUTHORISED_PARTNER") return null;
+  const offer = primaryOffer(match.offers);
+  if (!offer) return null;
+  return { state, offer, checkedAt: offer.lastCheckedAt ?? match.lastVerifiedAt };
 }
 
 export function priceLabel(offer: StoredOffer | null, now: Date) {

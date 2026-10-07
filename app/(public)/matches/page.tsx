@@ -38,6 +38,18 @@ const WHEN_HEADING: Record<MatchWhen, string> = {
   weekend: "Cricket matches this weekend",
 };
 
+// The ticket views linked from the home page and the menus.
+const TICKET_HEADING: Record<string, string> = {
+  official: "Matches with official ticket sources",
+  free: "Free entry matches",
+  alert: "Matches waiting for an official ticket link",
+};
+
+function headingFor(filters: MatchFilters, plain: string) {
+  if (filters.when) return WHEN_HEADING[filters.when];
+  return (filters.tickets && TICKET_HEADING[filters.tickets]) || plain;
+}
+
 const SHORTCUTS: [MatchWhen | undefined, string][] = [
   [undefined, "All upcoming"],
   ["today", "Today"],
@@ -47,7 +59,7 @@ const SHORTCUTS: [MatchWhen | undefined, string][] = [
 
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }) {
   const filters = await readFilters(searchParams);
-  const heading = filters.when ? WHEN_HEADING[filters.when] : "Upcoming cricket matches";
+  const heading = headingFor(filters, "Upcoming cricket matches");
   return pageMetadata(
     filters.page > 1 ? `${heading}, page ${filters.page}` : heading,
     "Every upcoming cricket match we list, from internationals and top leagues to local clubs: grounds, local start times and official ticket links.",
@@ -71,8 +83,20 @@ export default async function MatchesPage({ searchParams }: { searchParams: Sear
       <header className="lg:col-start-2 lg:row-start-1">
         <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">Directory</p>
         <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-          {filters.when ? WHEN_HEADING[filters.when] : "Upcoming matches"}
+          {headingFor(filters, "Upcoming matches")}
         </h1>
+        {filters.tickets === "official" && !filters.when ? (
+          <p className="mt-3 max-w-2xl text-muted">
+            Each link was checked against the organiser&apos;s, league&apos;s, board&apos;s or
+            ground&apos;s own page. Confirm the match and the seller&apos;s terms before you pay.{" "}
+            <Link
+              href="/how-we-check-ticket-links"
+              className="text-link underline underline-offset-2"
+            >
+              How we check
+            </Link>
+          </p>
+        ) : null}
         <p className="mt-2 text-muted">
           {result.total} {result.total === 1 ? "match" : "matches"} · page {result.page} of{" "}
           {result.pageCount}

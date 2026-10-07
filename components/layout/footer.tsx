@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
+import { SISTER_SITE } from "@/lib/company";
 
 export function Footer({ demo, email }: { demo: boolean; email: string | null }) {
   return (
@@ -7,9 +8,19 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
       <div className="mx-auto grid w-full max-w-[1120px] grid-cols-2 gap-x-6 gap-y-10 px-5 py-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div className="col-span-2 lg:col-span-1">
           <Logo />
-          <p className="mt-4 max-w-sm text-sm text-muted">
-            Find cricket you can attend, then leave through a reviewed ticket link. We do not sell
-            seats and we do not run a resale market.
+          <p className="mt-4 text-sm font-semibold">Find the match. Feel the ground.</p>
+          <p className="mt-1 max-w-sm text-sm text-muted">
+            Find cricket matches and buy from the official source. A person reviews every ticket
+            link, you see the seller&apos;s domain before you leave, and we never list resale.
+          </p>
+          <p className="mt-3 text-sm text-muted">
+            From the team behind{" "}
+            <a
+              href={SISTER_SITE.url}
+              className="font-medium text-link underline underline-offset-4"
+            >
+              {SISTER_SITE.name}
+            </a>
           </p>
         </div>
         <FooterColumn
@@ -42,7 +53,7 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
           links={[
             ["/legal/terms", "Terms of use"],
             ["/legal/privacy", "Privacy policy"],
-            ["/legal/ticket-policy", "Ticket policy"],
+            ["/how-we-check-ticket-links", "How we check ticket links"],
             ...(demo ? [["/about/demo-data", "Demo data"]] : []),
           ]}
         />
