@@ -31,7 +31,7 @@
 
 - **A live product.** [cricketmatch.today](https://cricketmatch.today) has served real fixtures since October 2026: over 200 matches in India, Australia, South Africa, New Zealand, Pakistan, Bangladesh and the UAE, and the BBL, WBBL and SA20. Most have an official ticket link that a person has checked.
 - **Full-stack TypeScript.** Next.js 16 App Router with React Server Components and server actions, MySQL 8 and Tailwind CSS 4.
-- **Well tested.** Over 150 Vitest unit and integration tests, some against a real MySQL 8 server and some against Postgres row-level security, plus 24 Playwright end-to-end tests. CI runs them all on every push.
+- **Well tested.** Over 150 Vitest unit and integration tests, some against a real MySQL 8 server and some against Postgres row-level security, plus 26 Playwright end-to-end tests. CI runs them all on every push.
 - **Self-hosted.** It runs on a Linux VPS with systemd, Caddy for HTTPS, an hourly data sync, nightly backups and a one-command deploy.
 - **Founder-led.** Gagan leads product and engineering. Co-founder Vansh brings a young cricketer's view of what players and fans need.
 
@@ -41,7 +41,7 @@
 
 - Browse by country, Indian state and town, league and season, team or ground, or search. The today, tomorrow and this weekend shortcuts use the date at each ground, and a Test counts on all five days.
 - Each match shows its start time at the ground and in the visitor's own time zone, and can be added to a calendar.
-- Ticket links go only to official sellers or authorised partners. They pass through a page that shows the seller's domain first. When a sale has not opened yet, fans can ask to be emailed when it does.
+- Ticket links go only to official sources or to sellers the organiser has authorised, never to resale. Each shows the seller, its domain and when a person last checked it, and passes through a page that names the seller before the fan leaves. [How we check ticket links](https://cricketmatch.today/how-we-check-ticket-links) sets out the rules. When a sale has not opened yet, fans can ask to be emailed when it does.
 
 **For clubs and academies**
 
@@ -55,7 +55,7 @@
 <p align="center">
   <img src="docs/screenshots/home-phone.jpg" width="250" alt="The home page on a phone">
   <img src="docs/screenshots/matches-phone.jpg" width="250" alt="Upcoming matches with filters on a phone">
-  <img src="docs/screenshots/match-phone.jpg" width="250" alt="A match page on a phone">
+  <img src="docs/screenshots/match-phone.jpg" width="250" alt="A match page on a phone, with its official ticket source and when it was checked">
 </p>
 
 ## Engineering highlights
