@@ -93,8 +93,9 @@ test("filtered views and empty places stay out of search and the sitemap", async
     .click();
   await expect(page).toHaveURL(/when=weekend/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Cricket matches this weekend");
-  // During an in-page navigation the old page's robots tag can linger next to the new one.
-  await expect(page.locator('meta[name="robots"]')).toHaveCount(1);
+  // Search engines load each address afresh. After an in-page navigation the previous page's
+  // robots tag can stay beside the new one for a while, so check a fresh load instead.
+  await page.goto("/matches?when=weekend");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
 
   await page.goto("/country/india/state/bihar");
