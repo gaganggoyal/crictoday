@@ -56,6 +56,16 @@ export function formatDateKey(iso: string, timeZone: string) {
   return formatter.format(new Date(iso));
 }
 
+/** "6 Oct 2026", the day an instant falls on in a time zone. */
+export function formatShortDate(iso: string, timeZone: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone,
+  }).format(new Date(iso));
+}
+
 export function formatDateHeading(iso: string, timeZone: string) {
   return new Intl.DateTimeFormat("en-GB", {
     weekday: "long",

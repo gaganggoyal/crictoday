@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { currentTime } from "@/lib/clock";
-import { POLICIES_UPDATED } from "@/lib/company";
+import { POLICIES_UPDATED, TICKET_POLICY_UPDATED } from "@/lib/company";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, placeState } from "@/lib/data/india";
 import { inDefaultWindow } from "@/lib/domain/filters";
@@ -54,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/contact"),
     entry("/legal/terms", policies),
     entry("/legal/privacy", policies),
-    entry("/legal/ticket-policy"),
+    entry("/how-we-check-ticket-links", new Date(`${TICKET_POLICY_UPDATED}T00:00:00Z`)),
     ...(matches.some((match) => match.demo) ? [entry("/about/demo-data")] : []),
   ];
 

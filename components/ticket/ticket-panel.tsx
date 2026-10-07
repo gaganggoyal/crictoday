@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import {
   ATTENDANCE_COPY,
   priceLabel,
-  primaryOffer,
   resolveAttendance,
+  ticketRoute,
 } from "@/lib/domain/ticket-state";
+import { formatShortDate } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
 import { RequestForm } from "@/components/forms/request-form";
 import { TicketBadge } from "@/components/match/ticket-badge";
@@ -12,8 +14,8 @@ import { TicketBadge } from "@/components/match/ticket-badge";
 export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
   const state = resolveAttendance(match, match.offers, now);
   const copy = ATTENDANCE_COPY[state];
-  const offer = primaryOffer(match.offers);
-  const price = priceLabel(offer, now);
+  const route = ticketRoute(match, now);
+  const price = route ? priceLabel(route.offer, now) : null;
   const alert = state === "REQUEST_ALERT" || state === "SOLD_OUT" || state === "POSTPONED";
 
   return (
@@ -23,33 +25,43 @@ export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
         <h2 className="font-display text-2xl font-extrabold">{copy.label}</h2>
         <p className="mt-2 text-sm text-muted">{copy.description}</p>
       </div>
-      {offer && (state === "OFFICIAL_LINK" || state === "AUTHORISED_PARTNER") ? (
+      {route ? (
         <div className="grid gap-2 rounded-2xl bg-background p-4 text-sm">
           <p>
             <span className="text-muted">Seller: </span>
-            <span className="font-medium">{offer.sellerName}</span>
+            <span className="font-medium">{route.offer.sellerName}</span>
           </p>
           <p>
             <span className="text-muted">Domain: </span>
-            <span className="font-medium">{offer.sellerDomain}</span>
+            <span className="font-medium">{route.offer.sellerDomain}</span>
           </p>
+          {route.checkedAt ? (
+            <p>
+              <span className="text-muted">Checked: </span>
+              <span className="font-medium">
+                {formatShortDate(route.checkedAt, match.timezone)}
+              </span>
+            </p>
+          ) : null}
           {price ? (
             <p>
               <span className="text-muted">From: </span>
               <span className="font-medium">{price}</span>
-              <span className="text-muted">
-                , checked {offer.lastCheckedAt ? new Date(offer.lastCheckedAt).toUTCString() : ""}
-              </span>
             </p>
           ) : (
             <p className="text-muted">No current price is shown.</p>
           )}
           <Link
-            href={`/go/${offer.id}`}
-            className="mt-2 inline-flex min-h-11 items-center justify-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+            href={`/go/${route.offer.id}`}
+            className="mt-2 inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-[#176B43] px-5 font-medium text-white"
           >
             {copy.cta}
+            <ArrowUpRight aria-hidden="true" size={18} />
           </Link>
+          <p className="text-xs leading-5 text-muted">
+            You continue to the seller&apos;s own site. Check the match details and their terms
+            before you pay.
+          </p>
         </div>
       ) : null}
       {state === "FREE_ENTRY" || state === "PRIVATE_EVENT" || state === "CANCELLED" ? (
@@ -67,8 +79,10 @@ export function TicketPanel({ match, now }: { match: StoredMatch; now: Date }) {
         </Link>
       ) : null}
       <p className="text-xs leading-5 text-muted">
-        cricketmatch.today does not sell tickets. Leaving this site is your choice, and only after
-        the seller domain is shown.
+        cricketmatch.today does not sell tickets or run resale.{" "}
+        <Link href="/how-we-check-ticket-links" className="text-link underline underline-offset-2">
+          How we check ticket links
+        </Link>
       </p>
     </aside>
   );

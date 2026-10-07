@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BellRing, Check, MapPin, Ticket, Trophy } from "lucide-react";
 import { JsonLd } from "@/components/seo/json-ld";
-import { FOUNDERS } from "@/lib/company";
+import { FOUNDERS, SISTER_SITE } from "@/lib/company";
 import { organizationJsonLd, pageMetadata } from "@/lib/seo";
 import { siteUrl } from "@/lib/utils";
 
@@ -103,6 +103,16 @@ export default function AboutPage() {
           <p>
             So we built cricketmatch.today: matches by country, state and city, start times at the
             ground and in your own time zone, and ticket links that go only to official sellers.
+          </p>
+          <p>
+            cricketmatch.today is from the team behind{" "}
+            <a
+              href={SISTER_SITE.url}
+              className="font-medium text-link underline underline-offset-4"
+            >
+              {SISTER_SITE.name}
+            </a>
+            , a deals and savings site for shoppers in India.
           </p>
         </div>
       </section>

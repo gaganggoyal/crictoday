@@ -46,7 +46,7 @@ export function Header({
             href="/matches?tickets=alert"
             className="hidden min-h-11 items-center px-2 text-sm font-medium xl:inline-flex"
           >
-            Request tickets
+            Ticket alerts
           </Link>
           <ThemeToggle />
           {email ? (

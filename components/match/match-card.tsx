@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { BadgeCheck, MapPin } from "lucide-react";
 import { FORMAT_LABEL } from "@/lib/domain/labels";
-import { isStale, resolveAttendance } from "@/lib/domain/ticket-state";
-import { formatInTimeZone } from "@/lib/domain/time";
+import { isStale, resolveAttendance, ticketRoute } from "@/lib/domain/ticket-state";
+import { formatInTimeZone, formatShortDate } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
 import { TicketBadge } from "@/components/match/ticket-badge";
 
 export function MatchCard({ match, now }: { match: StoredMatch; now: Date }) {
   const state = resolveAttendance(match, match.offers, now);
+  const route = ticketRoute(match, now);
   const stale = isStale(match.lastVerifiedAt, now);
   const muted = state === "CANCELLED" || state === "POSTPONED";
   return (
@@ -40,6 +41,21 @@ export function MatchCard({ match, now }: { match: StoredMatch; now: Date }) {
             {match.venueName}, {match.cityName}
           </span>
         </p>
+        {route ? (
+          <p className="mt-1 flex items-start gap-1.5">
+            <BadgeCheck aria-hidden="true" size={16} className="mt-0.5 shrink-0 text-link" />
+            <span>
+              <span className="text-muted">Seller </span>
+              <span className="font-medium">{route.offer.sellerDomain}</span>
+              {route.checkedAt ? (
+                <span className="text-muted">
+                  {" "}
+                  · checked {formatShortDate(route.checkedAt, match.timezone)}
+                </span>
+              ) : null}
+            </span>
+          </p>
+        ) : null}
         <p className="mt-2 flex flex-wrap gap-2 text-xs text-muted">
           <span className="rounded-full border border-line px-2 py-1">
             {FORMAT_LABEL[match.format]}

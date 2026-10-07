@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { ArrowUpRight } from "lucide-react";
 import { getDirectory } from "@/lib/data/catalog";
 import { dataMode, usesDatabase } from "@/lib/data/mode";
 import { serviceRecordClick } from "@/lib/data/service-writes";
@@ -62,13 +63,18 @@ export default async function GoPage({ params }: { params: Promise<{ offerId: st
           Demo inventory: this link is illustrative. It does not sell a real ticket.
         </p>
       ) : null}
+      <p className="mt-4 text-sm text-muted">
+        cricketmatch.today doesn&apos;t sell tickets. Check the match details and the seller&apos;s
+        terms before you pay.
+      </p>
       <a
         href={offer.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#176B43] px-5 font-medium text-white"
+        className="mt-6 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#176B43] px-5 font-medium text-white"
       >
         Continue to {offer.sellerDomain}
+        <ArrowUpRight aria-hidden="true" size={18} />
       </a>
     </div>
   );

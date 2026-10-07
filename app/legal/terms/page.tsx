@@ -25,8 +25,8 @@ const SECTIONS: DocSection[] = [
         </p>
         <p>
           Our <Link href="/legal/privacy">Privacy policy</Link> and{" "}
-          <Link href="/legal/ticket-policy">Ticket policy</Link> are part of these terms. If you do
-          not agree with them, please do not use the site.
+          <Link href="/how-we-check-ticket-links">Ticket policy</Link> are part of these terms. If
+          you do not agree with them, please do not use the site.
         </p>
       </>
     ),

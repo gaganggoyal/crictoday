@@ -49,6 +49,11 @@ const nextConfig: NextConfig = {
       { source: "/terms", destination: "/legal/terms", permanent: true },
       { source: "/terms-of-use", destination: "/legal/terms", permanent: true },
       { source: "/terms-and-conditions", destination: "/legal/terms", permanent: true },
+      {
+        source: "/legal/ticket-policy",
+        destination: "/how-we-check-ticket-links",
+        permanent: true,
+      },
     ];
   },
   async headers() {

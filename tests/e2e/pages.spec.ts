@@ -6,7 +6,7 @@ test("the about, contact and policy pages are linked from the footer", async ({ 
     ["Contact us", "Talk to us"],
     ["Terms of use", "Terms of use"],
     ["Privacy policy", "Privacy policy"],
-    ["Ticket policy", "Ticket policy"],
+    ["How we check ticket links", "How we check cricket ticket links"],
   ];
   for (const [link, heading] of pages) {
     await page.goto("/");
@@ -19,6 +19,13 @@ test("the about, contact and policy pages are linked from the footer", async ({ 
   await expect(page.getByRole("heading", { name: "Grievance team" })).toBeVisible();
 });
 
+test("the footer names the team behind indiaoffers.in", async ({ page }) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("contentinfo").getByRole("link", { name: "indiaoffers.in" }),
+  ).toHaveAttribute("href", "https://indiaoffers.in");
+});
+
 test("the about page introduces the founders", async ({ page }) => {
   await page.goto("/about");
   await expect(page.getByRole("heading", { name: "Gagan", exact: true })).toBeVisible();
@@ -28,6 +35,7 @@ test("the about page introduces the founders", async ({ page }) => {
 test("the addresses people guess for the policies redirect", async ({ page }) => {
   const redirects: [string, string][] = [
     ["/privacy", "/legal/privacy"],
+    ["/legal/ticket-policy", "/how-we-check-ticket-links"],
     ["/terms", "/legal/terms"],
     ["/about-us", "/about"],
     ["/contact-us", "/contact"],
@@ -41,7 +49,7 @@ test("the addresses people guess for the policies redirect", async ({ page }) =>
 test("pages carry a canonical, a share image and structured data", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(
-    "Cricket matches today, fixtures and tickets · cricketmatch.today",
+    "Cricket matches today, fixtures and official ticket links · cricketmatch.today",
   );
   // The site's root, with or without the trailing slash: the same address to a search engine.
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -85,6 +93,9 @@ test("filtered views and empty places stay out of search and the sitemap", async
     .click();
   await expect(page).toHaveURL(/when=weekend/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Cricket matches this weekend");
+  // Search engines load each address afresh. After an in-page navigation the previous page's
+  // robots tag can stay beside the new one for a while, so check a fresh load instead.
+  await page.goto("/matches?when=weekend");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
 
   await page.goto("/country/india/state/bihar");
