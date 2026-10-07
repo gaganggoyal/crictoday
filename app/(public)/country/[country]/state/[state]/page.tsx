@@ -6,7 +6,7 @@ import { ListYoursCallout, ProfileGrid } from "@/components/profile/profile-card
 import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { indiaState, placeState } from "@/lib/data/india";
-import { inDefaultWindow } from "@/lib/domain/filters";
+import { matchesToCome, stillToCome } from "@/lib/domain/filters";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
 type Params = Promise<{ country: string; state: string }>;
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       : `Cricket clubs, academies, grounds and matches in ${state.name}, city by city, from ${towns}.`,
     `/country/india/state/${state.slug}`,
     // An empty state page is thin, so it stays out of search until something is listed there.
-    profiles.length > 0 || matches.some((match) => inDefaultWindow(match, now)),
+    profiles.length > 0 || matches.some((match) => stillToCome(match, now)),
   );
 }
 
@@ -47,9 +47,10 @@ export default async function StatePage({ params }: { params: Params }) {
   if (!state) notFound();
   const directory = await getDirectory();
   const now = currentTime();
-  const matches = directory.matches
-    .filter((match) => placeState(match)?.slug === state.slug && inDefaultWindow(match, now))
-    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
+  const matches = matchesToCome(
+    directory.matches.filter((match) => placeState(match)?.slug === state.slug),
+    now,
+  );
   const profiles = directory.academies.filter(
     (profile) => placeState(profile)?.slug === state.slug,
   );

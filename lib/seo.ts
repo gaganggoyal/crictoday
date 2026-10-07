@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CONTACT_EMAIL, FOUNDERS } from "@/lib/company";
 import { imageSrc, socialImageSrc } from "@/lib/domain/media";
-import { primaryOffer, priceLabel, resolveAttendance } from "@/lib/domain/ticket-state";
+import { isOver, primaryOffer, priceLabel, resolveAttendance } from "@/lib/domain/ticket-state";
 import type { AttendanceState, StoredAcademy, StoredMatch, StoredOffer } from "@/lib/domain/types";
 import { siteUrl } from "@/lib/utils";
 
@@ -128,14 +128,10 @@ export function matchDescription(match: StoredMatch, now: Date) {
   return `${what}, at ${match.venueName}, ${match.cityName}${when}. ${attendanceSentence(state, primaryOffer(match.offers))}`;
 }
 
-/** Matches still to come: scheduled, and not more than six hours past their start. */
+/** Matches still to come: scheduled, and not over yet. */
 export function upcomingMatches(matches: StoredMatch[], now: Date) {
   return matches
-    .filter(
-      (match) =>
-        match.status === "published" &&
-        new Date(match.startsAt).getTime() >= now.getTime() - 6 * 60 * 60 * 1000,
-    )
+    .filter((match) => match.status === "published" && !isOver(match, now))
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
 }
 

@@ -1,7 +1,7 @@
 import "server-only";
 import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
-import { inDefaultWindow } from "@/lib/domain/filters";
+import { matchesToCome } from "@/lib/domain/filters";
 
 /** A public profile with its upcoming matches, from one directory read. */
 export async function getProfilePage(slug: string) {
@@ -9,8 +9,9 @@ export async function getProfilePage(slug: string) {
   const profile = directory.academies.find((academy) => academy.slug === slug);
   if (!profile) return null;
   const now = currentTime();
-  const matches = directory.matches
-    .filter((match) => match.academySlug === slug && inDefaultWindow(match, now))
-    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
+  const matches = matchesToCome(
+    directory.matches.filter((match) => match.academySlug === slug),
+    now,
+  );
   return { profile, matches, now };
 }

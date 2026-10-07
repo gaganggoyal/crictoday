@@ -10,7 +10,7 @@ import { SISTER_SITE } from "@/lib/company";
 import { getDirectory } from "@/lib/data/catalog";
 import { filterMatches, pickHero } from "@/lib/domain/filters";
 import { profilePath } from "@/lib/domain/profiles";
-import { ATTENDANCE_COPY, ticketRoute } from "@/lib/domain/ticket-state";
+import { ATTENDANCE_COPY, isOver, ticketRoute } from "@/lib/domain/ticket-state";
 import { formatInTimeZone, formatShortDate } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
 import { homeJsonLd, matchName, pageMetadata, upcomingMatches } from "@/lib/seo";
@@ -73,7 +73,7 @@ export default async function HomePage() {
   const featuredTickets = [...withTickets].sort((a, b) => b.featuredRank - a.featuredRank)[0];
   const featured = featuredTickets ? null : pickHero(directory.matches, now);
   const ticker = [...directory.matches]
-    .filter((match) => new Date(match.startsAt).getTime() > now.getTime() - 6 * 60 * 60 * 1000)
+    .filter((match) => !isOver(match, now))
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))
     .slice(0, 8);
   const comingUp = upcomingMatches(directory.matches, now);

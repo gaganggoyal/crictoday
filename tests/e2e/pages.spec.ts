@@ -109,6 +109,26 @@ test("filtered views and empty places stay out of search and the sitemap", async
   expect(sitemap).not.toContain("/submit/");
 });
 
+test("team and ground pages list only matches still to come", async ({ page }) => {
+  // The test clock is 5 October; India A played Australia A at the Wankhede the evening before.
+  const played = 'a[href="/match/india-a-vs-australia-a-mumbai-2026-10-04"]';
+  await page.goto("/venues/wankhede-stadium");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wankhede Stadium");
+  await expect(page.locator('main a[href^="/match/"]').first()).toBeVisible();
+  await expect(page.locator(played)).toHaveCount(0);
+
+  await page.goto("/teams/india-a");
+  await expect(
+    page.getByRole("heading", { name: "No upcoming India A matches listed" }),
+  ).toBeVisible();
+  await expect(page.locator(played)).toHaveCount(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+
+  const sitemap = await (await page.request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain("/venues/wankhede-stadium</loc>");
+  expect(sitemap).not.toContain("/teams/india-a</loc>");
+});
+
 test("the new pages fit a 320px screen", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 720 });
   for (const path of [

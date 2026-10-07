@@ -6,7 +6,7 @@ import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { indiaCity, placeState } from "@/lib/data/india";
 import { countries } from "@/lib/data/seed";
-import { inDefaultWindow } from "@/lib/domain/filters";
+import { matchesToCome } from "@/lib/domain/filters";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
 type Params = Promise<{ country: string; city: string }>;
@@ -31,9 +31,7 @@ async function loadCity(countrySlug: string, citySlug: string) {
   if (!name) return null;
   const sample = all[0] ?? profiles[0];
   const state = placeState(sample ?? { countrySlug, citySlug, stateSlug: null });
-  const matches = all
-    .filter((match) => inDefaultWindow(match, now))
-    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
+  const matches = matchesToCome(all, now);
   return { country, name, state, all, matches, profiles, now };
 }
 

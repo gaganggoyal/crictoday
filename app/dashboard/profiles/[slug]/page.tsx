@@ -7,7 +7,7 @@ import { ProfileLogo } from "@/components/profile/profile-picture";
 import { getSession } from "@/lib/auth/session";
 import { PROFILE_COUNTRIES, profileDefaults } from "@/lib/data/profile-form";
 import { ownerProfile } from "@/lib/data/profiles";
-import { inDefaultWindow } from "@/lib/domain/filters";
+import { stillToCome } from "@/lib/domain/filters";
 import { PROFILE_KIND_LABEL, profilePath } from "@/lib/domain/profiles";
 import { formatInTimeZone } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
@@ -43,8 +43,8 @@ export default async function ManageProfilePage({
   if (!data) notFound();
   const { profile, matches } = data;
   const now = new Date();
-  const upcoming = matches.filter((match) => inDefaultWindow(match, now));
-  const past = matches.filter((match) => !inDefaultWindow(match, now)).reverse();
+  const upcoming = matches.filter((match) => stillToCome(match, now));
+  const past = matches.filter((match) => !stillToCome(match, now)).reverse();
   const saved = firstParam(query.saved);
   const live = profile.verificationStatus === "verified";
 

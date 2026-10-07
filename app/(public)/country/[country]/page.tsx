@@ -7,26 +7,32 @@ import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, POPULAR_CITIES, placeState } from "@/lib/data/india";
 import { countries } from "@/lib/data/seed";
-import { inDefaultWindow } from "@/lib/domain/filters";
+import { matchesToCome } from "@/lib/domain/filters";
 import { formatDateHeading, formatDateKey } from "@/lib/domain/time";
 import type { StoredAcademy, StoredMatch } from "@/lib/domain/types";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
+
+const POSTPONED = "postponed";
 
 export async function generateMetadata({ params }: { params: Promise<{ country: string }> }) {
   const { country: slug } = await params;
   const country = countries.find((item) => item.slug === slug);
   if (!country) notFound();
   const directory = await getDirectory();
-  const matches = directory.matches.filter((match) => match.countrySlug === slug);
+  const now = currentTime();
+  const matches = matchesToCome(
+    directory.matches.filter((match) => match.countrySlug === slug),
+    now,
+  );
   const listed = matches.length > 0 || directory.academies.some((a) => a.countrySlug === slug);
-  const summary = upcomingSummary(matches, currentTime());
+  const summary = upcomingSummary(matches, now);
   return pageMetadata(
     `Cricket matches in ${country.name}: fixtures and tickets`,
     summary
       ? `${summary}. Start times, grounds and official ticket links for cricket in ${country.name}.`
       : country.blurb,
     `/country/${country.slug}`,
-    // A country with nothing listed is a thin page, so it stays out of search until it has some.
+    // With no matches to come and no clubs listed the page is thin, so it stays out of search.
     listed,
   );
 }
@@ -37,17 +43,19 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
   if (!country) notFound();
   const directory = await getDirectory();
   const now = currentTime();
-  const matches = directory.matches
-    .filter((match) => match.countrySlug === slug)
-    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt));
+  const matches = matchesToCome(
+    directory.matches.filter((match) => match.countrySlug === slug),
+    now,
+  );
   const cities = [...new Map(matches.map((match) => [match.citySlug, match])).values()];
+  // One group per day at the ground, with postponed matches together at the end.
   const groups = new Map<string, typeof matches>();
   for (const match of matches) {
-    const key = formatDateKey(match.startsAt, country.timezone);
+    const key =
+      match.status === "postponed" ? POSTPONED : formatDateKey(match.startsAt, country.timezone);
     groups.set(key, [...(groups.get(key) ?? []), match]);
   }
   const academies = directory.academies.filter((academy) => academy.countrySlug === slug);
-  const upcoming = matches.filter((match) => inDefaultWindow(match, now));
   const summary = upcomingSummary(matches, now);
 
   return (
@@ -68,7 +76,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
       {summary ? <p className="mt-3 max-w-2xl font-medium">{summary}.</p> : null}
       <p className="mt-3 max-w-2xl text-sm">{country.ticketGuidance}</p>
       {slug === "india" ? (
-        <IndiaPlaces matches={upcoming} academies={academies} />
+        <IndiaPlaces matches={matches} academies={academies} />
       ) : (
         <div className="mt-6 flex flex-wrap gap-2">
           {cities.map((city) => (
@@ -84,12 +92,14 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
       )}
       <div className="mt-10 grid gap-10">
         {matches.length === 0 ? (
-          <NothingListedYet title={`No listed matches in ${country.name} yet`} />
+          <NothingListedYet title={`No upcoming matches listed in ${country.name}`} />
         ) : null}
         {[...groups.entries()].map(([day, dayMatches]) => (
           <section key={day}>
             <h2 className="mb-4 font-display text-2xl font-extrabold">
-              {formatDateHeading(dayMatches[0]!.startsAt, country.timezone)}
+              {day === POSTPONED
+                ? "Postponed"
+                : formatDateHeading(dayMatches[0]!.startsAt, country.timezone)}
             </h2>
             <MatchGrid matches={dayMatches} now={now} />
           </section>
