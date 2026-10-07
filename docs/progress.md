@@ -1,6 +1,6 @@
 # Progress
 
-Updated 7 October 2026, after putting official ticket sources at the front of the site.
+Updated 7 October 2026, after limiting team, ground and league pages to matches still to come.
 
 ## Done
 
@@ -47,13 +47,17 @@ Updated 7 October 2026, after putting official ticket sources at the front of th
 - The README is written for people reviewing the code: what the site does, screenshots, the engineering choices, the stack and how to run it.
 - On a phone, a match page shows its tickets straight after the details, before the correction form. The source line and the last-checked time read normally on match and profile pages.
 - A match that has started says "Under way" instead of offering a ticket alert, and "Finished" two hours after it should be over (a Test runs for five days). Cards, filters, titles, descriptions, structured data and link previews follow, and a finished match drops its calendar button. Pages judge time through `lib/clock.ts`; in demo mode `DEMO_NOW` pins it, and the end-to-end tests run at 5 October 2026 so the dated demo keeps its states.
-
 - Official ticket sources lead the site since 7 October 2026, from the first steps of an outside plan:
   - the home page opens with "Find cricket matches. Buy from the official source.", a "Find official tickets" button, three promises and a featured ticket route, and official ticket sources come straight after it;
   - match cards and the ticket panel show the seller's domain and when the link was checked, and ticket buttons say where they go, such as "View official ticket source";
   - "Request tickets" is now "Ticket alerts", and the menus link the official-ticket list, which has its own heading;
   - `/how-we-check-ticket-links` replaces the ticket policy, and the old address redirects to it;
   - the footer and the About page say the site is from the team behind indiaoffers.in. Nothing says whether ticket links earn a commission.
+- Pages list only the matches still to come since 7 October 2026:
+  - team, ground, league, season and country pages, like Related matches on a match page;
+  - a match stays until it is over, two hours after it should end, so an ODI or a Test still being played stays listed. The directory, towns, states, the home page and the sitemap use the same rule instead of six hours after the start;
+  - postponed matches come last, and country pages put them under their own heading;
+  - a team or ground with nothing to come says so, and stays out of search and the sitemap until new fixtures arrive.
 
 ## Not done
 

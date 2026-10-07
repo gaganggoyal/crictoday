@@ -5,6 +5,7 @@ import { MatchGrid, NothingListedYet } from "@/components/match/match-grid";
 import { currentTime } from "@/lib/clock";
 import { getDirectory } from "@/lib/data/catalog";
 import { leagues } from "@/lib/data/seed";
+import { matchesToCome } from "@/lib/domain/filters";
 import { pageMetadata, upcomingSummary } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -28,9 +29,13 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
   const league = leagues.find((item) => item.slug === slug);
   if (!league) notFound();
   const directory = await getDirectory();
-  const matches = directory.matches.filter((match) => match.competitionSlug === league.slug);
+  const now = currentTime();
+  const listed = directory.matches.filter((match) => match.competitionSlug === league.slug);
+  const matches = matchesToCome(listed, now);
   const teams = [...new Set(matches.flatMap((match) => [match.homeSlug, match.awaySlug]))];
-  const summary = upcomingSummary(matches, currentTime());
+  const summary = upcomingSummary(matches, now);
+  // This season's fixtures were listed, so with none left to come they have all been played.
+  const played = listed.some((match) => match.seasonSlug === league.seasonSlug);
   return (
     <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
       <Breadcrumbs
@@ -56,12 +61,20 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
         </a>
       </p>
       <p className="mt-4 max-w-2xl text-sm">{league.ticketGuidance}</p>
-      <p className="mt-4 text-sm text-muted">{teams.length} sides in the current listings.</p>
+      {teams.length ? (
+        <p className="mt-4 text-sm text-muted">{teams.length} sides in the current listings.</p>
+      ) : null}
       <div className="mt-8">
         {matches.length ? (
-          <MatchGrid matches={matches} now={currentTime()} />
+          <MatchGrid matches={matches} now={now} />
         ) : (
-          <NothingListedYet title={`${league.seasonName} fixtures are not listed yet`} />
+          <NothingListedYet
+            title={
+              played
+                ? `No more ${league.seasonName} matches to come`
+                : `${league.seasonName} fixtures are not listed yet`
+            }
+          />
         )}
       </div>
     </div>

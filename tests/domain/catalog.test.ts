@@ -3,10 +3,12 @@ import { findDuplicateCandidates } from "@/lib/domain/duplicates";
 import {
   filterMatches,
   isFiltered,
+  matchesToCome,
   parseFilters,
   pickHero,
   playsOn,
   relatedMatches,
+  stillToCome,
 } from "@/lib/domain/filters";
 import {
   planImport,
@@ -368,5 +370,54 @@ describe("related matches", () => {
       relatedMatches(base, list, time, limit).map((match) => match.slug);
     expect(slugs(10)).toEqual(["on-now", "next", "same-town", "later", "no-date"]);
     expect(slugs()).toEqual(["on-now", "next", "same-town"]);
+  });
+});
+
+describe("matches still to come", () => {
+  const time = new Date("2026-10-07T12:00:00.000Z");
+  const at = (startsAt: string, patch: Partial<StoredMatch> = {}): StoredMatch => ({
+    ...matches[0]!,
+    slug: startsAt,
+    format: "t20",
+    status: "published",
+    startsAt,
+    endsAt: null,
+    offers: [],
+    ...patch,
+  });
+
+  it("keeps a match until two hours after it should end, however long its format runs", () => {
+    // A T20's play takes three and a half hours, so it is over five and a half hours in.
+    expect(stillToCome(at("2026-10-07T07:00:00.000Z"), time)).toBe(true);
+    expect(stillToCome(at("2026-10-07T06:00:00.000Z"), time)).toBe(false);
+    // An ODI seven hours in, and a Test on its third day, are still being played.
+    expect(stillToCome(at("2026-10-07T05:00:00.000Z", { format: "odi" }), time)).toBe(true);
+    expect(stillToCome(at("2026-10-05T04:00:00.000Z", { format: "test" }), time)).toBe(true);
+    // An end time from the source wins over the format's usual length.
+    const ended = { format: "odi", endsAt: "2026-10-07T09:00:00.000Z" } as const;
+    expect(stillToCome(at("2026-10-07T05:00:00.000Z", ended), time)).toBe(false);
+    expect(stillToCome(at("2026-10-07T09:00:00.000Z", { status: "completed" }), time)).toBe(false);
+  });
+
+  it("keeps a postponed match until it has a new date, and a cancelled one until its day passes", () => {
+    expect(stillToCome(at("2026-10-01T13:30:00.000Z", { status: "postponed" }), time)).toBe(true);
+    expect(stillToCome(at("2026-10-10T13:30:00.000Z", { status: "cancelled" }), time)).toBe(true);
+    expect(stillToCome(at("2026-10-01T13:30:00.000Z", { status: "cancelled" }), time)).toBe(false);
+  });
+
+  it("lists them soonest first, with postponed matches last", () => {
+    const list = [
+      at("2026-10-09T13:30:00.000Z", { slug: "later" }),
+      at("2026-10-01T13:30:00.000Z", { slug: "no-date", status: "postponed" }),
+      at("2026-10-06T13:30:00.000Z", { slug: "played" }),
+      at("2026-10-08T13:30:00.000Z", { slug: "next" }),
+      at("2026-10-07T10:00:00.000Z", { slug: "on-now" }),
+    ];
+    expect(matchesToCome(list, time).map((match) => match.slug)).toEqual([
+      "on-now",
+      "next",
+      "later",
+      "no-date",
+    ]);
   });
 });

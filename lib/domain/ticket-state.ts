@@ -76,6 +76,14 @@ export function expectedEnd(match: Pick<StoredMatch, "startsAt" | "endsAt" | "fo
   return start + days * DAY_MS + DAY_MINUTES[match.format] * MINUTE_MS;
 }
 
+/** Whether a match is over: marked completed, or two hours past when it should have ended. */
+export function isOver(
+  match: Pick<StoredMatch, "status" | "startsAt" | "endsAt" | "format">,
+  now: Date,
+) {
+  return match.status === "completed" || now.getTime() >= expectedEnd(match) + OVERRUN_MS;
+}
+
 /**
  * The one attendance state a match shows. Cancelled and postponed come first, then a match that is
  * over. A private or free match keeps its state while it is on, since people can still walk in to a
@@ -88,11 +96,10 @@ export function resolveAttendance(
 ): AttendanceState {
   if (match.status === "cancelled") return "CANCELLED";
   if (match.status === "postponed") return "POSTPONED";
-  const time = now.getTime();
-  if (match.status === "completed" || time >= expectedEnd(match) + OVERRUN_MS) return "FINISHED";
+  if (isOver(match, now)) return "FINISHED";
   if (match.attendanceType === "private") return "PRIVATE_EVENT";
   if (match.attendanceType === "free") return "FREE_ENTRY";
-  if (time >= Date.parse(match.startsAt)) return "IN_PLAY";
+  if (now.getTime() >= Date.parse(match.startsAt)) return "IN_PLAY";
 
   const active = offers.filter((offer) => offer.approved && offer.status === "active");
   if (active.some((offer) => offer.kind === "official")) return "OFFICIAL_LINK";

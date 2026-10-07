@@ -3,7 +3,7 @@ import { currentTime } from "@/lib/clock";
 import { POLICIES_UPDATED, TICKET_POLICY_UPDATED } from "@/lib/company";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, placeState } from "@/lib/data/india";
-import { inDefaultWindow } from "@/lib/domain/filters";
+import { stillToCome } from "@/lib/domain/filters";
 import { profilePath } from "@/lib/domain/profiles";
 import type { StoredMatch } from "@/lib/domain/types";
 import { siteUrl } from "@/lib/utils";
@@ -24,14 +24,15 @@ function changed(match: StoredMatch) {
 
 /**
  * Pages worth finding in search, each with the date its content last changed when we know it.
- * Places with nothing listed, forms and filtered views are left out; they are noindex too.
+ * Places, teams and grounds with nothing to come, forms and filtered views are left out; they are
+ * noindex too.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const directory = await getDirectory();
   const root = siteUrl();
   const now = currentTime();
   const { matches, academies } = directory;
-  const upcoming = matches.filter((match) => inDefaultWindow(match, now));
+  const upcoming = matches.filter((match) => stillToCome(match, now));
   const entry = (path: string, lastModified?: Date) => ({
     url: `${root}${path || "/"}`,
     ...(lastModified ? { lastModified } : {}),
@@ -61,13 +62,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const countries = directory.countries
     .filter(
       (country) =>
-        matches.some((match) => match.countrySlug === country.slug) ||
+        upcoming.some((match) => match.countrySlug === country.slug) ||
         academies.some((academy) => academy.countrySlug === country.slug),
     )
     .map((country) =>
       entry(
         `/country/${country.slug}`,
-        newest(matches.filter((match) => match.countrySlug === country.slug)),
+        newest(upcoming.filter((match) => match.countrySlug === country.slug)),
       ),
     );
 
@@ -93,28 +94,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const match of upcoming) town(match).push(match);
   const cities = [...towns].map(([path, list]) => entry(path, newest(list)));
 
+  // Every league has a page about it, even between seasons.
   const leagues = directory.leagues.map((league) =>
     entry(
       `/league/${league.slug}`,
-      newest(matches.filter((match) => match.competitionSlug === league.slug)),
+      newest(upcoming.filter((match) => match.competitionSlug === league.slug)),
     ),
   );
 
   const teams = unique(
-    matches.flatMap((match) => [match.homeSlug, match.awaySlug]),
+    upcoming.flatMap((match) => [match.homeSlug, match.awaySlug]),
     (slug) => slug,
   ).map((slug) =>
     entry(
       `/teams/${slug}`,
-      newest(matches.filter((match) => match.homeSlug === slug || match.awaySlug === slug)),
+      newest(upcoming.filter((match) => match.homeSlug === slug || match.awaySlug === slug)),
     ),
   );
 
   const venues = unique(
-    matches.map((match) => match.venueSlug),
+    upcoming.map((match) => match.venueSlug),
     (slug) => slug,
   ).map((slug) =>
-    entry(`/venues/${slug}`, newest(matches.filter((match) => match.venueSlug === slug))),
+    entry(`/venues/${slug}`, newest(upcoming.filter((match) => match.venueSlug === slug))),
   );
 
   return [

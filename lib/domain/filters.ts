@@ -1,4 +1,4 @@
-import { resolveAttendance, ticketSortRank } from "@/lib/domain/ticket-state";
+import { isOver, resolveAttendance, ticketSortRank } from "@/lib/domain/ticket-state";
 import { formatDateKey } from "@/lib/domain/time";
 import type {
   AttendanceState,
@@ -121,10 +121,23 @@ function haystack(match: StoredMatch) {
     .toLowerCase();
 }
 
-/** Upcoming: not yet six hours past its start, or postponed. */
-export function inDefaultWindow(match: StoredMatch, now: Date) {
-  if (match.status === "postponed") return true;
-  return new Date(match.startsAt).getTime() >= now.getTime() - 6 * 60 * 60 * 1000;
+/**
+ * Still to come: not over yet, so a match under way counts until it finishes. A postponed match
+ * stays until it has a new date.
+ */
+export function stillToCome(match: StoredMatch, now: Date) {
+  return match.status === "postponed" || !isOver(match, now);
+}
+
+/** The matches still to come, soonest first, then postponed ones, which have no date yet. */
+export function matchesToCome(matches: StoredMatch[], now: Date) {
+  return matches
+    .filter((match) => stillToCome(match, now))
+    .sort(
+      (a, b) =>
+        Number(a.status === "postponed") - Number(b.status === "postponed") ||
+        Date.parse(a.startsAt) - Date.parse(b.startsAt),
+    );
 }
 
 function shiftDay(key: string, days: number) {
@@ -162,7 +175,7 @@ export function filterMatches(matches: StoredMatch[], filters: MatchFilters, now
     if (!match.sourceUrl) return false;
     if (filters.when) {
       if (match.status === "postponed" || !playsOn(match, filters.when, now)) return false;
-    } else if (!filters.from && !filters.to && !inDefaultWindow(match, now)) return false;
+    } else if (!filters.from && !filters.to && !stillToCome(match, now)) return false;
     if (filters.country && match.countrySlug !== filters.country) return false;
     if (filters.city && match.citySlug !== filters.city) return false;
     if (filters.kind && match.kind !== filters.kind) return false;
@@ -214,36 +227,20 @@ function compareMatches(a: StoredMatch, b: StoredMatch, sort: MatchSort, now: Da
   return +new Date(a.startsAt) - +new Date(b.startsAt) || a.slug.localeCompare(b.slug);
 }
 
-/**
- * Other matches in the same town or competition that are still to come: neither finished nor
- * cancelled. Soonest first, then postponed ones, which have no date yet.
- */
+/** Other matches in the same town or competition that are still to come and not cancelled. */
 export function relatedMatches(match: StoredMatch, matches: StoredMatch[], now: Date, limit = 3) {
-  return matches
-    .filter((item) => {
-      if (item.slug === match.slug) return false;
-      if (item.citySlug !== match.citySlug && item.competitionSlug !== match.competitionSlug) {
-        return false;
-      }
-      const state = resolveAttendance(item, item.offers, now);
-      return state !== "FINISHED" && state !== "CANCELLED";
-    })
-    .sort(
-      (a, b) =>
-        Number(a.status === "postponed") - Number(b.status === "postponed") ||
-        Date.parse(a.startsAt) - Date.parse(b.startsAt),
-    )
-    .slice(0, limit);
+  const nearby = matches.filter(
+    (item) =>
+      item.slug !== match.slug &&
+      item.status !== "cancelled" &&
+      (item.citySlug === match.citySlug || item.competitionSlug === match.competitionSlug),
+  );
+  return matchesToCome(nearby, now).slice(0, limit);
 }
 
 export function pickHero(matches: StoredMatch[], now: Date) {
   return matches
-    .filter(
-      (match) =>
-        match.status === "published" &&
-        match.sourceUrl &&
-        new Date(match.startsAt).getTime() >= now.getTime() - 6 * 60 * 60 * 1000,
-    )
+    .filter((match) => match.status === "published" && match.sourceUrl && !isOver(match, now))
     .sort(
       (a, b) => b.featuredRank - a.featuredRank || +new Date(a.startsAt) - +new Date(b.startsAt),
     )[0];
