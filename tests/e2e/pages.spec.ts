@@ -93,6 +93,8 @@ test("filtered views and empty places stay out of search and the sitemap", async
     .click();
   await expect(page).toHaveURL(/when=weekend/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Cricket matches this weekend");
+  // During an in-page navigation the old page's robots tag can linger next to the new one.
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(1);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
 
   await page.goto("/country/india/state/bihar");
