@@ -38,12 +38,15 @@ test("the game is linked from the footer, carries a share image and fits a 320px
   await page.goto("/");
   await page.getByRole("contentinfo").getByRole("link", { name: "Mystery Cricketer" }).click();
   await expect(page).toHaveURL(new RegExp(`${GAME}$`));
+
+  // Link previews read the page as served, so check its image on a fresh load: after moving
+  // between pages in the browser, the last page's image tag can linger in the head.
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto(GAME);
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /\/og\/game$/);
   const image = await page.request.get("/og/game");
   expect(image.headers()["content-type"]).toBe("image/png");
 
-  await page.setViewportSize({ width: 320, height: 720 });
-  await page.goto(GAME);
   await guessSachin(page);
   await expect(page.getByText("7 of 8 guesses left")).toBeVisible();
   const overflow = await page.evaluate(
