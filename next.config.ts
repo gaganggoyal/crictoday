@@ -54,6 +54,8 @@ const nextConfig: NextConfig = {
         destination: "/how-we-check-ticket-links",
         permanent: true,
       },
+      // One game for now; temporary, so /games can become a list of games later.
+      { source: "/games", destination: "/games/mystery-cricketer", permanent: false },
     ];
   },
   async headers() {

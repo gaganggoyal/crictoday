@@ -30,6 +30,7 @@ export function Footer({ demo, email }: { demo: boolean; email: string | null })
             ["/countries", "Countries"],
             ["/leagues", "Top leagues"],
             ["/academies", "Clubs and academies"],
+            ["/games/mystery-cricketer", "Mystery Cricketer"],
           ]}
         />
         <FooterColumn

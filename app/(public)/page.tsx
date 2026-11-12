@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, BadgeCheck, Ban, BellRing, Check, ShieldCheck, Ticket } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BadgeCheck,
+  Ban,
+  BellRing,
+  Check,
+  ShieldCheck,
+  Ticket,
+} from "lucide-react";
 import { EmptyResults, MatchGrid } from "@/components/match/match-grid";
 import { SearchForm } from "@/components/match/search-form";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -37,6 +46,12 @@ const QUICK_LINKS = [
 ];
 
 const PROMISES = ["We don't sell tickets", "No resale listings", "Source and last check shown"];
+
+const HIT = "border-hit bg-hit";
+const NEAR = "border-near bg-near";
+const MISS = "border-line bg-background";
+/** The home page's Mystery Cricketer card shows a row of clue tiles. */
+const GAME_TILES = [HIT, NEAR, MISS, NEAR, MISS, HIT, HIT];
 
 const HOW = [
   {
@@ -251,6 +266,39 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section aria-labelledby="game" className="mx-auto w-full max-w-[1120px] px-5 pb-16">
+        <Link
+          href="/games/mystery-cricketer"
+          className="group grid gap-5 rounded-[1.25rem] border border-line bg-surface p-6 no-underline sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+        >
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">
+              Daily game
+            </p>
+            <h2
+              id="game"
+              className="mt-1 font-display text-3xl font-extrabold tracking-tight sm:text-4xl"
+            >
+              Mystery Cricketer
+            </h2>
+            <p className="mt-2 max-w-xl text-muted">
+              Guess today&apos;s cricketer in eight tries, from clues about his country, role,
+              bowling, age, debut and IPL team. A new one every midnight.
+            </p>
+            {/* A row of clue tiles, as the game draws them. */}
+            <div aria-hidden="true" className="mt-4 flex gap-1.5">
+              {GAME_TILES.map((colour, index) => (
+                <span key={index} className={`h-6 w-6 rounded-md border ${colour}`} />
+              ))}
+            </div>
+          </div>
+          <span className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-[#176B43] px-5 font-medium text-white group-hover:bg-[#105535]">
+            Play today&apos;s game
+            <ArrowRight aria-hidden="true" size={18} />
+          </span>
+        </Link>
       </section>
 
       <section aria-labelledby="how" className="mx-auto w-full max-w-[1120px] px-5 pb-16">

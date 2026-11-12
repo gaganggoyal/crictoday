@@ -1,6 +1,14 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { asRole, asService, database, FAN, MOD, PUBLIC_MATCH } from "@/tests/rls/harness";
+import {
+  asRole,
+  asService,
+  database,
+  FAN,
+  MOD,
+  PUBLIC_MATCH,
+  publicMatchStart,
+} from "@/tests/rls/harness";
 
 const HASH = "a".repeat(64);
 
@@ -202,7 +210,7 @@ describe("service role workflows", () => {
             'competition', 'Border-Gavaskar Trophy',
             'home', 'India',
             'away', 'Australia',
-            'startsAt', '2026-10-16T06:00:00.000Z',
+            'startsAt', '${publicMatchStart(2)}',
             'timezone', 'Asia/Kolkata',
             'venue', 'Narendra Modi Stadium',
             'city', 'Ahmedabad',
@@ -215,7 +223,7 @@ describe("service role workflows", () => {
             'id', '${PUBLIC_MATCH}',
             'match', jsonb_build_object(
               'externalId', 'sportmonks:9',
-              'startsAt', '2026-10-16T08:00:00.000Z',
+              'startsAt', '${publicMatchStart(4)}',
               'status', 'postponed',
               'format', 'test',
               'timezone', 'Asia/Kolkata',

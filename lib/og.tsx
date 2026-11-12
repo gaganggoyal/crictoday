@@ -176,6 +176,19 @@ export function siteImage() {
   );
 }
 
+/** Mystery Cricketer's preview, the same every day so it never gives the answer away. */
+export function gameImage() {
+  return render(
+    {
+      kicker: "Daily cricket game",
+      title: "Mystery Cricketer",
+      lines: ["Guess today's cricketer in eight tries", "New cricketer every midnight"],
+      badge: "Play free",
+    },
+    "public, max-age=86400",
+  );
+}
+
 /** A match's preview: teams, label, ground, local start and ticket state. */
 export function matchImage(match: StoredMatch, now: Date) {
   const state = resolveAttendance(match, match.offers, now);

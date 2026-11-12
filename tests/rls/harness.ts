@@ -14,6 +14,19 @@ export const PUBLIC_MATCH = "77777777-7777-4777-8777-777777777777";
 export const DRAFT_MATCH = "88888888-8888-4888-8888-888888888888";
 export const UNSOURCED_MATCH = "99999999-9999-4999-8999-999999999999";
 
+const HOUR_MS = 60 * 60 * 1000;
+/** The next whole hour when the tests start. */
+const START = Math.ceil(Date.now() / HOUR_MS) * HOUR_MS;
+
+/**
+ * The public match's start, `hours` later if given, in ISO 8601. It is counted from when the
+ * tests run, because alerts are refused for a match that has started: a fixed date would make the
+ * tests fail once it passed.
+ */
+export function publicMatchStart(hours = 0) {
+  return new Date(START + (30 * 24 + hours) * HOUR_MS).toISOString();
+}
+
 export async function database() {
   const db = new PGlite();
   await db.exec(readFileSync(path.join(root, "supabase/tests/bootstrap.sql"), "utf8"));
@@ -56,17 +69,17 @@ export async function database() {
     ) VALUES
       (
         '${PUBLIC_MATCH}', 'india-australia-public', '${COMP}', '${HOME}', '${AWAY}', '${VENUE}',
-        '2026-10-16 04:00:00+00', 'Asia/Kolkata', 'test', 'published', 'ticketed', 'admin',
+        '${publicMatchStart()}', 'Asia/Kolkata', 'test', 'published', 'ticketed', 'admin',
         'https://example.com/board', 'Board'
       ),
       (
         '${DRAFT_MATCH}', 'india-australia-draft', '${COMP}', '${HOME}', '${AWAY}', '${VENUE}',
-        '2026-10-17 04:00:00+00', 'Asia/Kolkata', 'test', 'draft', 'ticketed', 'admin',
+        '${publicMatchStart(24)}', 'Asia/Kolkata', 'test', 'draft', 'ticketed', 'admin',
         'https://example.com/draft', 'Board'
       ),
       (
         '${UNSOURCED_MATCH}', 'india-australia-unsourced', '${COMP}', '${HOME}', '${AWAY}', '${VENUE}',
-        '2026-10-18 04:00:00+00', 'Asia/Kolkata', 'test', 'published', 'ticketed', 'admin',
+        '${publicMatchStart(48)}', 'Asia/Kolkata', 'test', 'published', 'ticketed', 'admin',
         NULL, 'Board'
       );
     INSERT INTO audit_log (actor_id, action, entity_type, entity_id)

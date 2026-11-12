@@ -14,6 +14,11 @@
   --link: #176b43;
   --danger: #8c2f1b;
   --warning: #8a5a12;
+  /* Mystery Cricketer's clue tiles: a match, and a near miss. */
+  --hit: #176b43;
+  --hit-ink: #ffffff;
+  --near: #f2c14e;
+  --near-ink: #2b1d00;
   color-scheme: light;
 }
 
@@ -29,6 +34,10 @@
   --link: #8ee0b0;
   --danger: #ffb4a2;
   --warning: #f0c27a;
+  --hit: #176b43;
+  --hit-ink: #ffffff;
+  --near: #e8b84a;
+  --near-ink: #231800;
   color-scheme: dark;
 }
 
@@ -44,6 +53,10 @@
   --color-link: var(--link);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
+  --color-hit: var(--hit);
+  --color-hit-ink: var(--hit-ink);
+  --color-near: var(--near);
+  --color-near-ink: var(--near-ink);
   --font-sans: var(--font-satoshi), "Satoshi", "Avenir Next", sans-serif;
   --font-display: var(--font-cabinet), "Cabinet Grotesk", "Avenir Next", sans-serif;
   --radius-card: 1.25rem;
@@ -114,6 +127,22 @@ h3,
 .ticker:hover .ticker-track,
 .ticker:focus-within .ticker-track {
   animation-play-state: paused;
+}
+
+/* A new guess's tiles turn over one after another. */
+@keyframes tile-in {
+  from {
+    transform: perspective(400px) rotateX(-80deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.tile-in {
+  animation: tile-in 380ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
 input,

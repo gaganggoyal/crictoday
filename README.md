@@ -42,6 +42,7 @@
 - Browse by country, Indian state and town, league and season, team or ground, or search. The today, tomorrow and this weekend shortcuts use the date at each ground, and a Test counts on all five days.
 - Each match shows its start time at the ground and in the visitor's own time zone, and can be added to a calendar.
 - Ticket links go only to official sources or to sellers the organiser has authorised, never to resale. Each shows the seller, its domain and when a person last checked it, and passes through a page that names the seller before the fan leaves. [How we check ticket links](https://cricketmatch.today/how-we-check-ticket-links) sets out the rules. When a sale has not opened yet, fans can ask to be emailed when it does.
+- [Mystery Cricketer](https://cricketmatch.today/games/mystery-cricketer) is a daily guess-the-cricketer game: eight guesses, each answered with clues for country, role, bowling, batting, age, debut and last IPL team. The clues come from Cricsheet's records of every men's international and IPL match and from Wikipedia, and a finished game points to the cricketer's country's next listed match.
 
 **For clubs and academies**
 
@@ -109,6 +110,7 @@ lib/domain/     Pure rules: ticket states, filters, time zones, schedules and wo
 lib/data/       Data access for MySQL, Supabase and the demo store behind one interface
 lib/            Also auth, security, email, media, spreadsheets, providers and SEO
 data/fixtures/  Real fixtures and ticket links, each with its official source
+data/game/      Mystery Cricketer's cricketers and daily answers, built by scripts/game
 db/mysql/       MySQL migrations
 supabase/       Postgres migrations with row-level security
 deploy/vps/     systemd units, Caddy config, and the deploy, sync and backup scripts
