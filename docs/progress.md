@@ -1,6 +1,6 @@
 # Progress
 
-Updated 7 October 2026, after limiting team, ground and league pages to matches still to come.
+Updated 12 November 2026, after adding Mystery Cricketer, a daily guess-the-cricketer game.
 
 ## Done
 
@@ -58,6 +58,11 @@ Updated 7 October 2026, after limiting team, ground and league pages to matches 
   - a match stays until it is over, two hours after it should end, so an ODI or a Test still being played stays listed. The directory, towns, states, the home page and the sitemap use the same rule instead of six hours after the start;
   - postponed matches come last, and country pages put them under their own heading;
   - a team or ground with nothing to come says so, and stays out of search and the sitemap until new fixtures arrive.
+- Mystery Cricketer since 12 November 2026, at `/games/mystery-cricketer`:
+  - a new cricketer at midnight in each visitor's time zone, the same for everyone on a date, found in eight guesses. Each guess shows seven clues: country, role, bowling, batting, age, debut year and last IPL team, as a match, close or neither, with arrows for age and debut;
+  - 1,316 guessable men who have played for a Full Member since 2012, and 193 well-known answers in a 386-day schedule that stays on the server. [data/game/README.md](../data/game/README.md) has the sources and rules: Cricsheet's match records and Wikipedia, with Afghanistan from Wikipedia because Cricsheet withholds its matches;
+  - results share as coloured squares (Share, WhatsApp or copy), and the record, streak and guesses-to-win chart stay in the browser; the privacy policy names the storage key. A practice mode never deals one of the day's answers;
+  - a finished game links to the cricketer's country's next listed match. The home page, the browse bar on wide screens, the phone menu and the footer link to the game, and it has its own link preview at `/og/game`.
 
 ## Not done
 

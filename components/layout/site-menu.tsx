@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Gamepad2, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { INDIA_STATES, POPULAR_CITIES } from "@/lib/data/india";
@@ -110,6 +110,13 @@ export function CategoryBar({ menu }: { menu: MenuData }) {
           className="hidden min-h-11 items-center rounded-full px-3 text-sm font-medium text-muted hover:text-foreground lg:inline-flex"
         >
           Free entry
+        </Link>
+        <Link
+          href="/games/mystery-cricketer"
+          className="ml-auto hidden min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-muted hover:text-foreground xl:inline-flex"
+        >
+          <Gamepad2 aria-hidden="true" size={16} className="text-link" />
+          Mystery Cricketer
         </Link>
       </nav>
       {open ? (
@@ -434,6 +441,7 @@ export function MenuDrawer({ menu, email }: { menu: MenuData; email: string | nu
                     {link("/matches?tickets=official", "Official tickets")}
                     {link("/matches", "All matches")}
                     {link("/matches?tickets=free", "Free entry matches")}
+                    {link("/games/mystery-cricketer", "Mystery Cricketer, the daily game")}
                     {link("/how-we-check-ticket-links", "How we check ticket links")}
                     {link(email ? "/dashboard" : "/login", email ? "Your account" : "Sign in")}
                     {link("/get-listed", "List your club for free", true)}

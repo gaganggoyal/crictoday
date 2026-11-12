@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DocPage, Facts, type DocSection } from "@/components/layout/doc-page";
-import { CONTACT_EMAIL, POLICIES_UPDATED } from "@/lib/company";
+import { CONTACT_EMAIL, PRIVACY_UPDATED } from "@/lib/company";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -207,6 +207,10 @@ const SECTIONS: DocSection[] = [
             [
               "theme",
               "Not a cookie: a setting in your browser's storage that remembers light or dark mode if you choose one. It never leaves your device.",
+            ],
+            [
+              "mystery-cricketer",
+              "Not a cookie: your Mystery Cricketer guesses and record, in your browser's storage, so you can come back to the day's game and keep your streak. It never leaves your device, and games over 18 months old are dropped.",
             ],
           ]}
         />
@@ -440,7 +444,7 @@ export default function PrivacyPage() {
           or delete yours.
         </p>
       }
-      updated={POLICIES_UPDATED}
+      updated={PRIVACY_UPDATED}
       sections={SECTIONS}
     />
   );

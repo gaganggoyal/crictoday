@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DocPage, type DocSection } from "@/components/layout/doc-page";
-import { CONTACT_EMAIL, POLICIES_UPDATED } from "@/lib/company";
+import { CONTACT_EMAIL, TERMS_UPDATED } from "@/lib/company";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
@@ -383,7 +383,7 @@ export default function TermsPage() {
           what you can post, and how to complain.
         </p>
       }
-      updated={POLICIES_UPDATED}
+      updated={TERMS_UPDATED}
       sections={SECTIONS}
     />
   );

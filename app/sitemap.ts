@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { currentTime } from "@/lib/clock";
-import { POLICIES_UPDATED, TICKET_POLICY_UPDATED } from "@/lib/company";
+import { PRIVACY_UPDATED, TERMS_UPDATED, TICKET_POLICY_UPDATED } from "@/lib/company";
 import { getDirectory } from "@/lib/data/catalog";
 import { INDIA_STATES, placeState } from "@/lib/data/india";
 import { stillToCome } from "@/lib/domain/filters";
@@ -43,7 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...new Map(items.map((item) => [key(item), item])).values(),
   ];
 
-  const policies = new Date(`${POLICIES_UPDATED}T00:00:00Z`);
   const pages = [
     entry(""),
     entry("/matches"),
@@ -51,10 +50,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/leagues"),
     entry("/academies"),
     entry("/get-listed"),
+    entry("/games/mystery-cricketer"),
     entry("/about"),
     entry("/contact"),
-    entry("/legal/terms", policies),
-    entry("/legal/privacy", policies),
+    entry("/legal/terms", new Date(`${TERMS_UPDATED}T00:00:00Z`)),
+    entry("/legal/privacy", new Date(`${PRIVACY_UPDATED}T00:00:00Z`)),
     entry("/how-we-check-ticket-links", new Date(`${TICKET_POLICY_UPDATED}T00:00:00Z`)),
     ...(matches.some((match) => match.demo) ? [entry("/about/demo-data")] : []),
   ];
