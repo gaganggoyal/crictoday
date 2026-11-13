@@ -52,6 +52,16 @@ const panel = "rounded-[1.25rem] border border-line bg-surface p-4 sm:p-5";
 const pill =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-medium transition";
 
+const MODES = [
+  ["daily", "Today's cricketer"],
+  ["practice", "Practice"],
+] as const;
+
+const NO_PLAYERS: Player[] = [];
+const NO_IDS = new Set<string>();
+const NO_GUESSES_YET =
+  "Your guesses show up here, each with seven clues about the mystery cricketer.";
+
 /**
  * Mystery Cricketer. The day is the visitor's own, so the game waits for the browser: the server
  * cannot know the visitor's date, or what this browser has kept.
@@ -59,17 +69,6 @@ const pill =
 export function MysteryCricketer(props: Props) {
   const hydrated = useHydrated();
   const [mode, setMode] = useState<"daily" | "practice">("daily");
-  if (!hydrated) {
-    return (
-      <div className={cn(panel, "grid gap-3")} aria-busy="true">
-        <p className="text-sm text-muted">Getting today&apos;s cricketer…</p>
-        <div className="h-12 rounded-xl border border-line bg-background" />
-        <noscript>
-          <p>Mystery Cricketer needs JavaScript to run in your browser.</p>
-        </noscript>
-      </div>
-    );
-  }
   return (
     <div className="grid gap-4">
       <div
@@ -77,19 +76,14 @@ export function MysteryCricketer(props: Props) {
         aria-label="Game"
         className="inline-flex w-fit rounded-full border border-line bg-surface p-1"
       >
-        {(
-          [
-            ["daily", "Today's cricketer"],
-            ["practice", "Practice"],
-          ] as const
-        ).map(([value, label]) => (
+        {MODES.map(([value, label]) => (
           <button
             key={value}
             type="button"
             aria-pressed={mode === value}
             onClick={() => setMode(value)}
             className={cn(
-              "min-h-10 rounded-full px-4 text-sm font-medium",
+              "min-h-11 rounded-full px-4 text-sm font-medium",
               mode === value ? "bg-[#176B43] text-white" : "text-muted hover:text-foreground",
             )}
           >
@@ -97,11 +91,41 @@ export function MysteryCricketer(props: Props) {
           </button>
         ))}
       </div>
-      {mode === "daily" ? (
+      {!hydrated ? (
+        <Loading />
+      ) : mode === "daily" ? (
         <Daily {...props} onPractice={() => setMode("practice")} />
       ) : (
         <Practice avoid={new Set(props.puzzles.map((puzzle) => puzzle.answer))} />
       )}
+    </div>
+  );
+}
+
+function ignore() {}
+
+/**
+ * The board of a new game, drawn by the server while the browser gets ready, so the page does
+ * not jump when the game starts. The guesses left stay hidden: this browser may have some.
+ */
+function Loading() {
+  return (
+    <div className="grid gap-4" aria-busy="true">
+      <div className={cn(panel, "grid gap-4")}>
+        <BoardHeading
+          title={
+            <span className="font-display text-2xl font-extrabold">Today&apos;s cricketer</span>
+          }
+          used={0}
+          hideCount
+        />
+        <PlayerPicker players={NO_PLAYERS} exclude={NO_IDS} onPick={ignore} disabled />
+        <ClueLegend />
+      </div>
+      <p className="text-sm text-muted">{NO_GUESSES_YET}</p>
+      <noscript>
+        <p className="font-semibold">Mystery Cricketer needs JavaScript to run in your browser.</p>
+      </noscript>
     </div>
   );
 }
@@ -207,25 +231,27 @@ function DailyGame({
               stats={stats(saved, puzzle.date)}
               today={result === "won" ? ids.length : null}
             />
-            <NextCricketer date={puzzle.date} />
             {next ? (
               <NextMatchLink next={next} country={answer.country} />
             ) : (
               <Link
                 href="/matches?kind=international"
-                className="inline-flex min-h-11 items-center gap-1.5 font-medium text-link underline underline-offset-4"
+                className="inline-flex min-h-11 w-fit items-center gap-1.5 font-medium text-link underline underline-offset-4"
               >
                 See upcoming internationals
               </Link>
             )}
-            <button
-              type="button"
-              onClick={onPractice}
-              className={cn(pill, "w-fit border border-line bg-background hover:bg-surface")}
-            >
-              <Shuffle aria-hidden="true" size={17} />
-              Play a practice round
-            </button>
+            <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+              <NextCricketer date={puzzle.date} />
+              <button
+                type="button"
+                onClick={onPractice}
+                className={cn(pill, "w-fit border border-line bg-background hover:bg-surface")}
+              >
+                <Shuffle aria-hidden="true" size={17} />
+                Play a practice round
+              </button>
+            </div>
           </Ending>
         )
       }
@@ -327,23 +353,7 @@ function Board({
   return (
     <div className="grid gap-4">
       <div className={cn(panel, "grid gap-4")}>
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-          <h2 className="flex flex-wrap items-baseline gap-x-2">{title}</h2>
-          <p className="flex items-center gap-2 text-sm text-muted">
-            <span aria-hidden="true" className="flex gap-1">
-              {Array.from({ length: MAX_GUESSES }, (_, index) => (
-                <span
-                  key={index}
-                  className={cn(
-                    "h-2.5 w-2.5 rounded-full border",
-                    index < ids.length ? "border-ball bg-ball" : "border-muted/50",
-                  )}
-                />
-              ))}
-            </span>
-            {left} of {MAX_GUESSES} guesses left
-          </p>
-        </div>
+        <BoardHeading title={title} used={ids.length} />
         {ending ? null : (
           <>
             <PlayerPicker players={PLAYERS} exclude={guessed} onPick={onGuess} />
@@ -375,10 +385,40 @@ function Board({
           ))}
         </ol>
       ) : (
-        <p className="text-sm text-muted">
-          Your guesses show up here, each with seven clues about the mystery cricketer.
-        </p>
+        <p className="text-sm text-muted">{NO_GUESSES_YET}</p>
       )}
+    </div>
+  );
+}
+
+/** The board's title, and the guesses used as balls with the number left. */
+function BoardHeading({
+  title,
+  used,
+  hideCount = false,
+}: {
+  title: ReactNode;
+  used: number;
+  /** Keep the count's room but leave it blank, while the guesses are not known yet. */
+  hideCount?: boolean;
+}) {
+  return (
+    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+      <h2 className="flex flex-wrap items-baseline gap-x-2">{title}</h2>
+      <p className={cn("flex items-center gap-2 text-sm text-muted", hideCount && "invisible")}>
+        <span aria-hidden="true" className="flex gap-1">
+          {Array.from({ length: MAX_GUESSES }, (_, index) => (
+            <span
+              key={index}
+              className={cn(
+                "h-2.5 w-2.5 rounded-full border",
+                index < used ? "border-ball bg-ball" : "border-muted/50",
+              )}
+            />
+          ))}
+        </span>
+        {MAX_GUESSES - used} of {MAX_GUESSES} guesses left
+      </p>
     </div>
   );
 }
@@ -406,7 +446,7 @@ function Ending({
   return (
     <section
       aria-labelledby="game-result"
-      className={cn(panel, "grid gap-5", won ? "border-hit" : "border-line")}
+      className={cn(panel, "@container grid gap-5", won ? "border-hit" : "border-line")}
     >
       <div>
         <h2
@@ -498,9 +538,9 @@ function ShareResult({ text }: { text: string }) {
   );
 }
 
+/** The record beside the chart of wins where the panel is wide, above it on a phone. */
 function Record({ stats: record, today }: { stats: Stats; today: number | null }) {
   const winRate = record.played ? Math.round((record.won / record.played) * 100) : 0;
-  const most = Math.max(1, ...record.wins);
   const figures: [string, number | string][] = [
     ["Played", record.played],
     ["Won", `${winRate}%`],
@@ -508,47 +548,102 @@ function Record({ stats: record, today }: { stats: Stats; today: number | null }
     ["Best streak", record.best],
   ];
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-5 @xl:grid-cols-2 @xl:gap-8">
       <div>
         <h3 className="font-display text-xl font-bold">Your record</h3>
         <dl className="mt-2 grid grid-cols-4 gap-2">
           {figures.map(([name, value]) => (
+            // Value above name, and the values level whether or not a name wraps.
             <div
               key={name}
-              className="flex flex-col-reverse rounded-xl bg-background px-2 py-2.5 text-center"
+              className="flex flex-col-reverse justify-end rounded-xl bg-background px-1 py-2.5 text-center"
             >
-              <dt className="text-xs text-muted">{name}</dt>
-              <dd className="font-display text-2xl font-extrabold">{value}</dd>
+              <dt className="text-xs leading-tight text-muted">{name}</dt>
+              <dd className="font-display text-xl font-extrabold tabular-nums @min-[18rem]:text-2xl">
+                {value}
+              </dd>
             </div>
           ))}
         </dl>
-      </div>
-      <div>
-        <h3 className="font-display text-xl font-bold">Guesses to win</h3>
-        <ol className="mt-2 grid gap-1">
-          {record.wins.map((count, index) => (
-            <li key={index} className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-2">
-              <span className="text-right text-sm text-muted">{index + 1}</span>
-              <span
-                className={cn(
-                  "flex h-6 min-w-7 items-center justify-end rounded-md px-2 text-xs font-semibold",
-                  today === index + 1 ? "bg-hit text-hit-ink" : "bg-background text-foreground",
-                )}
-                style={{ width: `${Math.max(8, (count / most) * 100)}%` }}
-              >
-                <span className="sr-only">
-                  {count} {count === 1 ? "win" : "wins"} in {index + 1}{" "}
-                  {index === 0 ? "guess" : "guesses"}
-                </span>
-                <span aria-hidden="true">{count}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
         <p className="mt-2 text-xs text-muted">
           Kept in this browser, on this device. Clearing your browsing data clears it.
         </p>
       </div>
+      <WinChart wins={record.wins} today={today} />
+    </div>
+  );
+}
+
+function winsIn(count: number, guesses: number) {
+  return `${count} ${count === 1 ? "win" : "wins"} in ${guesses} ${guesses === 1 ? "guess" : "guesses"}`;
+}
+
+/**
+ * Wins by the guesses they took, as columns, with today's win in green and the rest grey. Each
+ * column is labelled with its count; the list after the columns says the same in words.
+ */
+function WinChart({ wins, today }: { wins: number[]; today: number | null }) {
+  const most = Math.max(1, ...wins);
+  if (wins.every((count) => count === 0)) {
+    // Empty columns would only look broken.
+    return (
+      <div>
+        <h3 className="font-display text-xl font-bold">Guesses to win</h3>
+        <p className="mt-2 text-sm text-muted">
+          No wins yet. Each win adds to a column for the number of guesses it took.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div>
+      <h3 id="wins-by-guesses" className="font-display text-xl font-bold">
+        Guesses to win
+      </h3>
+      <div aria-hidden="true" className="mt-2">
+        <div className="grid h-20 grid-cols-8 items-end gap-0.5 border-b border-line">
+          {wins.map((count, index) => (
+            <div
+              key={index}
+              title={winsIn(count, index + 1)}
+              className="flex h-full flex-col items-center justify-end gap-1"
+            >
+              {count ? (
+                <>
+                  <span
+                    className={cn(
+                      "text-xs tabular-nums",
+                      today === index + 1 ? "font-bold" : "font-semibold text-muted",
+                    )}
+                  >
+                    {count}
+                  </span>
+                  <span
+                    className={cn(
+                      "w-full max-w-6 rounded-t",
+                      today === index + 1 ? "bg-link" : "bg-muted/60",
+                    )}
+                    style={{ height: `${Math.max(4, Math.round((count / most) * 52))}px` }}
+                  />
+                </>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 grid grid-cols-8 gap-0.5 text-center text-xs text-muted">
+          {wins.map((_, index) => (
+            <span key={index}>{index + 1}</span>
+          ))}
+        </div>
+      </div>
+      <ol aria-labelledby="wins-by-guesses" className="sr-only">
+        {wins.map((count, index) => (
+          <li key={index}>
+            {winsIn(count, index + 1)}
+            {today === index + 1 ? ", including today" : ""}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

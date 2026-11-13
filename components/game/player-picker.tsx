@@ -1,24 +1,28 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { COUNTRIES, ROLES, type Player } from "@/lib/game/players";
 import { searchPlayers } from "@/lib/game/search";
 import { cn } from "@/lib/utils";
 
 /**
  * The guess box: type part of a name and pick the cricketer from the list. Arrow keys move
- * through the list, Enter picks and Escape closes it, as in the ARIA combobox pattern.
+ * through the list, Enter picks and Escape closes it, as in the ARIA combobox pattern. With a
+ * keyboard, typing a letter anywhere on the page starts a guess.
  */
 export function PlayerPicker({
   players,
   exclude,
   onPick,
+  disabled = false,
 }: {
   players: Player[];
   /** Cricketers already guessed. */
   exclude: Set<string>;
   onPick: (player: Player) => void;
+  /** The same box, not yet usable, while the game loads. */
+  disabled?: boolean;
 }) {
   const id = useId();
   const listId = `${id}-options`;
@@ -42,12 +46,36 @@ export function PlayerPicker({
     [showing, results, query, players, exclude],
   );
 
+  useEffect(() => {
+    if (disabled) return;
+    function onType(event: globalThis.KeyboardEvent) {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+      if (!/^[a-z]$/i.test(event.key)) return;
+      // Only when nothing has focus, so menus, the site search and other fields keep their keys.
+      if (document.activeElement && document.activeElement !== document.body) return;
+      // Add the letter here rather than trust each browser to type it into a box that took focus
+      // during the key press.
+      event.preventDefault();
+      input.current?.focus();
+      setQuery((typed) => typed + event.key);
+      setActive(0);
+      setOpen(true);
+    }
+    document.addEventListener("keydown", onType);
+    return () => document.removeEventListener("keydown", onType);
+  }, [disabled]);
+
   function pick(player: Player) {
     onPick(player);
     setQuery("");
     setActive(0);
     setOpen(false);
-    input.current?.focus();
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      // On a touch screen the keyboard would cover the new guess's clues, so put it away.
+      input.current?.blur();
+    } else {
+      input.current?.focus();
+    }
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -91,7 +119,10 @@ export function PlayerPicker({
           autoCapitalize="words"
           spellCheck={false}
           enterKeyHint="go"
-          placeholder="Start typing a name, such as Kohli"
+          disabled={disabled}
+          placeholder={
+            disabled ? "Getting today's cricketer…" : "Start typing a name, such as Kohli"
+          }
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);

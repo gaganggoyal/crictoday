@@ -54,3 +54,39 @@ test("the game is linked from the footer, carries a share image and fits a 320px
   );
   expect(overflow).toBe(false);
 });
+
+test("with a keyboard, typing anywhere on the page goes to the guess box", async ({ page }) => {
+  await page.goto(GAME);
+  const box = page.getByRole("combobox", { name: "Guess a cricketer" });
+  await expect(box).toBeEnabled();
+  // Give the game a frame to start listening once its box is ready.
+  await page.evaluate(
+    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  );
+  await page.keyboard.type("tendul");
+  await expect(box).toBeFocused();
+  await expect(box).toHaveValue("tendul");
+  await expect(page.getByRole("option", { name: /Sachin Tendulkar/ })).toBeVisible();
+});
+
+test.describe("on a small touch-screen phone", () => {
+  test.use({ viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true });
+
+  test("the guess box is on the first screen, and a guess puts the keyboard away so its clues show", async ({
+    page,
+  }) => {
+    await page.goto(GAME);
+    const box = page.getByRole("combobox", { name: "Guess a cricketer" });
+    await expect(box).toBeInViewport({ ratio: 1 });
+    await box.tap();
+    await box.fill("tendulkar");
+    await page.getByRole("option", { name: /Sachin Tendulkar/ }).tap();
+    await expect(page.getByText("7 of 8 guesses left")).toBeVisible();
+    await expect(box).not.toBeFocused();
+    const newest = page
+      .getByRole("list", { name: "Your guesses, newest first" })
+      .getByRole("listitem")
+      .first();
+    await expect(newest).toBeInViewport({ ratio: 1 });
+  });
+});
