@@ -20,7 +20,7 @@ describe("fixture files", () => {
     expect(new Set(matches.map((match) => match.slugBase)).size).toBe(matches.length);
     expect(matches.every((match) => match.sourceUrl?.startsWith("https://"))).toBe(true);
     expect(matches.every((match) => match.sourceType === "admin" && !match.demo)).toBe(true);
-    expect(matches.filter((match) => match.tickets)).toHaveLength(145);
+    expect(matches.filter((match) => match.tickets)).toHaveLength(171);
   });
 
   it("gives each official ticket link its seller, domain and sale state", () => {
@@ -61,11 +61,24 @@ describe("fixture files", () => {
     expect(find("fixtures:bbl-16:match-1").tickets?.onSaleAt).toBe("2026-10-10T12:30:00.000Z");
   });
 
-  it("hides the Delhi ODI until the BCCI names another ground", () => {
-    expect(find("fixtures:sri-lanka-in-india-2026-27:odi-1")).toMatchObject({
-      status: "draft",
+  it("moves the 1st ODI against Sri Lanka from Delhi to Visakhapatnam, as the BCCI announced", () => {
+    // A new key, so the match gets an address with its new town; the hidden Delhi row stays hidden.
+    expect(find("fixtures:sri-lanka-in-india-2026-27:odi-1-visakhapatnam")).toMatchObject({
+      status: "published",
+      venueName: "ACA-VDCA Cricket Stadium",
+      citySlug: "visakhapatnam",
+      stateSlug: "andhra-pradesh",
+      startsAt: "2026-12-13T08:30:00.000Z",
+      slugBase: "india-vs-sri-lanka-1st-odi-visakhapatnam-2026-12-13",
       tickets: null,
     });
+  });
+
+  it("keeps a series' own earlier check time when its source could not be read", () => {
+    expect(find("fixtures:india-in-new-zealand-2026-27:test-1").lastVerifiedAt).toBe(
+      "2026-10-06T04:41:00.000Z",
+    );
+    expect(find("fixtures:bbl-16:match-1").lastVerifiedAt).toBe(file.checkedAt);
   });
 
   it("rejects a ticket link that is not a full https address", () => {
@@ -133,6 +146,9 @@ describe("fixture files", () => {
     const future = structuredClone(file);
     future.checkedAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     expect(() => buildFixtureMatches(future)).toThrow(/checkedAt cannot be in the future/);
+    const series = structuredClone(file);
+    series.series[0].checkedAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    expect(() => buildFixtureMatches(series)).toThrow(/checkedAt cannot be in the future/);
   });
 
   it("rejects a start time without the local date and time", () => {

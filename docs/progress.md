@@ -1,6 +1,6 @@
 # Progress
 
-Updated 13 November 2026, after making Mystery Cricketer easier to play on phones and with a keyboard.
+Updated 13 November 2026, after rechecking the fixtures against the boards' and leagues' own sources.
 
 ## Done
 
@@ -24,7 +24,7 @@ Updated 13 November 2026, after making Mystery Cricketer easier to play on phone
 - Real fixtures since 6 October 2026. [data/fixtures/2026-27.json](../data/fixtures/2026-27.json) lists 209 matches in 23 series, each linked to the board's or organiser's own page: internationals in India, Australia, South Africa, New Zealand, Pakistan, Bangladesh and the UAE, and the WBBL|12, BBL|16 and SA20 2027 regular seasons. `pnpm db load-fixtures` loaded them, and the DEMO matches and academies were removed. The database was backed up first, in `/root/backups/`.
 - Email is on since 5 October 2026. Resend sends from `hello@cricketmatch.today` with a send-only key, and Spaceship forwards `admin@` and `hello@`. A sign-in email to admin@ and a test to hello@ were both delivered. On the server, `pnpm db sign-in-link <email>` prints a one-time sign-in link without email.
 - Emails are HTML in the site's style, with a plain-text part: the logo, the ball-in-grass banner, and for alerts a match panel with kick-off, venue and seller. `pnpm email:preview` writes or sends samples.
-- Official ticket links since 6 October 2026, for 145 of the 209 matches. They come from Cricket Australia's fixture data, Cricket South Africa's Ticketpro shop, New Zealand Cricket's ticket site, the state associations' District and ticketgenie pages, and the PCB's ticket site; sold-out matches say so. The fixture file lists them, and a link can wait for its sale to open. The hourly sync loads `data/fixtures`, so the file goes live within the hour of a deploy, and it emails the ticket alerts that new links answer.
+- Official ticket links since 6 October 2026, for 171 of the 209 matches after the check of 13 November. They come from Cricket Australia's fixture data, SA20's ticket site, Cricket South Africa's Ticketpro shop, New Zealand Cricket's ticket site, the state associations' District and ticketgenie pages, and the PCB's ticket site; sold-out matches say so. The fixture file lists them, and a link can wait for its sale to open. The hourly sync loads `data/fixtures`, so the file goes live within the hour of a deploy, and it emails the ticket alerts that new links answer.
 - Browse by place since 6 October 2026. A shop-style menu opens Countries, then India's 28 states and 8 union territories, then their towns, from `lib/data/india.ts`; phones get a drill-down drawer. Every state has a page, and every listed Indian town has one even before anything is listed there. Matches and profiles store their state.
 - Club and academy profiles since 6 October 2026. Academies, clubs, committees and leagues, and grounds and turfs sign in with their email and create a profile: about, place, contact with WhatsApp and social links, age groups, facilities, and offers such as coaching, camps, trials, nets, ground hire, tournament entry and membership. They post matches from a short form with "post and add another" for tournament schedules, and can edit, postpone or cancel them. A moderator checks each profile once at `/admin/profiles`; until then it and its matches stay hidden. Approved profiles publish matches at once with the profile as their source. Moderators are emailed about new profiles, and owners when a profile goes live or is sent back.
 - Profile pictures since 6 October 2026. Owners add a logo, a cover photo and up to 12 photos with captions, in order. The browser shrinks phone photos before sending; the server checks the file, turns it upright, strips camera and GPS data, and stores two WebP sizes. Cards, profile pages, match pages ("Posted by" with the logo), structured data and WhatsApp or social link previews use them. Moderators see new pictures on live profiles at `/admin/profiles` and can take any down.
@@ -67,9 +67,9 @@ Updated 13 November 2026, after making Mystery Cricketer easier to play on phone
 
 ## Not done
 
-- Some scheduled matches wait for confirmed start times, and knockouts wait for their teams. India v Sri Lanka in Delhi on 13 December is hidden until the BCCI names a new ground. [data/fixtures/README.md](../data/fixtures/README.md) lists them.
-- 64 matches have no ticket link yet, mostly because their sales have not opened. The README lists them.
-- Sold-out states and new ticket links need someone to recheck the boards' pages; nothing fetches them automatically.
+- Some scheduled matches wait for confirmed start times, and knockouts wait for their teams. [data/fixtures/README.md](../data/fixtures/README.md) lists them.
+- 22 matches still to come have no ticket link yet, most of them India's home series, whose seller the BCCI has not named. The README lists them.
+- The fixtures need rechecking every week, because a match not checked for a week says so on the site. The last check was on 13 November 2026; India's matches in New Zealand and Pakistan v Sri Lanka in Lahore could not be checked then and still show the 6 October check. Nothing fetches the boards' pages automatically, and Ticketek and Ticketmaster refuse automated reading, so sold-out Australian matches are marked by hand.
 - No clubs or academies are listed yet; the first will come through the new profiles.
 - Profiles are created and edited only with the MySQL database. The demo store and the Supabase path show their academies read-only.
 - No live provider tokens are configured.

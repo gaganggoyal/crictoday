@@ -624,13 +624,12 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
       updated: 0,
       unchanged: 0,
       skipped: [],
-      tickets: { added: 138, updated: 0, withdrawn: 0, waiting: 7 },
+      tickets: { added: 164, updated: 0, withdrawn: 0, waiting: 7 },
     });
-    // The Delhi ODI is stored but hidden until it has a ground.
     const listed = (await loadDirectory(pool)).matches.filter((match) =>
       match.sourceExternalId?.startsWith("fixtures:"),
     );
-    expect(listed).toHaveLength(208);
+    expect(listed).toHaveLength(209);
     const lucknow = "fixtures:west-indies-in-india-2026-27:t20i-1";
     expect(listed.find((match) => match.sourceExternalId === lucknow)).toMatchObject({
       slug: "india-vs-west-indies-1st-t20i-lucknow-2026-10-06",
@@ -793,7 +792,7 @@ describe.skipIf(!serverUrl)("MySQL backend", () => {
 
     // A sold-out link that reopens is updated, and a link the file drops comes down.
     const reopened = "fixtures:england-in-south-africa-2026-27:odi-1";
-    const dropped = "fixtures:australia-women-in-south-africa-2026-27:test";
+    const dropped = "fixtures:australia-women-in-south-africa-2026-27:odi-3";
     const changed = fixtures.map((fixture) =>
       fixture.sourceExternalId === reopened
         ? { ...fixture, tickets: { ...fixture.tickets!, status: "active" as const } }
