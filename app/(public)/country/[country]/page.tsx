@@ -106,7 +106,9 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
         ))}
       </div>
       <section className="mt-12">
-        <h2 className="mb-4 font-display text-3xl font-extrabold">Clubs, academies and grounds</h2>
+        <h2 className="mb-4 font-display text-3xl font-extrabold">
+          {academies.length ? "Clubs, academies and grounds" : "Clubs and academies"}
+        </h2>
         {academies.length ? <ProfileGrid profiles={academies} /> : null}
         <div className={academies.length ? "mt-6" : ""}>
           <ListYoursCallout place={country.name} />
