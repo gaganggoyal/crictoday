@@ -43,8 +43,19 @@ const fixtureSchema = z.object({
   tickets: ticketsSchema.optional(),
 });
 
+// When a file or series was last compared with its sources. Five minutes' grace for clock skew; a
+// check cannot be dated later than that.
+const checkTime = z.iso
+  .datetime()
+  .refine(
+    (value) => new Date(value).getTime() <= Date.now() + 5 * 60 * 1000,
+    "checkedAt cannot be in the future.",
+  );
+
 const seriesSchema = z.object({
   id: slug,
+  // A series whose source could not be read at the file's last check keeps its own, earlier time.
+  checkedAt: checkTime.optional(),
   competition: z.string().trim().min(2).max(120),
   competitionSlug: slug,
   kind: z.enum(["international", "league", "domestic"]),
@@ -60,13 +71,7 @@ const seriesSchema = z.object({
 });
 
 export const fixtureFileSchema = z.object({
-  // Five minutes' grace for clock skew; a check cannot be dated later than that.
-  checkedAt: z.iso
-    .datetime()
-    .refine(
-      (value) => new Date(value).getTime() <= Date.now() + 5 * 60 * 1000,
-      "checkedAt cannot be in the future.",
-    ),
+  checkedAt: checkTime,
   countries: z.record(slug, z.string().trim().min(2)),
   teams: z.record(
     slug,
@@ -191,7 +196,7 @@ export function buildFixtureMatches(input: unknown): FixtureMatch[] {
         sourceUrl: series.source.url,
         sourceLabel: series.source.label,
         featuredRank: 0,
-        lastVerifiedAt: file.checkedAt,
+        lastVerifiedAt: series.checkedAt ?? file.checkedAt,
         publishedAt: null,
         entryNotes: null,
         demo: false,
