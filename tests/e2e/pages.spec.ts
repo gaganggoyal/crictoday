@@ -129,6 +129,30 @@ test("team and ground pages list only matches still to come", async ({ page }) =
   expect(sitemap).not.toContain("/teams/india-a</loc>");
 });
 
+test("a city page names its grounds and links on to the country's other cities", async ({
+  page,
+}) => {
+  await page.goto("/country/india/ahmedabad");
+  // No club or academy is listed in Ahmedabad, so the title does not promise one.
+  await expect(page).toHaveTitle(/^Cricket in Ahmedabad: matches, grounds and tickets · /);
+  const grounds = page.getByRole("region", { name: "Grounds in Ahmedabad" });
+  await expect(grounds.getByRole("link", { name: /^Narendra Modi Stadium/ })).toHaveAttribute(
+    "href",
+    "/venues/narendra-modi-stadium",
+  );
+  await expect(grounds.getByText(/to come, the next on \d+ \w+ 2026/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Clubs and academies" })).toBeVisible();
+  const more = page.getByRole("region", { name: "More cricket in India" });
+  await expect(more.getByRole("link", { name: /^Mumbai \d+ match/ })).toHaveAttribute(
+    "href",
+    "/country/india/mumbai",
+  );
+  await expect(more.getByRole("link", { name: "All of India" })).toHaveAttribute(
+    "href",
+    "/country/india",
+  );
+});
+
 test("the new pages fit a 320px screen", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 720 });
   for (const path of [
