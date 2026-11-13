@@ -1,6 +1,6 @@
 # Progress
 
-Updated 12 November 2026, after adding Mystery Cricketer, a daily guess-the-cricketer game.
+Updated 13 November 2026, after making Mystery Cricketer easier to play on phones and with a keyboard.
 
 ## Done
 
@@ -62,7 +62,8 @@ Updated 12 November 2026, after adding Mystery Cricketer, a daily guess-the-cric
   - a new cricketer at midnight in each visitor's time zone, the same for everyone on a date, found in eight guesses. Each guess shows seven clues: country, role, bowling, batting, age, debut year and last IPL team, as a match, close or neither, with arrows for age and debut;
   - 1,316 guessable men who have played for a Full Member since 2012, and 193 well-known answers in a 386-day schedule that stays on the server. [data/game/README.md](../data/game/README.md) has the sources and rules: Cricsheet's match records and Wikipedia, with Afghanistan from Wikipedia because Cricsheet withholds its matches;
   - results share as coloured squares (Share, WhatsApp or copy), and the record, streak and guesses-to-win chart stay in the browser; the privacy policy names the storage key. A practice mode never deals one of the day's answers;
-  - a finished game links to the cricketer's country's next listed match. The home page, the browse bar on wide screens, the phone menu and the footer link to the game, and it has its own link preview at `/og/game`.
+  - a finished game links to the cricketer's country's next listed match. The home page, the browse bar on wide screens, the phone menu and the footer link to the game, and it has its own link preview at `/og/game`;
+  - on a phone the guess box is on the first screen, down to 320 by 568, and each guess puts the keyboard away so its clues show. The server draws the board before the game starts in the browser, so nothing jumps. With a keyboard, typing anywhere on the page starts a guess, and on wide screens the result puts the record beside the guesses-to-win chart.
 
 ## Not done
 

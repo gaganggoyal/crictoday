@@ -104,22 +104,27 @@ export default async function MysteryCricketerPage() {
   const updated = LONG_DATE.format(new Date(`${PLAYERS_UPDATED}T00:00:00Z`));
 
   return (
-    <div className="mx-auto w-full max-w-[1120px] px-5 py-10">
+    // On a phone the header stays short, so the guess box is on the first screen.
+    <div className="mx-auto w-full max-w-[1120px] px-5 pt-6 pb-10 sm:pt-10">
       <header className="max-w-3xl">
         <p className="text-xs font-semibold tracking-[0.16em] text-link uppercase">
           Daily cricket game
         </p>
-        <h1 className="mt-2 font-display text-5xl leading-[0.98] font-extrabold tracking-tight sm:text-6xl">
+        {/* One line from a 320px phone up: 34px there, growing to 60px. */}
+        <h1 className="mt-2 font-display text-[clamp(2.125rem,10.5vw,3.75rem)] leading-[0.98] font-extrabold tracking-tight">
           Mystery Cricketer
         </h1>
-        <p className="mt-4 text-lg text-muted">
-          Guess today&apos;s cricketer in {MAX_GUESSES} tries. Each guess shows how close you are:
-          his country, role, batting, bowling, age, debut and last IPL team. A new cricketer arrives
-          at midnight, your time.
+        <p className="mt-2 text-muted sm:mt-4 sm:text-lg">
+          Guess today&apos;s cricketer in {MAX_GUESSES} tries.{" "}
+          <span className="hidden sm:inline">
+            Each guess shows how close you are: his country, role, batting, bowling, age, debut and
+            last IPL team.{" "}
+          </span>
+          A new cricketer arrives at midnight, your time.
         </p>
       </header>
 
-      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10">
+      <div className="mt-6 grid gap-12 sm:mt-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10">
         <div className="min-w-0">
           <MysteryCricketer
             puzzles={puzzlesNow(now)}
