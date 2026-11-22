@@ -217,8 +217,10 @@ const SECTIONS: DocSection[] = [
         <p>
           We use no analytics, advertising or social media cookies. Our pages load nothing from
           other companies&apos; servers: the fonts, pictures and code all come from
-          cricketmatch.today. If we ever add analytics, we will update this policy before we switch
-          it on.
+          cricketmatch.today. The one exception is a YouTube video on a live stream page, and only
+          once you press play: the player then loads from YouTube&apos;s privacy-enhanced
+          youtube-nocookie.com, and Google&apos;s privacy policy covers what it collects. If we ever
+          add analytics, we will update this policy before we switch it on.
         </p>
       </>
     ),

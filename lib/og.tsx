@@ -189,6 +189,11 @@ export function gameImage() {
   );
 }
 
+/** A live stream page's preview: the match, its ground and its start. */
+export function streamImage(card: { kicker: string; title: string; lines: string[] }) {
+  return render({ ...card, badge: "Watch the stream" }, "public, max-age=86400");
+}
+
 /** A match's preview: teams, label, ground, local start and ticket state. */
 export function matchImage(match: StoredMatch, now: Date) {
   const state = resolveAttendance(match, match.offers, now);

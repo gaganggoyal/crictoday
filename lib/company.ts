@@ -6,7 +6,7 @@ export const CONTACT_EMAIL = "hello@cricketmatch.today";
 export const TERMS_UPDATED = "2026-10-06";
 
 /** When the privacy policy last changed, as YYYY-MM-DD: Mystery Cricketer's browser storage. */
-export const PRIVACY_UPDATED = "2026-11-12";
+export const PRIVACY_UPDATED = "2026-11-22";
 
 /** When "How we check ticket links", the ticket policy, last changed, as YYYY-MM-DD. */
 export const TICKET_POLICY_UPDATED = "2026-10-07";

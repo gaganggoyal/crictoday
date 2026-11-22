@@ -7,6 +7,7 @@ import { stillToCome } from "@/lib/domain/filters";
 import { profilePath } from "@/lib/domain/profiles";
 import type { StoredMatch } from "@/lib/domain/types";
 import { siteUrl } from "@/lib/utils";
+import { WATCH_PAGES, watchPath } from "@/lib/watch";
 
 /** The newest of some dates, or undefined: an unknown date is left out rather than guessed. */
 function latest(dates: Array<string | null | undefined>) {
@@ -56,6 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/legal/terms", new Date(`${TERMS_UPDATED}T00:00:00Z`)),
     entry("/legal/privacy", new Date(`${PRIVACY_UPDATED}T00:00:00Z`)),
     entry("/how-we-check-ticket-links", new Date(`${TICKET_POLICY_UPDATED}T00:00:00Z`)),
+    ...WATCH_PAGES.map((page) => entry(watchPath(page), new Date(page.checkedAt))),
     ...(matches.some((match) => match.demo) ? [entry("/about/demo-data")] : []),
   ];
 

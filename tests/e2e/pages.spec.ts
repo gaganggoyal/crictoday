@@ -162,6 +162,7 @@ test("the new pages fit a 320px screen", async ({ page }) => {
     "/legal/privacy",
     "/legal/terms",
     "/matches?when=today",
+    "/watch/india-a-vs-pakistan-a-asia-cup-rising-stars-2026",
   ]) {
     await page.goto(path);
     const overflow = await page.evaluate(
@@ -169,4 +170,35 @@ test("the new pages fit a 320px screen", async ({ page }) => {
     );
     expect(overflow, path).toBe(false);
   }
+});
+
+test("a live stream page loads nothing from YouTube until play is pressed", async ({ page }) => {
+  const youtube: string[] = [];
+  page.on("request", (request) => {
+    if (/youtube|ytimg|googlevideo/.test(new URL(request.url()).hostname)) {
+      youtube.push(request.url());
+    }
+  });
+  // The test never plays the video for real.
+  await page.route(/youtube-nocookie\.com/, (route) => route.abort());
+  await page.goto("/watch/india-a-vs-pakistan-a-asia-cup-rising-stars-2026");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("India A vs Pakistan A live");
+  await expect(page).toHaveTitle(
+    "India A vs Pakistan A live stream – Asia Cup Rising Stars 2026 · cricketmatch.today",
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    /\/og\/watch\/india-a-vs-pakistan-a-asia-cup-rising-stars-2026$/,
+  );
+  const play = page.getByRole("link", { name: "Play India A vs Pakistan A live stream" });
+  await expect(play).toHaveAttribute("href", "https://www.youtube.com/watch?v=yG06f6yORy4");
+  await expect(page.locator("iframe")).toHaveCount(0);
+  expect(youtube).toEqual([]);
+  // Once the page's script runs, play opens the player here instead of following the link.
+  await expect(play).toHaveAttribute("data-ready", "");
+  await play.click();
+  await expect(page.locator("iframe")).toHaveAttribute(
+    "src",
+    /^https:\/\/www\.youtube-nocookie\.com\/embed\/yG06f6yORy4\?/,
+  );
 });
