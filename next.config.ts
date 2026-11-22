@@ -10,6 +10,8 @@ function contentSecurityPolicy() {
     "img-src 'self' data: blob:",
     "font-src 'self'",
     "connect-src 'self' https://*.supabase.co https://us.i.posthog.com https://*.sentry.io",
+    // A live stream page's YouTube player, loaded only when the visitor presses play.
+    "frame-src https://www.youtube-nocookie.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

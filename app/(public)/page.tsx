@@ -23,6 +23,7 @@ import { ATTENDANCE_COPY, isOver, ticketRoute } from "@/lib/domain/ticket-state"
 import { formatInTimeZone, formatShortDate } from "@/lib/domain/time";
 import type { StoredMatch } from "@/lib/domain/types";
 import { homeJsonLd, matchName, pageMetadata, upcomingMatches } from "@/lib/seo";
+import { liveStreams, watchPath } from "@/lib/watch";
 import hero from "@/public/images/hero.jpg";
 
 const home = pageMetadata(
@@ -92,6 +93,7 @@ export default async function HomePage() {
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))
     .slice(0, 8);
   const comingUp = upcomingMatches(directory.matches, now);
+  const live = liveStreams(now)[0];
 
   return (
     <>
@@ -108,6 +110,23 @@ export default async function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#101612] via-[#101612]/75 to-[#101612]/25" />
         <div className="relative mx-auto flex min-h-[92svh] w-full max-w-[1120px] flex-col justify-end px-5 pt-20 pb-12 text-[#F3F5EF]">
+          {live ? (
+            <Link
+              href={watchPath(live)}
+              className="mb-5 inline-flex min-h-11 w-fit max-w-full items-center gap-2 rounded-full bg-[#D85F25] px-4 text-sm font-semibold text-white no-underline hover:bg-[#B94E1C]"
+            >
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-white"
+              />
+              <span>
+                Live now: <span className="sm:hidden">{live.short}</span>
+                <span className="hidden sm:inline">{live.name}</span>
+              </span>
+              <span className="hidden font-normal text-white/90 sm:inline">· Watch the stream</span>
+              <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
+            </Link>
+          ) : null}
           <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[#F3F5EF]/85 uppercase">
             <BadgeCheck aria-hidden="true" className="h-4 w-4 shrink-0 text-[#8EE0B0]" />
             Official ticket sources checked
